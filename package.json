@@ -1,7 +1,7 @@
 {
   "name": "@ldesign/webcomponent",
-  "version": "1.0.0",
-  "description": "基于 Stencil 的 Web Component 组件库",
+  "version": "2.0.0",
+  "description": "高性能、现代化的 Web Components 组件库，支持虚拟滚动、按需导入、完整主题系统",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -22,8 +22,334 @@
       "require": "./loader/index.cjs.js",
       "types": "./loader/index.d.ts"
     },
-    "./components/*": {
-      "import": "./dist/components/*.js"
+    "./dist/*": "./dist/*",
+    "./components/*": "./dist/components/*",
+    "./styles/*": {
+      "default": "./src/styles/*"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/types/utils/index.d.ts"
+    },
+    "./affix": {
+      "import": "./dist/components/affix.js",
+      "types": "./dist/types/components/affix/affix.d.ts"
+    },
+    "./alert": {
+      "import": "./dist/components/alert.js",
+      "types": "./dist/types/components/alert/alert.d.ts"
+    },
+    "./anchor": {
+      "import": "./dist/components/anchor.js",
+      "types": "./dist/types/components/anchor/anchor.d.ts"
+    },
+    "./avatar": {
+      "import": "./dist/components/avatar.js",
+      "types": "./dist/types/components/avatar/avatar.d.ts"
+    },
+    "./backtop": {
+      "import": "./dist/components/backtop.js",
+      "types": "./dist/types/components/backtop/backtop.d.ts"
+    },
+    "./breadcrumb": {
+      "import": "./dist/components/breadcrumb.js",
+      "types": "./dist/types/components/breadcrumb/breadcrumb.d.ts"
+    },
+    "./button": {
+      "import": "./dist/components/button.js",
+      "types": "./dist/types/components/button/button.d.ts"
+    },
+    "./calendar": {
+      "import": "./dist/components/calendar.js",
+      "types": "./dist/types/components/calendar/calendar.d.ts"
+    },
+    "./card": {
+      "import": "./dist/components/card.js",
+      "types": "./dist/types/components/card/card.d.ts"
+    },
+    "./cascader": {
+      "import": "./dist/components/cascader.js",
+      "types": "./dist/types/components/cascader/cascader.d.ts"
+    },
+    "./checkbox": {
+      "import": "./dist/components/checkbox.js",
+      "types": "./dist/types/components/checkbox/checkbox.d.ts"
+    },
+    "./checkbox-group": {
+      "import": "./dist/components/checkbox-group.js",
+      "types": "./dist/types/components/checkbox-group/checkbox-group.d.ts"
+    },
+    "./circle-navigation": {
+      "import": "./dist/components/circle-navigation.js",
+      "types": "./dist/types/components/circle-navigation/circle-navigation.d.ts"
+    },
+    "./col": {
+      "import": "./dist/components/col.js",
+      "types": "./dist/types/components/col/col.d.ts"
+    },
+    "./collapse": {
+      "import": "./dist/components/collapse.js",
+      "types": "./dist/types/components/collapse/collapse.d.ts"
+    },
+    "./color-input": {
+      "import": "./dist/components/color-input.js",
+      "types": "./dist/types/components/color-input/color-input.d.ts"
+    },
+    "./color-picker": {
+      "import": "./dist/components/color-picker.js",
+      "types": "./dist/types/components/color-picker/color-picker.d.ts"
+    },
+    "./color-picker-panel": {
+      "import": "./dist/components/color-picker-panel.js",
+      "types": "./dist/types/components/color-picker-panel/color-picker-panel.d.ts"
+    },
+    "./countdown": {
+      "import": "./dist/components/countdown.js",
+      "types": "./dist/types/components/countdown/countdown.d.ts"
+    },
+    "./datepicker": {
+      "import": "./dist/components/datepicker.js",
+      "types": "./dist/types/components/datepicker/datepicker.d.ts"
+    },
+    "./descriptions": {
+      "import": "./dist/components/descriptions.js",
+      "types": "./dist/types/components/descriptions/descriptions.d.ts"
+    },
+    "./divider": {
+      "import": "./dist/components/divider.js",
+      "types": "./dist/types/components/divider/divider.d.ts"
+    },
+    "./draggable": {
+      "import": "./dist/components/draggable.js",
+      "types": "./dist/types/components/draggable/draggable.d.ts"
+    },
+    "./drawer": {
+      "import": "./dist/components/drawer.js",
+      "types": "./dist/types/components/drawer/drawer.d.ts"
+    },
+    "./dropdown": {
+      "import": "./dist/components/dropdown.js",
+      "types": "./dist/types/components/dropdown/dropdown.d.ts"
+    },
+    "./dropdown-panel": {
+      "import": "./dist/components/dropdown-panel.js",
+      "types": "./dist/types/components/dropdown-panel/dropdown-panel.d.ts"
+    },
+    "./ellipsis": {
+      "import": "./dist/components/ellipsis.js",
+      "types": "./dist/types/components/ellipsis/ellipsis.d.ts"
+    },
+    "./empty": {
+      "import": "./dist/components/empty.js",
+      "types": "./dist/types/components/empty/empty.d.ts"
+    },
+    "./form": {
+      "import": "./dist/components/form.js",
+      "types": "./dist/types/components/form/form.d.ts"
+    },
+    "./grid": {
+      "import": "./dist/components/grid.js",
+      "types": "./dist/types/components/grid/grid.d.ts"
+    },
+    "./grid-item": {
+      "import": "./dist/components/grid-item.js",
+      "types": "./dist/types/components/grid-item/grid-item.d.ts"
+    },
+    "./icon": {
+      "import": "./dist/components/icon.js",
+      "types": "./dist/types/components/icon/icon.d.ts"
+    },
+    "./image": {
+      "import": "./dist/components/image.js",
+      "types": "./dist/types/components/image/image.d.ts"
+    },
+    "./image-preview": {
+      "import": "./dist/components/image-preview.js",
+      "types": "./dist/types/components/image-preview/image-preview.d.ts"
+    },
+    "./image-viewer": {
+      "import": "./dist/components/image-viewer.js",
+      "types": "./dist/types/components/image-viewer/image-viewer.d.ts"
+    },
+    "./input": {
+      "import": "./dist/components/input.js",
+      "types": "./dist/types/components/input/input.d.ts"
+    },
+    "./input-number": {
+      "import": "./dist/components/input-number.js",
+      "types": "./dist/types/components/input-number/input-number.d.ts"
+    },
+    "./layout": {
+      "import": "./dist/components/layout.js",
+      "types": "./dist/types/components/layout/layout.d.ts"
+    },
+    "./loading": {
+      "import": "./dist/components/loading.js",
+      "types": "./dist/types/components/loading/loading.d.ts"
+    },
+    "./mention": {
+      "import": "./dist/components/mention.js",
+      "types": "./dist/types/components/mention/mention.d.ts"
+    },
+    "./menu": {
+      "import": "./dist/components/menu.js",
+      "types": "./dist/types/components/menu/menu.d.ts"
+    },
+    "./message": {
+      "import": "./dist/components/message.js",
+      "types": "./dist/types/components/message/message.d.ts"
+    },
+    "./modal": {
+      "import": "./dist/components/modal.js",
+      "types": "./dist/types/components/modal/modal.d.ts"
+    },
+    "./notification": {
+      "import": "./dist/components/notification.js",
+      "types": "./dist/types/components/notification/notification.d.ts"
+    },
+    "./pagination": {
+      "import": "./dist/components/pagination.js",
+      "types": "./dist/types/components/pagination/pagination.d.ts"
+    },
+    "./picker": {
+      "import": "./dist/components/picker.js",
+      "types": "./dist/types/components/picker/picker.d.ts"
+    },
+    "./popconfirm": {
+      "import": "./dist/components/popconfirm.js",
+      "types": "./dist/types/components/popconfirm/popconfirm.d.ts"
+    },
+    "./popup": {
+      "import": "./dist/components/popup.js",
+      "types": "./dist/types/components/popup/popup.d.ts"
+    },
+    "./progress": {
+      "import": "./dist/components/progress.js",
+      "types": "./dist/types/components/progress/progress.d.ts"
+    },
+    "./radio": {
+      "import": "./dist/components/radio.js",
+      "types": "./dist/types/components/radio/radio.d.ts"
+    },
+    "./radio-group": {
+      "import": "./dist/components/radio-group.js",
+      "types": "./dist/types/components/radio-group/radio-group.d.ts"
+    },
+    "./rate": {
+      "import": "./dist/components/rate.js",
+      "types": "./dist/types/components/rate/rate.d.ts"
+    },
+    "./resize-box": {
+      "import": "./dist/components/resize-box.js",
+      "types": "./dist/types/components/resize-box/resize-box.d.ts"
+    },
+    "./result": {
+      "import": "./dist/components/result.js",
+      "types": "./dist/types/components/result/result.d.ts"
+    },
+    "./ripple": {
+      "import": "./dist/components/ripple.js",
+      "types": "./dist/types/components/ripple/ripple.d.ts"
+    },
+    "./row": {
+      "import": "./dist/components/row.js",
+      "types": "./dist/types/components/row/row.d.ts"
+    },
+    "./scrollbar": {
+      "import": "./dist/components/scrollbar.js",
+      "types": "./dist/types/components/scrollbar/scrollbar.d.ts"
+    },
+    "./select": {
+      "import": "./dist/components/select.js",
+      "types": "./dist/types/components/select/select.d.ts"
+    },
+    "./skeleton": {
+      "import": "./dist/components/skeleton.js",
+      "types": "./dist/types/components/skeleton/skeleton.d.ts"
+    },
+    "./slider": {
+      "import": "./dist/components/slider.js",
+      "types": "./dist/types/components/slider/slider.d.ts"
+    },
+    "./space": {
+      "import": "./dist/components/space.js",
+      "types": "./dist/types/components/space/space.d.ts"
+    },
+    "./spin": {
+      "import": "./dist/components/spin.js",
+      "types": "./dist/types/components/spin/spin.d.ts"
+    },
+    "./split": {
+      "import": "./dist/components/split.js",
+      "types": "./dist/types/components/split/split.d.ts"
+    },
+    "./statistic": {
+      "import": "./dist/components/statistic.js",
+      "types": "./dist/types/components/statistic/statistic.d.ts"
+    },
+    "./steps": {
+      "import": "./dist/components/steps.js",
+      "types": "./dist/types/components/steps/steps.d.ts"
+    },
+    "./swiper": {
+      "import": "./dist/components/swiper.js",
+      "types": "./dist/types/components/swiper/swiper.d.ts"
+    },
+    "./switch": {
+      "import": "./dist/components/switch.js",
+      "types": "./dist/types/components/switch/switch.d.ts"
+    },
+    "./table": {
+      "import": "./dist/components/table.js",
+      "types": "./dist/types/components/table/table.d.ts"
+    },
+    "./tabs": {
+      "import": "./dist/components/tabs.js",
+      "types": "./dist/types/components/tabs/tabs.d.ts"
+    },
+    "./tag": {
+      "import": "./dist/components/tag.js",
+      "types": "./dist/types/components/tag/tag.d.ts"
+    },
+    "./tag-group": {
+      "import": "./dist/components/tag-group.js",
+      "types": "./dist/types/components/tag-group/tag-group.d.ts"
+    },
+    "./time-picker": {
+      "import": "./dist/components/time-picker.js",
+      "types": "./dist/types/components/time-picker/time-picker.d.ts"
+    },
+    "./timeline": {
+      "import": "./dist/components/timeline.js",
+      "types": "./dist/types/components/timeline/timeline.d.ts"
+    },
+    "./tooltip": {
+      "import": "./dist/components/tooltip.js",
+      "types": "./dist/types/components/tooltip/tooltip.d.ts"
+    },
+    "./tour": {
+      "import": "./dist/components/tour.js",
+      "types": "./dist/types/components/tour/tour.d.ts"
+    },
+    "./transfer": {
+      "import": "./dist/components/transfer.js",
+      "types": "./dist/types/components/transfer/transfer.d.ts"
+    },
+    "./tree": {
+      "import": "./dist/components/tree.js",
+      "types": "./dist/types/components/tree/tree.d.ts"
+    },
+    "./upload": {
+      "import": "./dist/components/upload.js",
+      "types": "./dist/types/components/upload/upload.d.ts"
+    },
+    "./virtual-list": {
+      "import": "./dist/components/virtual-list.js",
+      "types": "./dist/types/components/virtual-list/virtual-list.d.ts"
+    },
+    "./watermark": {
+      "import": "./dist/components/watermark.js",
+      "types": "./dist/types/components/watermark/watermark.d.ts"
     }
   },
   "files": [
@@ -53,7 +379,14 @@
     "stencil",
     "ui-components",
     "ldesign",
-    "typescript"
+    "typescript",
+    "vue3",
+    "react",
+    "virtual-scroll",
+    "tree-shaking",
+    "theme-system",
+    "high-performance",
+    "on-demand-import"
   ],
   "author": "LDesign Team",
   "license": "MIT",
@@ -79,5 +412,11 @@
     "rimraf": "^5.0.5",
     "typescript": "^5.7.2",
     "vitepress": "^1.0.0-rc.31"
-  }
+  },
+  "sideEffects": [
+    "*.css",
+    "*.less",
+    "dist/loader/**",
+    "src/global/**"
+  ]
 }

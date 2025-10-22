@@ -1,38 +1,21 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig } from 'vitepress';
 
 export default defineConfig({
   title: 'LDesign WebComponent',
-  description: '基于 Stencil 的高质量 Web Components 组件库',
-  base: '/ldesign-webcomponent/',
-
-  head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['meta', { name: 'theme-color', content: '#722ED1' }],
-    ['meta', { name: 'og:type', content: 'website' }],
-    ['meta', { name: 'og:locale', content: 'zh-CN' }],
-    ['meta', { name: 'og:site_name', content: 'LDesign WebComponent' }],
-  ],
-
-  vue: {
-    template: {
-      compilerOptions: {
-        isCustomElement: (tag) => tag.startsWith('ldesign-') || tag.startsWith('l-')
-      }
-    }
-  },
+  description: '高性能、现代化的 Web Components 组件库',
 
   themeConfig: {
     logo: '/logo.svg',
 
     nav: [
       { text: '指南', link: '/guide/introduction' },
-      { text: '组件', link: '/components/button' },
-      { text: '设计', link: '/design/tokens' },
+      { text: '组件', link: '/components/overview' },
+      { text: '资源', link: '/resources/overview' },
       {
-        text: '资源',
+        text: 'v2.0.0',
         items: [
-          { text: 'GitHub', link: 'https://github.com/ldesign/webcomponent' },
-          { text: 'NPM', link: 'https://www.npmjs.com/package/@ldesign/webcomponent' },
+          { text: '更新日志', link: '/changelog' },
+          { text: '迁移指南', link: '/guide/migration' }
         ]
       }
     ],
@@ -48,108 +31,124 @@ export default defineConfig({
           ]
         },
         {
+          text: '框架集成',
+          items: [
+            { text: '原生 HTML', link: '/guide/integration-html' },
+            { text: 'Vue 3', link: '/guide/integration-vue' },
+            { text: 'React', link: '/guide/integration-react' },
+          ]
+        },
+        {
           text: '进阶',
           items: [
+            { text: '按需导入', link: '/guide/on-demand' },
             { text: '主题定制', link: '/guide/theming' },
-            { text: '国际化', link: '/guide/i18n' },
+            { text: '性能优化', link: '/guide/performance' },
             { text: '最佳实践', link: '/guide/best-practices' },
+          ]
+        },
+        {
+          text: '其他',
+          items: [
+            { text: '迁移指南', link: '/guide/migration' },
+            { text: 'FAQ', link: '/guide/faq' },
           ]
         }
       ],
+
       '/components/': [
+        {
+          text: '组件总览',
+          items: [
+            { text: '组件概览', link: '/components/overview' },
+          ]
+        },
         {
           text: '基础组件',
           items: [
             { text: 'Button 按钮', link: '/components/button' },
             { text: 'Icon 图标', link: '/components/icon' },
-            { text: 'Tag 标签', link: '/components/tag' },
-            { text: 'Draggable 拖拽缩放', link: '/components/draggable' },
-          ]
-        },
-        {
-          text: '导航组件',
-          items: [
-            { text: 'Menu 菜单', link: '/components/menu' },
-            { text: 'Tabs 选项卡', link: '/components/tabs' },
-            { text: 'Dropdown 下拉菜单', link: '/components/dropdown' },
-            { text: 'DropdownPanel 下拉面板', link: '/components/dropdown-panel' },
-            { text: 'Pagination 分页', link: '/components/pagination' },
-            { text: 'CircleNavigation 圆形导航', link: '/components/circle-navigation' },
-          ]
-        },
-        {
-          text: '数据展示',
-          items: [
-            { text: 'Avatar 头像', link: '/components/avatar' },
-            { text: 'Tag 标签', link: '/components/tag' },
-            { text: 'Image 图片', link: '/components/image' },
-            { text: 'ImageViewer 图片预览器', link: '/components/image-viewer' },
-            { text: 'Ellipsis 文本省略', link: '/components/ellipsis' },
-            { text: 'Swiper 轮播图', link: '/components/swiper' },
-            { text: 'Draggable 拖拽缩放', link: '/components/draggable' },
-            { text: 'Tree 树', link: '/components/tree' },
-            { text: 'Calendar 日历', link: '/components/calendar' },
-            { text: 'Countdown 倒计时', link: '/components/countdown' },
-          ]
-        },
-        {
-          text: '布局组件',
-          items: [
-            { text: 'Affix 固钉', link: '/components/affix' },
-            { text: 'BackTop 返回顶部', link: '/components/backtop' },
-            { text: 'Grid 栅格布局', link: '/components/grid' },
-            { text: 'Space 间距', link: '/components/space' },
-            { text: 'ResizeBox 伸缩框', link: '/components/resize-box' },
-            { text: 'Split 面板分割', link: '/components/split' },
-            { text: 'Scrollbar 滚动条', link: '/components/scrollbar' },
           ]
         },
         {
           text: '表单组件',
           items: [
+            { text: 'Form 表单', link: '/components/form' },
             { text: 'Input 输入框', link: '/components/input' },
-            { text: 'InputNumber 数字输入框', link: '/components/input-number' },
-            { text: 'Mention 提及', link: '/components/mention' },
-            { text: 'Select 选择器', link: '/components/select' },
-            { text: 'Transfer 穿梭框', link: '/components/transfer' },
+            { text: 'InputNumber 数字输入', link: '/components/input-number' },
             { text: 'Checkbox 复选框', link: '/components/checkbox' },
             { text: 'Radio 单选框', link: '/components/radio' },
             { text: 'Switch 开关', link: '/components/switch' },
-            { text: 'Slider 滑块', link: '/components/slider' },
-            { text: 'ColorPicker 颜色选择器', link: '/components/color-picker' },
-            { text: 'ColorPickerPanel 颜色选择面板', link: '/components/color-picker-panel' },
+            { text: 'Select 选择器', link: '/components/select' },
+            { text: 'DatePicker 日期选择', link: '/components/date-picker' },
+            { text: 'TimePicker 时间选择', link: '/components/time-picker' },
+            { text: 'Upload 文件上传', link: '/components/upload' },
             { text: 'Rate 评分', link: '/components/rate' },
-            { text: 'TimePicker 时间选择器', link: '/components/time-picker' },
-            { text: 'DatePicker 日期选择器', link: '/components/date-picker' },
-            { text: 'Picker 滚轮选择器', link: '/components/picker' },
+            { text: 'Slider 滑块', link: '/components/slider' },
+            { text: 'ColorPicker 颜色选择', link: '/components/color-picker' },
+          ]
+        },
+        {
+          text: '数据展示',
+          items: [
+            { text: 'Table 表格', link: '/components/table' },
+            { text: 'VirtualList 虚拟列表', link: '/components/virtual-list' },
+            { text: 'Empty 空状态', link: '/components/empty' },
+            { text: 'Timeline 时间轴', link: '/components/timeline' },
+            { text: 'Steps 步骤条', link: '/components/steps' },
+            { text: 'Descriptions 描述列表', link: '/components/descriptions' },
+            { text: 'Statistic 统计数值', link: '/components/statistic' },
+            { text: 'Result 结果页', link: '/components/result' },
+            { text: 'Tree 树形控件', link: '/components/tree' },
+            { text: 'Pagination 分页', link: '/components/pagination' },
+            { text: 'Avatar 头像', link: '/components/avatar' },
+            { text: 'Tag 标签', link: '/components/tag' },
+            { text: 'Progress 进度条', link: '/components/progress' },
           ]
         },
         {
           text: '反馈组件',
           items: [
-            { text: 'Collapse 折叠面板', link: '/components/collapse' },
-            { text: 'Popup 弹出层', link: '/components/popup' },
-            { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
-            { text: 'Tooltip 工具提示', link: '/components/tooltip' },
-            { text: 'Modal 模态框', link: '/components/modal' },
-            { text: 'Drawer 抽屉', link: '/components/drawer' },
-            { text: 'Alert 警告', link: '/components/alert' },
+            { text: 'Skeleton 骨架屏', link: '/components/skeleton' },
+            { text: 'Spin 加载指示', link: '/components/spin' },
+            { text: 'Alert 警告提示', link: '/components/alert' },
             { text: 'Message 全局提示', link: '/components/message' },
-            { text: 'Notification 通知提醒', link: '/components/notification' },
-            { text: 'Loading 加载', link: '/components/loading' },
-            { text: 'Progress 进度条', link: '/components/progress' },
-            { text: 'Ripple 水波纹', link: '/components/ripple' },
+            { text: 'Notification 通知', link: '/components/notification' },
+            { text: 'Modal 对话框', link: '/components/modal' },
+            { text: 'Drawer 抽屉', link: '/components/drawer' },
+            { text: 'Popconfirm 气泡确认', link: '/components/popconfirm' },
+            { text: 'Loading 加载中', link: '/components/loading' },
           ]
-        }
-      ],
-      '/design/': [
+        },
         {
-          text: '设计规范',
+          text: '导航组件',
           items: [
-            { text: '设计令牌', link: '/design/tokens' },
-            { text: '颜色系统', link: '/design/colors' },
-            { text: '字体排版', link: '/design/typography' },
-            { text: '间距系统', link: '/design/spacing' },
+            { text: 'Breadcrumb 面包屑', link: '/components/breadcrumb' },
+            { text: 'Anchor 锚点', link: '/components/anchor' },
+            { text: 'Menu 导航菜单', link: '/components/menu' },
+            { text: 'Dropdown 下拉菜单', link: '/components/dropdown' },
+            { text: 'Tabs 标签页', link: '/components/tabs' },
+          ]
+        },
+        {
+          text: '布局组件',
+          items: [
+            { text: 'Layout 布局', link: '/components/layout' },
+            { text: 'Card 卡片', link: '/components/card' },
+            { text: 'Divider 分割线', link: '/components/divider' },
+            { text: 'Grid 网格', link: '/components/grid' },
+            { text: 'Space 间距', link: '/components/space' },
+            { text: 'Split 分割面板', link: '/components/split' },
+          ]
+        },
+        {
+          text: '其他组件',
+          items: [
+            { text: 'Watermark 水印', link: '/components/watermark' },
+            { text: 'Tour 漫游式引导', link: '/components/tour' },
+            { text: 'Tooltip 文字提示', link: '/components/tooltip' },
+            { text: 'Affix 固钉', link: '/components/affix' },
+            { text: 'Backtop 回到顶部', link: '/components/backtop' },
           ]
         }
       ]
@@ -160,53 +159,22 @@ export default defineConfig({
     ],
 
     footer: {
-      message: '基于 MIT 许可发布',
-      copyright: 'Copyright © 2025 LDesign Team'
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2024-present LDesign Team'
     },
 
     search: {
       provider: 'local'
-    },
-
-    editLink: {
-      pattern: 'https://github.com/ldesign/webcomponent/edit/main/docs/:path',
-      text: '在 GitHub 上编辑此页'
-    },
-
-    lastUpdated: {
-      text: '最后更新于',
-      formatOptions: {
-        dateStyle: 'short',
-        timeStyle: 'medium'
-      }
     }
   },
 
   markdown: {
-    theme: {
-      light: 'github-light',
-      dark: 'github-dark'
-    },
-    lineNumbers: true
+    lineNumbers: true,
   },
 
   vite: {
-    define: {
-      __VUE_OPTIONS_API__: false,
-    },
-    server: {
-      port: 5173,
-      host: true
-    },
-    // 确保正确处理 webcomponent 的模块解析
-    resolve: {
-      alias: {
-        '@ldesign/webcomponent': '/packages/webcomponent/dist/ldesign-webcomponent/ldesign-webcomponent.esm.js'
-      }
-    },
-    optimizeDeps: {
-      include: ['@ldesign/webcomponent/loader'],
-      exclude: ['@ldesign/webcomponent']
+    ssr: {
+      noExternal: ['@ldesign/webcomponent']
     }
   }
-})
+});

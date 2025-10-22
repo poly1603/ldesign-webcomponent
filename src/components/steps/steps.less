@@ -1,0 +1,126 @@
+.ldesign-steps {
+  display: flex;
+
+  &--horizontal {
+    flex-direction: row;
+
+    .ldesign-step-item {
+      flex: 1;
+    }
+  }
+
+  &--vertical {
+    flex-direction: column;
+
+    .ldesign-step-item__tail {
+      position: absolute;
+      left: 16px;
+      top: 40px;
+      bottom: -20px;
+      width: 2px;
+      height: auto;
+    }
+  }
+}
+
+.ldesign-step-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &__container {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ld-border-color, #d9d9d9);
+    background-color: var(--ld-bg-container, #ffffff);
+    margin-right: var(--ld-spacing-2, 8px);
+    transition: all var(--ld-transition-base, 250ms) ease;
+  }
+
+  &__number {
+    font-weight: var(--ld-font-weight-medium, 500);
+    color: var(--ld-text-secondary, rgba(0, 0, 0, 0.6));
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: var(--ld-font-size-base, 16px);
+    font-weight: var(--ld-font-weight-medium, 500);
+    color: var(--ld-text-primary, rgba(0, 0, 0, 0.87));
+    line-height: 32px;
+  }
+
+  &__description {
+    font-size: var(--ld-font-size-sm, 14px);
+    color: var(--ld-text-secondary, rgba(0, 0, 0, 0.6));
+    margin-top: var(--ld-spacing-1, 4px);
+  }
+
+  &__tail {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    right: 0;
+    height: 2px;
+    background-color: var(--ld-border-color, #d9d9d9);
+    transition: background-color var(--ld-transition-base, 250ms) ease;
+  }
+
+  &:last-child &__tail {
+    display: none;
+  }
+
+  // States
+  &--wait {
+    .ldesign-step-item__icon {
+      border-color: var(--ld-border-color, #d9d9d9);
+    }
+  }
+
+  &--process {
+    .ldesign-step-item__icon {
+      border-color: var(--ld-color-primary, #7334cb);
+      background-color: var(--ld-color-primary, #7334cb);
+      color: white;
+    }
+
+    .ldesign-step-item__number {
+      color: white;
+    }
+  }
+
+  &--finish {
+    .ldesign-step-item__icon {
+      border-color: var(--ld-color-primary, #7334cb);
+      color: var(--ld-color-primary, #7334cb);
+    }
+
+    .ldesign-step-item__tail {
+      background-color: var(--ld-color-primary, #7334cb);
+    }
+  }
+
+  &--error {
+    .ldesign-step-item__icon {
+      border-color: var(--ld-color-error, #dd2222);
+      color: var(--ld-color-error, #dd2222);
+    }
+
+    .ldesign-step-item__title {
+      color: var(--ld-color-error, #dd2222);
+    }
+  }
+}
+

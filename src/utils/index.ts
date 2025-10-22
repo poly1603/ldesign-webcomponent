@@ -2,6 +2,12 @@
  * 工具函数集合
  */
 
+// 导出虚拟滚动
+export * from './virtual-scroll';
+
+// 导出对象池
+export * from './object-pool';
+
 /**
  * 生成BEM类名
  * @param block 块名
@@ -11,11 +17,11 @@
  */
 export function bem(block: string, element?: string, modifier?: string | string[]): string {
   let className = `ldesign-${block}`;
-  
+
   if (element) {
     className += `__${element}`;
   }
-  
+
   if (modifier) {
     if (Array.isArray(modifier)) {
       modifier.forEach(mod => {
@@ -27,7 +33,7 @@ export function bem(block: string, element?: string, modifier?: string | string[
       className += `--${modifier}`;
     }
   }
-  
+
   return className;
 }
 
@@ -130,4 +136,137 @@ export function deepMerge<T>(target: T, ...sources: Partial<T>[]): T {
  */
 function isObject(item: any): boolean {
   return item && typeof item === 'object' && !Array.isArray(item);
+}
+
+/**
+ * 获取元素的滚动父元素
+ * @param element 目标元素
+ * @returns 滚动父元素
+ */
+export function getScrollParent(element: HTMLElement | null): HTMLElement | null {
+  if (!element) return null;
+
+  let parent = element.parentElement;
+
+  while (parent) {
+    const { overflow, overflowY } = window.getComputedStyle(parent);
+    if (/(auto|scroll)/.test(overflow + overflowY)) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+
+  return document.documentElement;
+}
+
+/**
+ * 检测是否为移动设备
+ * @returns 是否为移动设备
+ */
+export function isMobileDevice(): boolean {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+/**
+ * 获取元素相对于文档的位置
+ * @param element 目标元素
+ * @returns 位置信息
+ */
+export function getElementOffset(element: HTMLElement): { top: number; left: number } {
+  const rect = element.getBoundingClientRect();
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+  return {
+    top: rect.top + scrollTop,
+    left: rect.left + scrollLeft,
+  };
+}
+
+/**
+ * 等待动画完成
+ * @param element 目标元素
+ * @param duration 动画时长（毫秒）
+ * @returns Promise
+ */
+export function waitForAnimation(element: HTMLElement, duration: number): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      resolve();
+    }, duration);
+
+    // 如果动画提前结束，清除定时器
+    const onAnimationEnd = () => {
+      clearTimeout(timer);
+      element.removeEventListener('animationend', onAnimationEnd);
+      resolve();
+    };
+
+    element.addEventListener('animationend', onAnimationEnd);
+  });
+}
+
+/**
+ * 克隆对象（深拷贝）
+ * @param obj 源对象
+ * @returns 克隆后的对象
+ */
+export function cloneDeep<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') return obj;
+
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as any;
+  }
+
+  if (obj instanceof Array) {
+    return obj.map(item => cloneDeep(item)) as any;
+  }
+
+  if (obj instanceof Object) {
+    const clonedObj = {} as T;
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        clonedObj[key] = cloneDeep(obj[key]);
+      }
+    }
+    return clonedObj;
+  }
+
+  return obj;
+}
+
+/**
+ * 格式化文件大小
+ * @param bytes 字节数
+ * @param decimals 小数位数
+ * @returns 格式化后的字符串
+ */
+export function formatFileSize(bytes: number, decimals: number = 2): string {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+/**
+ * 将驼峰命名转为短横线命名
+ * @param str 驼峰字符串
+ * @returns 短横线字符串
+ */
+export function camelToKebab(str: string): string {
+  return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+/**
+ * 将短横线命名转为驼峰命名
+ * @param str 短横线字符串
+ * @returns 驼峰字符串
+ */
+export function kebabToCamel(str: string): string {
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }

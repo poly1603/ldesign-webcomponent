@@ -1,0 +1,54 @@
+{
+  "name": "@ldesign/webcomponent-react",
+  "version": "2.0.0",
+  "description": "React integration for @ldesign/webcomponent",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "web-components",
+    "ldesign",
+    "ui-components"
+  ],
+  "author": "LDesign Team",
+  "license": "MIT",
+  "dependencies": {
+    "@lit/react": "^1.0.5"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@ldesign/webcomponent": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.0.0"
+  }
+}
+
+
+
+

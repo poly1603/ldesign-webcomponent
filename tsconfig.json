@@ -2,17 +2,28 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
-    "declaration": false,
+    "declaration": true,
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es6"
+      "es2017",
+      "es2018",
+      "es2019"
     ],
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    
+    // Strict mode options
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
@@ -33,6 +44,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "www"
+    "www",
+    "loader"
   ]
 }

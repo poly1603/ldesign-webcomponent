@@ -1,0 +1,318 @@
+/**
+ * LDesign Web Component Theme System
+ * Comprehensive design token system supporting light/dark themes
+ */
+
+/* ============ Base Theme Tokens ============ */
+:root {
+  /* Typography */
+  --ld-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ld-font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+  --ld-font-size-xs: 12px;
+  --ld-font-size-sm: 14px;
+  --ld-font-size-base: 16px;
+  --ld-font-size-lg: 18px;
+  --ld-font-size-xl: 20px;
+  --ld-font-size-2xl: 24px;
+  --ld-font-size-3xl: 30px;
+  --ld-font-size-4xl: 36px;
+
+  --ld-font-weight-normal: 400;
+  --ld-font-weight-medium: 500;
+  --ld-font-weight-semibold: 600;
+  --ld-font-weight-bold: 700;
+
+  --ld-line-height-tight: 1.25;
+  --ld-line-height-normal: 1.5;
+  --ld-line-height-relaxed: 1.75;
+
+  /* Spacing */
+  --ld-spacing-0: 0;
+  --ld-spacing-1: 4px;
+  --ld-spacing-2: 8px;
+  --ld-spacing-3: 12px;
+  --ld-spacing-4: 16px;
+  --ld-spacing-5: 20px;
+  --ld-spacing-6: 24px;
+  --ld-spacing-8: 32px;
+  --ld-spacing-10: 40px;
+  --ld-spacing-12: 48px;
+  --ld-spacing-16: 64px;
+  --ld-spacing-20: 80px;
+
+  /* Border Radius */
+  --ld-radius-none: 0;
+  --ld-radius-sm: 2px;
+  --ld-radius-base: 4px;
+  --ld-radius-md: 6px;
+  --ld-radius-lg: 8px;
+  --ld-radius-xl: 12px;
+  --ld-radius-2xl: 16px;
+  --ld-radius-3xl: 24px;
+  --ld-radius-full: 9999px;
+
+  /* Border Width */
+  --ld-border-width-0: 0;
+  --ld-border-width-1: 1px;
+  --ld-border-width-2: 2px;
+  --ld-border-width-4: 4px;
+
+  /* Transitions */
+  --ld-transition-fast: 150ms;
+  --ld-transition-base: 250ms;
+  --ld-transition-slow: 350ms;
+  --ld-transition-slower: 500ms;
+
+  --ld-ease-linear: linear;
+  --ld-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ld-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ld-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-Index Scale */
+  --ld-z-index-dropdown: 1000;
+  --ld-z-index-sticky: 1020;
+  --ld-z-index-fixed: 1030;
+  --ld-z-index-modal-backdrop: 1040;
+  --ld-z-index-modal: 1050;
+  --ld-z-index-popover: 1060;
+  --ld-z-index-tooltip: 1070;
+
+  /* Component Sizes */
+  --ld-size-sm: 24px;
+  --ld-size-base: 32px;
+  --ld-size-md: 36px;
+  --ld-size-lg: 40px;
+  --ld-size-xl: 48px;
+}
+
+/* ============ Light Theme (Default) ============ */
+:root,
+[data-theme="light"] {
+  /* Brand Colors */
+  --ld-color-primary: #7334cb;
+  --ld-color-primary-hover: #8c5ad3;
+  --ld-color-primary-active: #5e2aa7;
+  --ld-color-primary-light: #bfa4e5;
+  --ld-color-primary-lighter: #d8c8ee;
+  --ld-color-primary-lightest: #f1ecf9;
+
+  /* Semantic Colors */
+  --ld-color-success: #42bd42;
+  --ld-color-success-hover: #62cb62;
+  --ld-color-success-active: #389938;
+  --ld-color-success-light: #a5e4a5;
+  --ld-color-success-lighter: #c7efc7;
+  --ld-color-success-lightest: #ebfaeb;
+
+  --ld-color-warning: #f5c538;
+  --ld-color-warning-hover: #f8d362;
+  --ld-color-warning-active: #f0b80f;
+  --ld-color-warning-light: #fbe08d;
+  --ld-color-warning-lighter: #feecb9;
+  --ld-color-warning-lightest: #fff8e6;
+
+  --ld-color-error: #dd2222;
+  --ld-color-error-hover: #e54848;
+  --ld-color-error-active: #b31e1e;
+  --ld-color-error-light: #f39696;
+  --ld-color-error-lighter: #f8bebe;
+  --ld-color-error-lightest: #fde8e8;
+
+  --ld-color-info: #1890ff;
+  --ld-color-info-hover: #40a9ff;
+  --ld-color-info-active: #096dd9;
+  --ld-color-info-light: #91d5ff;
+  --ld-color-info-lighter: #bae7ff;
+  --ld-color-info-lightest: #e6f7ff;
+
+  /* Neutral Colors */
+  --ld-color-gray-50: #fafafa;
+  --ld-color-gray-100: #f5f5f5;
+  --ld-color-gray-200: #eeeeee;
+  --ld-color-gray-300: #e0e0e0;
+  --ld-color-gray-400: #bdbdbd;
+  --ld-color-gray-500: #9e9e9e;
+  --ld-color-gray-600: #757575;
+  --ld-color-gray-700: #616161;
+  --ld-color-gray-800: #424242;
+  --ld-color-gray-900: #212121;
+
+  /* Text Colors */
+  --ld-text-primary: rgba(0, 0, 0, 0.87);
+  --ld-text-secondary: rgba(0, 0, 0, 0.6);
+  --ld-text-tertiary: rgba(0, 0, 0, 0.38);
+  --ld-text-disabled: rgba(0, 0, 0, 0.26);
+  --ld-text-inverse: rgba(255, 255, 255, 0.95);
+
+  /* Background Colors */
+  --ld-bg-body: #ffffff;
+  --ld-bg-container: #ffffff;
+  --ld-bg-elevated: #ffffff;
+  --ld-bg-overlay: rgba(0, 0, 0, 0.45);
+  --ld-bg-mask: rgba(0, 0, 0, 0.45);
+
+  --ld-bg-hover: rgba(0, 0, 0, 0.04);
+  --ld-bg-active: rgba(0, 0, 0, 0.08);
+  --ld-bg-disabled: rgba(0, 0, 0, 0.04);
+  --ld-bg-selected: rgba(115, 52, 203, 0.08);
+
+  /* Border Colors */
+  --ld-border-color: #d9d9d9;
+  --ld-border-color-hover: #b3b3b3;
+  --ld-border-color-active: #7334cb;
+  --ld-border-color-disabled: #e5e5e5;
+
+  /* Shadow */
+  --ld-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ld-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --ld-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ld-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ld-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --ld-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --ld-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* ============ Dark Theme ============ */
+[data-theme="dark"] {
+  /* Brand Colors (adjusted for dark mode) */
+  --ld-color-primary: #a67fdb;
+  --ld-color-primary-hover: #bfa4e5;
+  --ld-color-primary-active: #8c5ad3;
+  --ld-color-primary-light: #5e2aa7;
+  --ld-color-primary-lighter: #491f84;
+  --ld-color-primary-lightest: #35165f;
+
+  /* Semantic Colors (adjusted) */
+  --ld-color-success: #62cb62;
+  --ld-color-success-hover: #83d883;
+  --ld-color-success-active: #42bd42;
+
+  --ld-color-warning: #f8d362;
+  --ld-color-warning-hover: #fbe08d;
+  --ld-color-warning-active: #f5c538;
+
+  --ld-color-error: #e54848;
+  --ld-color-error-hover: #ec6f6f;
+  --ld-color-error-active: #dd2222;
+
+  --ld-color-info: #40a9ff;
+  --ld-color-info-hover: #69c0ff;
+  --ld-color-info-active: #1890ff;
+
+  /* Neutral Colors (inverted) */
+  --ld-color-gray-50: #1a1a1a;
+  --ld-color-gray-100: #2a2a2a;
+  --ld-color-gray-200: #333333;
+  --ld-color-gray-300: #3d3d3d;
+  --ld-color-gray-400: #525252;
+  --ld-color-gray-500: #6b6b6b;
+  --ld-color-gray-600: #8a8a8a;
+  --ld-color-gray-700: #a8a8a8;
+  --ld-color-gray-800: #c7c7c7;
+  --ld-color-gray-900: #e5e5e5;
+
+  /* Text Colors */
+  --ld-text-primary: rgba(255, 255, 255, 0.95);
+  --ld-text-secondary: rgba(255, 255, 255, 0.65);
+  --ld-text-tertiary: rgba(255, 255, 255, 0.45);
+  --ld-text-disabled: rgba(255, 255, 255, 0.3);
+  --ld-text-inverse: rgba(0, 0, 0, 0.85);
+
+  /* Background Colors */
+  --ld-bg-body: #141414;
+  --ld-bg-container: #1f1f1f;
+  --ld-bg-elevated: #292929;
+  --ld-bg-overlay: rgba(0, 0, 0, 0.65);
+  --ld-bg-mask: rgba(0, 0, 0, 0.65);
+
+  --ld-bg-hover: rgba(255, 255, 255, 0.08);
+  --ld-bg-active: rgba(255, 255, 255, 0.15);
+  --ld-bg-disabled: rgba(255, 255, 255, 0.08);
+  --ld-bg-selected: rgba(166, 127, 219, 0.15);
+
+  /* Border Colors */
+  --ld-border-color: #434343;
+  --ld-border-color-hover: #595959;
+  --ld-border-color-active: #a67fdb;
+  --ld-border-color-disabled: #303030;
+
+  /* Shadow (enhanced for dark mode) */
+  --ld-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --ld-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+  --ld-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.24);
+  --ld-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --ld-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.16);
+  --ld-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --ld-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.24);
+}
+
+/* ============ Component Specific Tokens ============ */
+:root {
+  /* Button */
+  --ld-button-height-sm: 24px;
+  --ld-button-height-base: 32px;
+  --ld-button-height-md: 36px;
+  --ld-button-height-lg: 40px;
+  --ld-button-padding-x-sm: 8px;
+  --ld-button-padding-x-base: 15px;
+  --ld-button-padding-x-md: 18px;
+  --ld-button-padding-x-lg: 20px;
+  --ld-button-radius: var(--ld-radius-md);
+
+  /* Input */
+  --ld-input-height-sm: 24px;
+  --ld-input-height-base: 32px;
+  --ld-input-height-md: 36px;
+  --ld-input-height-lg: 40px;
+  --ld-input-padding-x: 12px;
+  --ld-input-radius: var(--ld-radius-md);
+  --ld-input-border-width: 1px;
+
+  /* Card */
+  --ld-card-radius: var(--ld-radius-lg);
+  --ld-card-padding: var(--ld-spacing-6);
+  --ld-card-shadow: var(--ld-shadow);
+
+  /* Modal */
+  --ld-modal-radius: var(--ld-radius-lg);
+  --ld-modal-padding: var(--ld-spacing-6);
+  --ld-modal-header-padding: var(--ld-spacing-6);
+  --ld-modal-footer-padding: var(--ld-spacing-6);
+  --ld-modal-width-sm: 400px;
+  --ld-modal-width-base: 520px;
+  --ld-modal-width-lg: 720px;
+  --ld-modal-width-xl: 960px;
+
+  /* Dropdown */
+  --ld-dropdown-radius: var(--ld-radius-lg);
+  --ld-dropdown-padding: var(--ld-spacing-2);
+  --ld-dropdown-shadow: var(--ld-shadow-lg);
+
+  /* Table */
+  --ld-table-header-bg: var(--ld-bg-elevated);
+  --ld-table-row-hover-bg: var(--ld-bg-hover);
+  --ld-table-border-color: var(--ld-border-color);
+  --ld-table-padding: var(--ld-spacing-4);
+
+  /* Tooltip */
+  --ld-tooltip-bg: rgba(0, 0, 0, 0.85);
+  --ld-tooltip-color: rgba(255, 255, 255, 0.95);
+  --ld-tooltip-radius: var(--ld-radius-base);
+  --ld-tooltip-padding: var(--ld-spacing-2) var(--ld-spacing-3);
+  --ld-tooltip-font-size: var(--ld-font-size-sm);
+}
+
+[data-theme="dark"] {
+  --ld-tooltip-bg: rgba(255, 255, 255, 0.9);
+  --ld-tooltip-color: rgba(0, 0, 0, 0.85);
+}
+
+/* ============ Utility Classes ============ */
+.ld-theme-transition {
+  transition: background-color var(--ld-transition-base) var(--ld-ease-in-out),
+    border-color var(--ld-transition-base) var(--ld-ease-in-out),
+    color var(--ld-transition-base) var(--ld-ease-in-out);
+}
+
+

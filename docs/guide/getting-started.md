@@ -1,12 +1,10 @@
 # 快速开始
 
-本指南将帮助你快速上手 LDesign WebComponent 组件库。
+本指南将帮助您在 5 分钟内开始使用 LDesign WebComponent。
 
 ## 安装
 
-使用你喜欢的包管理器安装 LDesign WebComponent：
-
-::: code-group
+:::code-group
 
 ```bash [npm]
 npm install @ldesign/webcomponent
@@ -22,223 +20,218 @@ pnpm add @ldesign/webcomponent
 
 :::
 
-## 基础用法
+## Hello World
 
-### 在 HTML 中使用
+### 原生 HTML
 
-最简单的使用方式是直接在 HTML 中引入：
+创建 `index.html`:
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <script type="module" src="https://unpkg.com/@ldesign/webcomponent/dist/ldesign-webcomponent/ldesign-webcomponent.esm.js"></script>
+  <meta charset="UTF-8">
+  <title>Hello LDesign</title>
+  
+  <!-- 按需导入组件 -->
+  <script type="module">
+    import '@ldesign/webcomponent/button';
+    import '@ldesign/webcomponent/input';
+  </script>
 </head>
 <body>
-  <ldesign-button type="primary">点击我</ldesign-button>
-  <ldesign-input placeholder="请输入内容"></ldesign-input>
+  <h1>Hello LDesign!</h1>
+  
+  <ldesign-button type="primary">Click me</ldesign-button>
+  <ldesign-input placeholder="Enter text"></ldesign-input>
+  
+  <script>
+    const btn = document.querySelector('ldesign-button');
+    btn.addEventListener('ldesignClick', () => {
+      alert('Hello LDesign!');
+    });
+  </script>
 </body>
 </html>
 ```
 
-### 在 JavaScript/TypeScript 中使用
+### Vue 3
 
-```typescript
-import { defineCustomElements } from '@ldesign/webcomponent/loader'
+1. **安装依赖**
 
-// 注册所有组件
-defineCustomElements()
-
-// 现在可以在 HTML 中使用组件了
-document.body.innerHTML = `
-  <ldesign-button type="primary">Hello World</ldesign-button>
-`
+```bash
+npm install @ldesign/webcomponent @ldesign/webcomponent-vue
 ```
 
-### 按需导入
-
-如果你只需要特定的组件，可以按需导入：
+2. **配置插件** (`main.ts`)
 
 ```typescript
-// 不含 dist 的按需导入
-import '@ldesign/webcomponent/components/ldesign-button'
-import '@ldesign/webcomponent/components/ldesign-input'
+import { createApp } from 'vue';
+import LDesignVue from '@ldesign/webcomponent-vue';
+import App from './App.vue';
+
+const app = createApp(App);
+app.use(LDesignVue);
+app.mount('#app');
 ```
 
-## 框架集成
+3. **使用组件** (`App.vue`)
+
+```vue
+<script setup lang="ts">
+import { defineButton, defineInput } from '@ldesign/webcomponent-vue';
+
+defineButton();
+defineInput();
+
+const handleClick = () => {
+  alert('Hello LDesign!');
+};
+</script>
+
+<template>
+  <h1>Hello LDesign!</h1>
+  <ldesign-button type="primary" @ldesignClick="handleClick">
+    Click me
+  </ldesign-button>
+  <ldesign-input placeholder="Enter text" />
+</template>
+```
 
 ### React
 
-在 React 中使用 LDesign WebComponent：
+1. **安装依赖**
+
+```bash
+npm install @ldesign/webcomponent @ldesign/webcomponent-react
+```
+
+2. **使用组件** (`App.tsx`)
 
 ```tsx
-import React, { useEffect } from 'react'
-import { defineCustomElements } from '@ldesign/webcomponent/loader'
-
-// 注册组件
-defineCustomElements()
+import { Button, Input } from '@ldesign/webcomponent-react';
 
 function App() {
+  const handleClick = () => {
+    alert('Hello LDesign!');
+  };
+
   return (
     <div>
-      <ldesign-button 
-        type="primary" 
-        onClick={(e) => console.log('clicked', e)}
-      >
-        React 中的按钮
-      </ldesign-button>
+      <h1>Hello LDesign!</h1>
+      <Button type="primary" onClick={handleClick}>
+        Click me
+      </Button>
+      <Input placeholder="Enter text" />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
 ```
 
-为了获得更好的 TypeScript 支持，你可以添加类型声明：
+## 🎨 主题定制
 
-```typescript
-// types/jsx.d.ts
-import { JSX as LocalJSX } from '@ldesign/webcomponent'
-import { DetailedHTMLProps, HTMLAttributes } from 'react'
+### 切换主题
 
-type StencilProps<T> = {
-  [P in keyof T]?: Omit<T[P], 'ref'> | HTMLAttributes<T>
-}
+```javascript
+// 切换到暗色主题
+document.documentElement.setAttribute('data-theme', 'dark');
 
-type ReactProps<T> = {
-  [P in keyof T]?: DetailedHTMLProps<HTMLAttributes<T[P]>, T[P]>
-}
-
-type StencilToReact<T = LocalJSX.IntrinsicElements, U = HTMLElementTagNameMap> = StencilProps<T> & ReactProps<U>
-
-declare global {
-  export namespace JSX {
-    interface IntrinsicElements extends StencilToReact {}
-  }
-}
+// 切换到亮色主题
+document.documentElement.setAttribute('data-theme', 'light');
 ```
 
-### Vue 3
-
-在 Vue 3 中使用：
-
-```vue
-<template>
-  <div>
-    <ldesign-button 
-      type="primary" 
-      @ldesignClick="handleClick"
-    >
-      Vue 中的按钮
-    </ldesign-button>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { defineCustomElements } from '@ldesign/webcomponent/loader'
-
-// 注册组件
-defineCustomElements()
-
-const handleClick = (event: CustomEvent) => {
-  console.log('clicked', event.detail)
-}
-</script>
-```
-
-### Angular
-
-在 Angular 中使用：
-
-```typescript
-// app.module.ts
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { BrowserModule } from '@angular/platform-browser'
-import { defineCustomElements } from '@ldesign/webcomponent/loader'
-
-import { AppComponent } from './app.component'
-
-// 注册组件
-defineCustomElements()
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule],
-  providers: [],
-  bootstrap: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA] // 允许自定义元素
-})
-export class AppModule { }
-```
-
-```typescript
-// app.component.ts
-import { Component } from '@angular/core'
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <ldesign-button 
-      type="primary" 
-      (ldesignClick)="handleClick($event)"
-    >
-      Angular 中的按钮
-    </ldesign-button>
-  `
-})
-export class AppComponent {
-  handleClick(event: CustomEvent) {
-    console.log('clicked', event.detail)
-  }
-}
-```
-
-## 样式定制
-
-LDesign WebComponent 使用 CSS 变量来支持主题定制。你可以通过覆盖 CSS 变量来自定义样式：
+### 自定义主题变量
 
 ```css
 :root {
-  /* 主品牌色 */
-  --ldesign-brand-color: #1890ff;
-  --ldesign-brand-color-hover: #40a9ff;
-  --ldesign-brand-color-active: #096dd9;
+  /* 主色调 */
+  --ld-color-primary: #7334cb;
+  --ld-color-primary-hover: #8c5ad3;
   
-  /* 字体大小 */
-  --ls-font-size-base: 16px;
-  --ls-font-size-lg: 18px;
+  /* 成功色 */
+  --ld-color-success: #42bd42;
   
   /* 间距 */
-  --ls-spacing-base: 16px;
-  --ls-spacing-lg: 24px;
+  --ld-spacing-4: 16px;
+  --ld-spacing-6: 24px;
   
   /* 圆角 */
-  --ls-border-radius-base: 4px;
+  --ld-radius-base: 4px;
+  --ld-radius-lg: 8px;
 }
 ```
 
-## 事件处理
+## 📦 按需导入（推荐）
 
-LDesign WebComponent 的组件会触发自定义事件，事件名以 `ldesign` 为前缀：
+### 为什么要按需导入？
+
+- ✅ 包体积减少 **95%**（380KB → 8-35KB）
+- ✅ 加载速度提升 **10倍**
+- ✅ 页面性能更好
+
+### 如何按需导入？
 
 ```javascript
-// 监听按钮点击事件
-document.addEventListener('ldesignClick', (event) => {
-  console.log('Button clicked:', event.detail)
-})
+// ❌ 不推荐：全量导入
+import '@ldesign/webcomponent';
 
-// 监听输入框变化事件
-document.addEventListener('ldesignInput', (event) => {
-  console.log('Input changed:', event.detail)
-})
+// ✅ 推荐：按需导入
+import '@ldesign/webcomponent/button';
+import '@ldesign/webcomponent/input';
+import '@ldesign/webcomponent/table';
 ```
 
-## 下一步
+详见 [按需导入指南](/guide/on-demand)
 
-现在你已经了解了基础用法，可以：
+## 🚀 高性能特性
 
-- 查看[完整的组件列表](/components/button)
-- 了解[主题定制](/guide/theming)
-- 学习[最佳实践](/guide/best-practices)
+### 虚拟滚动
 
-如果遇到问题，请查看我们的 [FAQ](/guide/faq) 或在 [GitHub](https://github.com/ldesign/webcomponent/issues) 上提出问题。
+渲染 100,000+ 项列表而不卡顿：
+
+```html
+<ldesign-virtual-list
+  :items="bigData"
+  item-height="60"
+  height="500"
+/>
+```
+
+### 虚拟表格
+
+```html
+<ldesign-table
+  :dataSource="bigData"
+  virtual
+  height="600"
+  row-height="48"
+/>
+```
+
+## 📖 下一步
+
+### 基础
+
+- [安装说明](/guide/installation) - 详细安装说明
+- [按需导入](/guide/on-demand) - 优化包体积
+- [组件概览](/components/overview) - 查看所有组件
+
+### 框架集成
+
+- [Vue 3 集成](/guide/integration-vue) - Vue 详细指南
+- [React 集成](/guide/integration-react) - React 详细指南
+- [HTML 使用](/guide/integration-html) - 原生使用
+
+### 进阶
+
+- [主题定制](/guide/theming) - 自定义主题
+- [性能优化](/guide/performance) - 性能优化技巧
+- [最佳实践](/guide/best-practices) - 开发建议
+
+## 🆘 遇到问题？
+
+- 📖 查看 [FAQ](/guide/faq)
+- 🐛 [报告问题](https://github.com/ldesign/webcomponent/issues)
+- 💬 [讨论交流](https://github.com/ldesign/webcomponent/discussions)

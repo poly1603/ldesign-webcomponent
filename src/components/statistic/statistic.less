@@ -1,0 +1,29 @@
+.ldesign-statistic {
+  display: block;
+
+  &__title {
+    margin-bottom: var(--ld-spacing-2, 8px);
+    font-size: var(--ld-font-size-sm, 14px);
+    color: var(--ld-text-secondary, rgba(0, 0, 0, 0.6));
+  }
+
+  &__content {
+    display: flex;
+    align-items: baseline;
+    gap: var(--ld-spacing-1, 4px);
+  }
+
+  &__prefix,
+  &__suffix {
+    font-size: var(--ld-font-size-lg, 18px);
+    color: var(--ld-text-secondary, rgba(0, 0, 0, 0.6));
+  }
+
+  &__value {
+    font-size: var(--ld-font-size-3xl, 30px);
+    font-weight: var(--ld-font-weight-semibold, 600);
+    color: var(--ld-text-primary, rgba(0, 0, 0, 0.87));
+    line-height: 1.2;
+  }
+}
+

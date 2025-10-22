@@ -1,0 +1,88 @@
+.ldesign-descriptions {
+  display: block;
+  --descriptions-column: 3;
+
+  &__title {
+    margin-bottom: var(--ld-spacing-4, 16px);
+    font-size: var(--ld-font-size-base, 16px);
+    font-weight: var(--ld-font-weight-semibold, 600);
+    color: var(--ld-text-primary, rgba(0, 0, 0, 0.87));
+  }
+
+  &__view {
+    display: grid;
+    grid-template-columns: repeat(var(--descriptions-column), 1fr);
+    gap: var(--ld-spacing-4, 16px);
+  }
+
+  &--bordered &__view {
+    border: 1px solid var(--ld-border-color, #d9d9d9);
+    gap: 0;
+  }
+
+  &--small {
+    font-size: var(--ld-font-size-sm, 14px);
+
+    .ldesign-descriptions-item {
+      padding: var(--ld-spacing-2, 8px);
+    }
+  }
+
+  &--medium {
+    .ldesign-descriptions-item {
+      padding: var(--ld-spacing-3, 12px);
+    }
+  }
+
+  &--large {
+    .ldesign-descriptions-item {
+      padding: var(--ld-spacing-4, 16px);
+    }
+  }
+}
+
+.ldesign-descriptions-item {
+  display: grid;
+  grid-column: span var(--item-span, 1);
+
+  .ldesign-descriptions--horizontal & {
+    grid-template-columns: auto 1fr;
+    gap: var(--ld-spacing-4, 16px);
+  }
+
+  .ldesign-descriptions--vertical & {
+    grid-template-columns: 1fr;
+  }
+
+  .ldesign-descriptions--bordered & {
+    border-bottom: 1px solid var(--ld-border-color, #d9d9d9);
+    border-right: 1px solid var(--ld-border-color, #d9d9d9);
+
+    &:nth-child(n) {
+      border-right: 1px solid var(--ld-border-color, #d9d9d9);
+    }
+  }
+
+  &__label {
+    font-weight: var(--ld-font-weight-medium, 500);
+    color: var(--ld-text-primary, rgba(0, 0, 0, 0.87));
+
+    .ldesign-descriptions--bordered & {
+      background-color: var(--ld-color-gray-50, #fafafa);
+      padding: var(--ld-spacing-3, 12px) var(--ld-spacing-4, 16px);
+    }
+  }
+
+  &__content {
+    color: var(--ld-text-secondary, rgba(0, 0, 0, 0.6));
+
+    .ldesign-descriptions--bordered & {
+      padding: var(--ld-spacing-3, 12px) var(--ld-spacing-4, 16px);
+    }
+
+    .ldesign-descriptions--vertical & {
+      margin-top: var(--ld-spacing-2, 8px);
+    }
+  }
+}
+

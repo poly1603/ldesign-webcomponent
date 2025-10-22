@@ -68,3 +68,34 @@ export { DropdownPanel } from './dropdown-panel/dropdown-panel';
 
 // Modal quick APIs
 export { alertModal, confirmModal, promptModal, promptPassword, promptForm } from './modal/modal-api';
+
+// New Data Display Components
+export { LdesignVirtualList } from './virtual-list/virtual-list';
+export { LdesignTable } from './table/table';
+export { LdesignEmpty } from './empty/empty';
+export { LdesignTimeline, LdesignTimelineItem } from './timeline/timeline';
+export { LdesignSteps, LdesignStepItem } from './steps/steps';
+export { LdesignDescriptions, LdesignDescriptionsItem } from './descriptions/descriptions';
+export { LdesignStatistic } from './statistic/statistic';
+export { LdesignResult } from './result/result';
+
+// New Feedback Components
+export { LdesignSkeleton } from './skeleton/skeleton';
+export { LdesignSpin } from './spin/spin';
+
+// New Layout Components
+export { LdesignCard } from './card/card';
+export { LdesignDivider } from './divider/divider';
+export { LdesignLayout, LdesignLayoutHeader, LdesignLayoutSider, LdesignLayoutContent, LdesignLayoutFooter } from './layout/layout';
+
+// New Navigation Components
+export { LdesignBreadcrumb, LdesignBreadcrumbItem } from './breadcrumb/breadcrumb';
+export { LdesignAnchor, LdesignAnchorLink } from './anchor/anchor';
+
+// New Form Components
+export { LdesignForm, LdesignFormItem } from './form/form';
+export { LdesignUpload } from './upload/upload';
+
+// New Other Components
+export { LdesignWatermark } from './watermark/watermark';
+export { LdesignTour } from './tour/tour';

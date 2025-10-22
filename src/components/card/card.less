@@ -1,0 +1,106 @@
+.ldesign-card {
+  display: block;
+  background-color: var(--ld-bg-container, #ffffff);
+  border-radius: var(--ld-card-radius, var(--ld-radius-lg, 8px));
+  overflow: hidden;
+  transition: all var(--ld-transition-base, 250ms) ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ld-card-header-padding, var(--ld-spacing-5, 20px) var(--ld-spacing-6, 24px));
+    border-bottom: 1px solid var(--ld-border-color, #d9d9d9);
+  }
+
+  &__title {
+    flex: 1;
+    font-size: var(--ld-font-size-lg, 18px);
+    font-weight: var(--ld-font-weight-medium, 500);
+    color: var(--ld-text-primary, rgba(0, 0, 0, 0.87));
+  }
+
+  &__extra {
+    flex-shrink: 0;
+    margin-left: var(--ld-spacing-4, 16px);
+  }
+
+  &__body {
+    padding: var(--ld-card-padding, var(--ld-spacing-6, 24px));
+  }
+
+  &__footer {
+    padding: var(--ld-spacing-5, 20px) var(--ld-spacing-6, 24px);
+    border-top: 1px solid var(--ld-border-color, #d9d9d9);
+  }
+
+  // Modifiers
+  &--bordered {
+    border: 1px solid var(--ld-border-color, #d9d9d9);
+  }
+
+  &--hoverable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  &--small {
+    .ldesign-card__header {
+      padding: var(--ld-spacing-3, 12px) var(--ld-spacing-4, 16px);
+    }
+
+    .ldesign-card__body {
+      padding: var(--ld-spacing-4, 16px);
+    }
+
+    .ldesign-card__footer {
+      padding: var(--ld-spacing-3, 12px) var(--ld-spacing-4, 16px);
+    }
+  }
+
+  &--large {
+    .ldesign-card__header {
+      padding: var(--ld-spacing-6, 24px) var(--ld-spacing-8, 32px);
+    }
+
+    .ldesign-card__body {
+      padding: var(--ld-spacing-8, 32px);
+    }
+
+    .ldesign-card__footer {
+      padding: var(--ld-spacing-6, 24px) var(--ld-spacing-8, 32px);
+    }
+  }
+
+  // Shadow
+  &--shadow-always {
+    box-shadow: var(--ld-card-shadow, var(--ld-shadow, 0 1px 3px 0 rgba(0, 0, 0, 0.1)));
+  }
+
+  &--shadow-hover:hover {
+    box-shadow: var(--ld-card-shadow, var(--ld-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)));
+  }
+
+  &--loading {
+    pointer-events: none;
+  }
+
+  // Dark theme
+  [data-theme="dark"] & {
+    background-color: var(--ld-color-gray-100, #2a2a2a);
+
+    &--bordered {
+      border-color: var(--ld-border-color, #434343);
+    }
+
+    .ldesign-card__header,
+    .ldesign-card__footer {
+      border-color: var(--ld-border-color, #434343);
+    }
+  }
+}
+
+

@@ -1,0 +1,48 @@
+{
+  "name": "@ldesign/webcomponent-vue",
+  "version": "2.0.0",
+  "description": "Vue 3 integration for @ldesign/webcomponent",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "web-components",
+    "ldesign",
+    "ui-components"
+  ],
+  "author": "LDesign Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.3.0",
+    "@ldesign/webcomponent": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.0.0",
+    "vue": "^3.4.0"
+  }
+}
+
+
+
+
