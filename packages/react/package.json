@@ -19,8 +19,7 @@
   ],
   "scripts": {
     "build": "tsc && vite build",
-    "dev": "vite",
-    "prepublishOnly": "npm run build"
+    "dev": "vite"
   },
   "keywords": [
     "react",
@@ -48,7 +47,3 @@
     "vite": "^5.0.0"
   }
 }
-
-
-
-

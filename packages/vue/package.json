@@ -19,8 +19,7 @@
   ],
   "scripts": {
     "build": "vite build",
-    "dev": "vite",
-    "prepublishOnly": "npm run build"
+    "dev": "vite"
   },
   "keywords": [
     "vue",
@@ -42,7 +41,3 @@
     "vue": "^3.4.0"
   }
 }
-
-
-
-

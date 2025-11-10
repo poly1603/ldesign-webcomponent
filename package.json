@@ -371,8 +371,7 @@
     "dev": "concurrently \"npm run build:watch\" \"npm run docs:dev\"",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "clean": "rimraf dist loader",
-    "prepublishOnly": "npm run clean && npm run build && npm run test"
+    "clean": "rimraf dist loader"
   },
   "keywords": [
     "web-components",
