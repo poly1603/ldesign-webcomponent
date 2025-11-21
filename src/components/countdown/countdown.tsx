@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, Method, Watch, h, Host, Element } from '@stencil/core';
 import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Countdown 倒计时组件
@@ -70,6 +71,8 @@ export class LdesignCountdown {
   private timer: any;
   private targetEnd: number | null = null; // 目标结束时间戳（ms）
 
+  private resources = new ResourceManager();
+
   // 监听属性变化，重新计算目标
   @Watch('endTime')
   @Watch('value')
@@ -91,7 +94,7 @@ export class LdesignCountdown {
   }
 
   disconnectedCallback() {
-    this.clearTimer();
+    this.resources.cleanup();
   }
 
   /** 开始/继续倒计时 */
@@ -102,7 +105,7 @@ export class LdesignCountdown {
     if (this.paused) return; // 受控暂停优先
     this.clearTimer();
     const interval = this.millisecond ? 50 : 1000;
-    this.timer = setInterval(() => this.tick(), interval);
+    this.timer = this.resources.addSafeInterval(() => this.tick(), interval) as any;
     // 立刻触发一次以避免 1s 延迟
     this.tick();
   }
@@ -303,13 +306,13 @@ export class LdesignCountdown {
     return (
       <span class="ldesign-countdown__progress ldesign-countdown__progress--circle" style={{ width: `${size}px`, height: `${size}px` }} aria-hidden="false">
         <svg class="ldesign-countdown__progress-circle" width={size} height={size} viewBox={`0 0 ${size} ${size}`}
-             style={{ transform: 'rotate(-90deg)' }}>
-          <circle class="ldesign-countdown__progress-circle-bg" cx={size/2} cy={size/2} r={r}
-                  stroke-width={this.circleStroke} fill="none" />
-          <circle class="ldesign-countdown__progress-circle-fg" cx={size/2} cy={size/2} r={r}
-                  stroke-width={this.circleStroke} fill="none"
-                  stroke-dasharray={`${c}`}
-                  stroke-dashoffset={`${offset}`} />
+          style={{ transform: 'rotate(-90deg)' }}>
+          <circle class="ldesign-countdown__progress-circle-bg" cx={size / 2} cy={size / 2} r={r}
+            stroke-width={this.circleStroke} fill="none" />
+          <circle class="ldesign-countdown__progress-circle-fg" cx={size / 2} cy={size / 2} r={r}
+            stroke-width={this.circleStroke} fill="none"
+            stroke-dasharray={`${c}`}
+            stroke-dashoffset={`${offset}`} />
         </svg>
         <span class="ldesign-countdown__progress-text">{text}</span>
       </span>

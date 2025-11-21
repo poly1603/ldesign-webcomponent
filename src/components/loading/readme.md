@@ -25,6 +25,19 @@ Loading 加载组件
 | `zIndex`     | `z-index`     | 全屏时的层级（可选）      | `number`                                     | `undefined` |
 
 
+## Dependencies
+
+### Used by
+
+ - [ldesign-table](../table)
+
+### Graph
+```mermaid
+graph TD;
+  ldesign-table --> ldesign-loading
+  style ldesign-loading fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

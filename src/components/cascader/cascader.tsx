@@ -1,4 +1,5 @@
-import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 import type { Placement } from '@floating-ui/dom';
 
 export interface CascaderOption {
@@ -54,7 +55,7 @@ export class LdesignCascader {
   @Prop() panelWidth?: number | string;
 
   // events
-  @Event() ldesignChange!: EventEmitter<{ value: string[] | undefined; options: CascaderOption[] }>; 
+  @Event() ldesignChange!: EventEmitter<{ value: string[] | undefined; options: CascaderOption[] }>;
   @Event() ldesignVisibleChange!: EventEmitter<boolean>;
 
   // state
@@ -62,11 +63,16 @@ export class LdesignCascader {
   @State() activePath: string[] = []; // 当前面板内的选中链
   @State() drawerVisible: boolean = false; // overlay for drawer when trigger!=='manual'
   @State() hoveredPath: string[] = []; // hover 状态下展开的路径
-  
+
   private hoverTimer: any = null; // hover 延迟计时器
   private leaveTimer: any = null; // 离开延迟计时器
+  private resources = new ResourceManager();
 
   /* ---------------- lifecycle ---------------- */
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
+
   @Watch('options') watchOptions(v: string | CascaderOption[]) {
     this.parsed = this.parseOptions(v);
   }
@@ -109,7 +115,7 @@ export class LdesignCascader {
       const val = path[i];
       if (!cursor) return [];
       const hit = cursor.find(n => n.value === val);
-      cursor = hit?.children;
+      cursor = hit?.children || undefined;
     }
     return cursor || [];
   }
@@ -203,9 +209,9 @@ export class LdesignCascader {
     }
     // 鼠标离开整个下拉区域后，延迟收起所有子菜单，避免轻微抖动
     if (this.leaveTimer) clearTimeout(this.leaveTimer);
-    this.leaveTimer = setTimeout(() => {
+    this.leaveTimer = this.resources.addSafeTimeout(() => {
       this.hoveredPath = [];
-    }, 200);
+    }, 200) as any;
   };
 
   private getDropdownInlineStyle(): any {
@@ -219,14 +225,14 @@ export class LdesignCascader {
     if (item.disabled) { ev?.preventDefault(); return; }
     const next = this.activePath.slice(0, level); // 保留之前的层级
     next[level] = item.value;
-    
+
     // 如果点击的是已选中项且有子级，只展开下一级不提交
     const alreadySelected = this.activePath[level] === item.value;
     if (alreadySelected && !this.isLeaf(item)) {
       // 保持选中状态，不触发变更
       return;
     }
-    
+
     this.activePath = next;
     const isLeaf = this.isLeaf(item);
     const shouldCommit = isLeaf || this.changeOnSelect;
@@ -238,13 +244,13 @@ export class LdesignCascader {
 
   private onItemHover(level: number, item: CascaderOption) {
     if (item.disabled) return;
-    
+
     // 清除离开计时器，防止菜单被关闭
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-    
+
     // 如果没有子级，不需要处理
     if (!item.children || item.children.length === 0) {
       // 但是需要清除更深层级的展开
@@ -253,19 +259,19 @@ export class LdesignCascader {
       }
       return;
     }
-    
+
     // 如果已经是当前 hover 的项，不需要重复设置
     if (this.hoveredPath[level] === item.value) {
       return;
     }
-    
+
     // 清除之前的 hover 计时器
     if (this.hoverTimer) {
       clearTimeout(this.hoverTimer);
     }
-    
+
     // 延迟展开，避免过于频繁的切换
-    this.hoverTimer = setTimeout(() => {
+    this.hoverTimer = this.resources.addSafeTimeout(() => {
       // 构建 hover 路径
       const next = this.hoveredPath.slice(0, level);
       next[level] = item.value;
@@ -279,13 +285,13 @@ export class LdesignCascader {
       clearTimeout(this.hoverTimer);
       this.hoverTimer = null;
     }
-    
+
     // 不立即清除，给一些时间让鼠标移动到子菜单
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
     }
-    
-    this.leaveTimer = setTimeout(() => {
+
+    this.leaveTimer = this.resources.addSafeTimeout(() => {
       // 检查当前 hover 路径是否还是这个项
       if (this.hoveredPath[level] === item.value) {
         // 清除这个层级及之后的所有 hover 状态
@@ -310,7 +316,7 @@ export class LdesignCascader {
       <span class="ldesign-cascader__clear" onClick={this.clearAll} title="清空"><ldesign-icon name="x" size="small" /></span>
     ) : null;
     return (
-      <div class={classes} tabindex={this.disabled ? -1 : 0} onKeyDown={(e: any) => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); this.openOverlay(); } }}>
+      <div class={classes} tabindex={this.disabled ? -1 : 0} onKeyDown={(e: any) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.openOverlay(); } }}>
         <span class="ldesign-cascader__text">{text}</span>
         {clearBtn}
         <span class="ldesign-cascader__arrow"><ldesign-icon name="chevron-down" size="small" /></span>
@@ -321,7 +327,7 @@ export class LdesignCascader {
   // PC 模式: 渲染列表和子菜单
   private renderPopupList(items: CascaderOption[], level: number = 0): any {
     const style: any = { maxHeight: `${this.listMaxHeight}px`, minWidth: '160px' };
-    
+
     return (
       <ul class="ldesign-cascader__list" role="menu" style={style}>
         {items.map((item) => {
@@ -330,7 +336,7 @@ export class LdesignCascader {
           const hasChildren = !!(item.children && item.children.length);
           // hover 时展开子菜单
           const isHovered = this.hoveredPath[level] === item.value;
-          
+
           const classes = {
             'ldesign-cascader__item': true,
             'ldesign-cascader__item--selected': selected,
@@ -338,11 +344,11 @@ export class LdesignCascader {
             'ldesign-cascader__item--has-children': hasChildren,
             'ldesign-cascader__item--hovered': isHovered,
           } as any;
-          
+
           return (
-            <li 
+            <li
               key={item.value}
-              class={classes} 
+              class={classes}
               onClick={(e) => this.onItemClick(level, item, e)}
               onMouseEnter={() => this.onItemHover(level, item)}
             >
@@ -355,33 +361,33 @@ export class LdesignCascader {
       </ul>
     );
   }
-  
+
   // 渲染所有层级的菜单（平铺方式）
   private renderAllMenus(): any[] {
     const menus: any[] = [];
     let currentItems = this.parsed;
-    
+
     // 渲染第一层
     menus.push(
-      <div 
-        class="ldesign-cascader__menu-container" 
+      <div
+        class="ldesign-cascader__menu-container"
         key="menu-0"
       >
         {this.renderPopupList(currentItems, 0)}
       </div>
     );
-    
+
     // 根据 hoveredPath 渲染后续层级
     for (let i = 0; i < this.hoveredPath.length; i++) {
       const parentValue = this.hoveredPath[i];
       const parent = currentItems.find(item => item.value === parentValue);
-      
+
       if (parent && parent.children && parent.children.length > 0) {
         currentItems = parent.children;
         const level = i + 1;
         menus.push(
-          <div 
-            class="ldesign-cascader__menu-container" 
+          <div
+            class="ldesign-cascader__menu-container"
             key={`menu-${level}`}
           >
             {this.renderPopupList(currentItems, level)}
@@ -391,10 +397,10 @@ export class LdesignCascader {
         break;
       }
     }
-    
+
     return menus;
   }
-  
+
   // 移动端模式: 多列平铺
   private renderColumns() {
     const cols = this.getColumns();
@@ -451,7 +457,7 @@ export class LdesignCascader {
             <span slot="trigger">
               <slot name="trigger">{this.renderTrigger()}</slot>
             </span>
-            <div 
+            <div
               class="ldesign-cascader__dropdown"
               onMouseEnter={this.onDropdownEnter}
               onMouseLeave={this.onDropdownLeave}

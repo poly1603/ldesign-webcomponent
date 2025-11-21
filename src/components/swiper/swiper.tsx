@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Method, Watch, h, Host, Fragment, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * ldesign-swiper 轮播图组件
@@ -81,6 +82,8 @@ export class LdesignSwiper {
 
   private dragStartX = 0; private dragStartY = 0; private startOffset = 0; private lastDelta = 0;
 
+  private resources = new ResourceManager();
+
   // ── Watches ───────────────────────────────────────────
   @Watch('value')
   onValueChange(v?: number) {
@@ -113,13 +116,14 @@ export class LdesignSwiper {
     try {
       this.ro = new ResizeObserver(() => this.onResize());
       if (this.viewportEl) this.ro.observe(this.viewportEl);
-    } catch {}
+    } catch { }
   }
 
   disconnectedCallback() {
     this.stopAutoplay();
-    try { this.ro?.disconnect(); } catch {}
+    try { this.ro?.disconnect(); } catch { }
     this.unbindKeyboard();
+    this.resources.cleanup();
   }
 
   private onResize() { this.update(); }
@@ -239,7 +243,7 @@ export class LdesignSwiper {
     if (!this.autoplay || this.slideCount <= 1) return;
     this.stopAutoplay();
     const delay = Math.max(0, this.autoplayDelay);
-    this.autoplayTimer = window.setInterval(() => {
+    this.autoplayTimer = this.resources.addSafeInterval(() => {
       const next = this.currentIndex + 1;
       if (!this.loop && next >= this.slideCount) {
         this.stopAutoplay();
@@ -255,9 +259,9 @@ export class LdesignSwiper {
   private bindHoverPause() {
     if (!this.pauseOnHover) return;
     const onEnter = () => { if (this.autoplay) this.stopAutoplay(); };
-    const onLeave = () => { if (this.autoplay && !this.disableOnInteraction) this.startAutoplayIfNeeded(); else if (this.autoplay && this.disableOnInteraction && !this.autoplayTimer) {/* remain stopped */} };
-    this.host.addEventListener('mouseenter', onEnter);
-    this.host.addEventListener('mouseleave', onLeave);
+    const onLeave = () => { if (this.autoplay && !this.disableOnInteraction) this.startAutoplayIfNeeded(); else if (this.autoplay && this.disableOnInteraction && !this.autoplayTimer) {/* remain stopped */ } };
+    this.resources.addSafeEventListener(this.host, 'mouseenter', onEnter as EventListener);
+    this.resources.addSafeEventListener(this.host, 'mouseleave', onLeave as EventListener);
   }
 
   // ── Keyboard ──────────────────────────────────────────
@@ -274,8 +278,8 @@ export class LdesignSwiper {
     }
     if (handled) e.preventDefault();
   };
-  private bindKeyboardIfNeeded() { if (this.keyboard) this.host.addEventListener('keydown', this.keyHandler); }
-  private unbindKeyboard() { this.host.removeEventListener('keydown', this.keyHandler); }
+  private bindKeyboardIfNeeded() { if (this.keyboard) this.resources.addSafeEventListener(this.host, 'keydown', this.keyHandler as EventListener); }
+  private unbindKeyboard() { /* cleanup会自动移除 */ }
 
   // ── Pointer ───────────────────────────────────────────
   private onPointerDown = (e: PointerEvent) => {
@@ -296,7 +300,7 @@ export class LdesignSwiper {
     this.startOffset = base;
     this.lastDelta = 0;
 
-    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { }
   };
 
   private onPointerMove = (e: PointerEvent) => {

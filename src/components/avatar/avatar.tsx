@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Avatar 头像
@@ -96,7 +97,7 @@ export class LdesignAvatar {
   @State() private textScale: number = 1; // 文本缩放
 
   private textEl?: HTMLSpanElement; // 文本内部元素
-  private resizeObs?: ResizeObserver;
+  private resources = new ResourceManager();
 
   @Watch('text')
   @Watch('gap')
@@ -114,17 +115,18 @@ export class LdesignAvatar {
   }
 
   disconnectedCallback() {
-    try { this.resizeObs?.disconnect(); } catch {}
+    this.resources.cleanup();
   }
 
   private bindResize() {
     if (!this.autosize) return;
     if (typeof ResizeObserver !== 'undefined') {
-      this.resizeObs = new ResizeObserver(() => this.measureText());
-      this.resizeObs.observe(this.el);
+      this.resources.observeResize(() => this.measureText(), this.el);
     } else {
       // 退化：窗口尺寸变化时尝试重算
-      (globalThis as any)?.addEventListener?.('resize', this.measureText, { passive: true } as any);
+      if (globalThis && 'addEventListener' in globalThis) {
+        this.resources.addSafeEventListener(globalThis as any, 'resize', this.measureText as EventListener, { passive: true });
+      }
     }
   }
 
@@ -213,7 +215,7 @@ export class LdesignAvatar {
     if (this.src && !this.hasImgError) {
       return (
         <img class="ldesign-avatar__img" src={this.src} srcSet={this.srcset} sizes={this.sizes} alt={this.alt}
-             style={{ objectFit: this.fit }} onLoad={this.handleImgLoad} onError={this.handleImgError} />
+          style={{ objectFit: this.fit }} onLoad={this.handleImgLoad} onError={this.handleImgError} />
       );
     }
 
@@ -237,15 +239,15 @@ export class LdesignAvatar {
     const hasCount = this.badgeValue !== undefined && this.badgeValue !== null && this.badgeValue !== '';
     if (!hasCount && !this.badge) return null;
     const [offsetX, offsetY] = this.badgeOffset;
-    const style = { 
+    const style = {
       background: this.badgeColor,
       transform: `translate(${offsetX}px, ${offsetY}px)`
     } as any;
     const positionClass = `ldesign-avatar__badge--${this.badgePosition}`;
     return (
-      <span class={{ 
-        'ldesign-avatar__badge': true, 
-        'ldesign-avatar__badge--dot': !hasCount, 
+      <span class={{
+        'ldesign-avatar__badge': true,
+        'ldesign-avatar__badge--dot': !hasCount,
         'ldesign-avatar__badge--count': hasCount,
         [positionClass]: true
       }} style={style}>

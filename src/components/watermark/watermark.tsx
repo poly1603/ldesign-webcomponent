@@ -1,4 +1,5 @@
 import { Component, Prop, Element, State, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Watermark 水印组件
@@ -74,6 +75,7 @@ export class LdesignWatermark {
 
   private mutationObserver?: MutationObserver;
   private watermarkDiv?: HTMLDivElement;
+  private resources = new ResourceManager();
 
   componentDidLoad(): void {
     this.generateWatermark();
@@ -81,9 +83,7 @@ export class LdesignWatermark {
   }
 
   disconnectedCallback(): void {
-    if (this.mutationObserver) {
-      this.mutationObserver.disconnect();
-    }
+    this.resources.cleanup();
   }
 
   /**
@@ -129,7 +129,7 @@ export class LdesignWatermark {
    * 设置 MutationObserver 防止删除
    */
   private setupMutationObserver(): void {
-    this.mutationObserver = new MutationObserver((mutations) => {
+    const callback = (mutations: MutationRecord[]) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           if (!this.watermarkDiv || !this.el.contains(this.watermarkDiv)) {
@@ -141,9 +141,9 @@ export class LdesignWatermark {
           }
         }
       });
-    });
+    };
 
-    this.mutationObserver.observe(this.el, {
+    this.mutationObserver = this.resources.observeMutation(callback, this.el, {
       childList: true,
       attributes: true,
       subtree: true,

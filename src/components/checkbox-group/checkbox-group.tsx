@@ -1,5 +1,6 @@
 import { Component, Prop, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
 import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * CheckboxGroup 复选框组组件
@@ -12,6 +13,7 @@ import { Size } from '../../types';
 })
 export class LdesignCheckboxGroup {
   @Element() el!: HTMLElement;
+  private resources = new ResourceManager();
 
   /**
    * 绑定值
@@ -75,7 +77,7 @@ export class LdesignCheckboxGroup {
       if (!('labelPlacement' in box) || box.labelPlacement === undefined) box.labelPlacement = this.labelPlacement;
 
       // 监听变化
-      box.addEventListener('ldesignChange', this.handleCheckboxChange);
+      this.resources.addSafeEventListener(box, 'ldesignChange', this.handleCheckboxChange as EventListener);
     });
   }
 
@@ -116,10 +118,7 @@ export class LdesignCheckboxGroup {
   };
 
   disconnectedCallback() {
-    const checkboxes = this.el.querySelectorAll('ldesign-checkbox');
-    checkboxes.forEach((box: any) => {
-      box.removeEventListener('ldesignChange', this.handleCheckboxChange);
-    });
+    this.resources.cleanup();
   }
 
   render() {

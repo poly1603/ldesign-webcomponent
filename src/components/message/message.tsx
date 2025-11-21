@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, Method, Element, h, Host } from '@stencil/core';
 import { message as messageAPI, MessageOptions } from './message-manager';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type MessageType = 'info' | 'success' | 'warning' | 'error' | 'loading';
 
@@ -37,7 +38,7 @@ export class LdesignMessage {
 
   /** 简单文本内容（也可使用 slot 自定义内容） */
   @Prop() message?: string;
-  
+
   /** 标题内容 */
   @Prop() messageTitle?: string;
 
@@ -46,13 +47,13 @@ export class LdesignMessage {
 
   /** 出现位置 */
   @Prop() placement: 'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right' | 'center' = 'top';
-  
+
   /** 最大宽度 */
   @Prop() maxWidth?: string;
-  
+
   /** 是否支持HTML内容 */
   @Prop() html: boolean = false;
-  
+
   /** 自定义类名 */
   @Prop() customClass?: string;
 
@@ -61,18 +62,19 @@ export class LdesignMessage {
 
   /** 内部：是否处于关闭过渡阶段 */
   @State() private isClosing = false;
-  
+
   /** 消息实例ID */
   @State() private messageId?: string;
 
   /** 关闭事件 */
   @Event() ldesignClose!: EventEmitter<void>;
-  
+
   /** 点击事件 */
   @Event() ldesignClick!: EventEmitter<void>;
 
-  private closeTimer?: number;
+  private closeTimer?: any;
   private useGlobalManager = false;
+  private resources = new ResourceManager();
 
   connectedCallback() {
     // 检查是否使用全局管理器
@@ -94,7 +96,7 @@ export class LdesignMessage {
   }
 
   disconnectedCallback() {
-    this.clearTimer();
+    this.resources.cleanup();
   }
 
   /** 手动关闭（带高度收起动画，带动后续消息平滑上移） */
@@ -133,7 +135,7 @@ export class LdesignMessage {
 
   private startTimer() {
     if (this.duration && this.duration > 0) {
-      this.closeTimer = (setTimeout(() => this.close(), this.duration) as unknown) as number;
+      this.closeTimer = this.resources.addSafeTimeout(() => this.close(), this.duration);
     }
   }
 

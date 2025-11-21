@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch, Fragment } from '@stencil/core';
 import { Placement } from '@floating-ui/dom';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type DropdownPlacement = Placement;
 export type DropdownTrigger = 'click' | 'hover' | 'focus' | 'contextmenu' | 'manual';
@@ -107,7 +108,7 @@ export class LdesignDropdown {
   @Prop() appendTo: 'self' | 'body' | 'closest-popup' = 'body';
 
   /** 选中变化事件 */
-  @Event() ldesignChange!: EventEmitter<{ key: string; item: DropdownItem }>; 
+  @Event() ldesignChange!: EventEmitter<{ key: string; item: DropdownItem }>;
 
   /** 对外转发可见性变化 */
   @Event() ldesignVisibleChange!: EventEmitter<boolean>;
@@ -135,12 +136,16 @@ export class LdesignDropdown {
     this.currentKey = this.value ?? this.defaultValue;
   }
 
+  private resources = new ResourceManager();
+
   componentDidLoad() {
-    window.addEventListener('resize', this.handleResize);
+    this.resources.addSafeEventListener(window, 'resize', this.handleResize as EventListener);
     this.updateFitWidth();
   }
 
-  disconnectedCallback() { window.removeEventListener('resize', this.handleResize); }
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
 
   // ---------- utils ----------
   private isMobile(): boolean {

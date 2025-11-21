@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
 import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Slider 滑块组件
@@ -14,6 +15,7 @@ export class LdesignSlider {
   @Element() host!: HTMLElement;
 
   private trackEl?: HTMLElement;
+  private resources = new ResourceManager();
 
   /** 当前值 */
   @Prop({ mutable: true, reflect: true }) value: number = 0;
@@ -51,8 +53,7 @@ export class LdesignSlider {
     if (!this.isDragging) return;
     e.preventDefault();
     this.isDragging = false;
-    window.removeEventListener('pointermove', this.onWindowPointerMove);
-    window.removeEventListener('pointerup', this.onWindowPointerUp);
+    // 事件监听器会在cleanup时自动移除
     this.ldesignChange.emit(this.value);
   };
 
@@ -115,9 +116,13 @@ export class LdesignSlider {
 
     // 开始拖动
     this.isDragging = true;
-    window.addEventListener('pointermove', this.onWindowPointerMove);
-    window.addEventListener('pointerup', this.onWindowPointerUp);
+    this.resources.addSafeEventListener(window, 'pointermove', this.onWindowPointerMove as EventListener);
+    this.resources.addSafeEventListener(window, 'pointerup', this.onWindowPointerUp as EventListener);
   };
+
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
 
   private handleKeyDown = (e: KeyboardEvent) => {
     if (this.disabled) return;
@@ -177,7 +182,7 @@ export class LdesignSlider {
   render() {
     const percent = this.getPercent();
     const isVertical = this.vertical;
-    
+
     // 根据尺寸设置具体的thumb大小
     const thumbSizes = {
       'small': { width: '12px', height: '12px' },
@@ -190,27 +195,27 @@ export class LdesignSlider {
       // 垂直模式：完全独立的渲染逻辑
       return (
         <Host class="ldesign-slider-host ldesign-slider-host--vertical" style={{ display: 'inline-flex' }}>
-          <div 
+          <div
             class={this.getRootClass()}
             onPointerDown={this.handleTrackPointerDown as any}
           >
-            <div 
+            <div
               class="ldesign-slider__track ldesign-slider__track--vertical"
               ref={(el) => (this.trackEl = el)}
               style={{ position: 'relative', width: '4px', height: '100%', margin: '0' }}
             >
-              <div 
-              class="ldesign-slider__rail ldesign-slider__rail--vertical"
-              style={{ position: 'absolute', width: '100%', height: '100%', left: '0', top: '0', background: 'var(--ld-slider-rail-bg, #e5e7eb)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', borderRadius: '9999px' }}
+              <div
+                class="ldesign-slider__rail ldesign-slider__rail--vertical"
+                style={{ position: 'absolute', width: '100%', height: '100%', left: '0', top: '0', background: 'var(--ld-slider-rail-bg, #e5e7eb)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', borderRadius: '9999px' }}
               />
-              <div 
+              <div
                 class="ldesign-slider__fill ldesign-slider__fill--vertical"
                 style={{ position: 'absolute', width: '100%', bottom: '0', background: 'var(--ld-slider-fill-bg, var(--ldesign-color-primary, #1677ff))', borderRadius: '9999px', height: `${percent}%` }}
               />
               <div
                 class="ldesign-slider__thumb ldesign-slider__thumb--vertical"
-                style={{ 
-                  bottom: `${percent}%`, 
+                style={{
+                  bottom: `${percent}%`,
                   transform: 'translate(-50%, 50%)',
                   width: currentThumbSize.width,
                   height: currentThumbSize.height,
@@ -248,16 +253,16 @@ export class LdesignSlider {
     // 水平模式：保持原有逻辑
     return (
       <Host class="ldesign-slider-host ldesign-slider-host--horizontal">
-        <div 
+        <div
           class={this.getRootClass()}
           onPointerDown={this.handleTrackPointerDown as any}
         >
-          <div 
+          <div
             class="ldesign-slider__track"
             ref={(el) => (this.trackEl = el)}
           >
             <div class="ldesign-slider__rail" style={{ background: 'var(--ld-slider-rail-bg, #e5e7eb)' }} />
-            <div 
+            <div
               class="ldesign-slider__fill"
               style={{ width: `${percent}%`, background: 'var(--ld-slider-fill-bg, var(--ldesign-color-primary, #1677ff))' }}
             />

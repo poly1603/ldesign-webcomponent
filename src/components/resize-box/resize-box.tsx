@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch } from '@stencil/core';
 import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * ResizeBox 伸缩框
@@ -60,6 +61,7 @@ export class LdesignResizeBox {
   private startY = 0;
   private startW = 0;
   private startH = 0;
+  private resources = new ResourceManager();
 
   private parseNumber(v: number | string | undefined, fallback: number): number {
     if (v == null) return fallback;
@@ -81,7 +83,7 @@ export class LdesignResizeBox {
   private getAllowed() {
     const edgeAll: Array<'top' | 'right' | 'bottom' | 'left'> = ['top', 'right', 'bottom', 'left'];
     const cornerAll: Array<'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'> = [
-      'top-left','top-right','bottom-right','bottom-left'
+      'top-left', 'top-right', 'bottom-right', 'bottom-left'
     ];
     return {
       edges: this.parseList(this.directions as any, edgeAll),
@@ -122,12 +124,12 @@ export class LdesignResizeBox {
     this.resizing = true;
 
     // 捕获指针，保证拖拽顺畅不中断
-    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); this.activePointerId = e.pointerId; } catch {}
+    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); this.activePointerId = e.pointerId; } catch { }
 
     this.ldesignResizeStart.emit({ width: this.startW, height: this.startH, edge });
 
-    window.addEventListener('pointermove', this.onWindowPointerMove, { passive: false });
-    window.addEventListener('pointerup', this.onWindowPointerUp, { passive: false, once: false });
+    this.resources.addSafeEventListener(window, 'pointermove', this.onWindowPointerMove as EventListener, { passive: false });
+    this.resources.addSafeEventListener(window, 'pointerup', this.onWindowPointerUp as EventListener, { passive: false });
   };
 
   private onCornerPointerDown = (corner: 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left') => (e: PointerEvent) => {
@@ -149,12 +151,12 @@ export class LdesignResizeBox {
     this.activeEdge = corner;
     this.resizing = true;
 
-    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); this.activePointerId = e.pointerId; } catch {}
+    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); this.activePointerId = e.pointerId; } catch { }
 
     this.ldesignResizeStart.emit({ width: this.startW, height: this.startH, edge: corner });
 
-    window.addEventListener('pointermove', this.onWindowPointerMove, { passive: false });
-    window.addEventListener('pointerup', this.onWindowPointerUp, { passive: false, once: false });
+    this.resources.addSafeEventListener(window, 'pointermove', this.onWindowPointerMove as EventListener, { passive: false });
+    this.resources.addSafeEventListener(window, 'pointerup', this.onWindowPointerUp as EventListener, { passive: false });
   };
 
   private onWindowPointerMove = (e: PointerEvent) => {
@@ -230,16 +232,12 @@ export class LdesignResizeBox {
         // 释放捕获
         (this.host as any)?.releasePointerCapture?.(this.activePointerId);
       }
-    } catch {}
-
-    window.removeEventListener('pointermove', this.onWindowPointerMove as any);
-    window.removeEventListener('pointerup', this.onWindowPointerUp as any);
+    } catch { }
   };
 
   disconnectedCallback() {
     // 组件被移除时确保清理全局事件
-    window.removeEventListener('pointermove', this.onWindowPointerMove as any);
-    window.removeEventListener('pointerup', this.onWindowPointerUp as any);
+    this.resources.cleanup();
   }
 
   private getRootClass(): string {

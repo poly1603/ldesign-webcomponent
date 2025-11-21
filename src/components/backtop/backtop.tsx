@@ -1,4 +1,5 @@
 import { Component, Prop, h, Host, Element, State, Watch } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * BackTop 返回顶部组件
@@ -40,7 +41,8 @@ export class LdesignBacktop {
   /** 内联定位样式（用于 target 容器时固定在容器内部） */
   @State() positionStyle: any = {};
 
-  private scrollContainer: HTMLElement | Window = typeof window !== 'undefined' ? window : (undefined as any);
+  private scrollContainer?: HTMLElement | Window;
+  private resources = new ResourceManager();
   private buttonEl?: HTMLElement;
 
   connectedCallback() {
@@ -54,8 +56,8 @@ export class LdesignBacktop {
   }
 
   disconnectedCallback() {
-    this.unbindScroll();
     this.unbindGlobalListeners();
+    this.resources.cleanup();
   }
 
   @Watch('target')
@@ -73,10 +75,10 @@ export class LdesignBacktop {
 
     const handler = this.handleScroll as EventListener;
     if (container === window) {
-      window.addEventListener('scroll', handler, { passive: true });
+      this.resources.addSafeEventListener(window, 'scroll', handler, { passive: true });
       this.updateVisible(this.getScrollTop(window));
     } else {
-      (container as HTMLElement).addEventListener('scroll', handler, { passive: true } as any);
+      this.resources.addSafeEventListener(container as HTMLElement, 'scroll', handler, { passive: true });
       this.updateVisible(this.getScrollTop(container as HTMLElement));
     }
 
@@ -84,29 +86,18 @@ export class LdesignBacktop {
   }
 
   private unbindScroll() {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    const handler = this.handleScroll as EventListener;
-
-    if (this.scrollContainer) {
-      if (this.scrollContainer === window) {
-        window.removeEventListener('scroll', handler as any);
-      } else {
-        (this.scrollContainer as HTMLElement).removeEventListener('scroll', handler as any);
-      }
-    }
+    // cleanup会自动移除所有事件监听器
   }
 
   private bindGlobalListeners() {
     if (typeof window === 'undefined') return;
-    window.addEventListener('resize', this.updatePosition as EventListener, { passive: true } as any);
+    this.resources.addSafeEventListener(window, 'resize', this.updatePosition as EventListener, { passive: true });
     // 当页面发生滚动（非容器滚动）时也更新位置，保持贴紧容器
-    window.addEventListener('scroll', this.updatePosition as EventListener, { passive: true } as any);
+    this.resources.addSafeEventListener(window, 'scroll', this.updatePosition as EventListener, { passive: true });
   }
 
   private unbindGlobalListeners() {
-    if (typeof window === 'undefined') return;
-    window.removeEventListener('resize', this.updatePosition as EventListener);
-    window.removeEventListener('scroll', this.updatePosition as EventListener);
+    // cleanup会自动移除所有事件监听器
   }
 
   private resolveTarget(): HTMLElement | Window {

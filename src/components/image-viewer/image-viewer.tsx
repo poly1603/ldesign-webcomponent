@@ -1,5 +1,6 @@
 import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
 import { lockPageScroll, unlockPageScroll } from '../../utils/scroll-lock';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type ImageViewerItem = {
   src: string;
@@ -61,7 +62,7 @@ export class LdesignImageViewer {
   @Prop() transitionDuration: number = 240;
   /** 过渡缓动函数 */
   @Prop() transitionEasing: string = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-  
+
   /** 打开/关闭动画效果：fade 淡入淡出；zoom 缩放；slide-up 上滑；slide-down 下滑；none 无动画 */
   @Prop() openAnimation: 'fade' | 'zoom' | 'fade-zoom' | 'slide-up' | 'slide-down' | 'none' = 'fade-zoom';
   /** 打开动画时长（ms，不设置则使用 transitionDuration） */
@@ -70,7 +71,7 @@ export class LdesignImageViewer {
   @Prop() closeAnimation?: 'fade' | 'zoom' | 'fade-zoom' | 'slide-up' | 'slide-down' | 'none';
   /** 关闭动画时长（ms，不设置则使用 openDuration 或 transitionDuration） */
   @Prop() closeDuration?: number;
-  
+
   /** 是否显示标题与描述 */
   @Prop() showCaption: boolean = true;
   /** 标题与描述的显示位置：bottom 底部（工具栏上方）；top 顶部（缩略图下方） */
@@ -120,8 +121,9 @@ export class LdesignImageViewer {
   private moveRaf?: number;
   private imageEl?: HTMLImageElement; // 仅用于旧图交叉淡出覆盖层
   private panelEl?: HTMLElement;
-  private canvasEl?: HTMLElement;
-  private imgKey: number = 0;
+  private canvasEl?: HTMLDivElement;
+  private draggableRefs: Map<number, any> = new Map();
+  private resources = new ResourceManager();
   // 多指触控/手势（主要用于保留旧逻辑状态，实际手势由 Draggable 处理）
   private activePointers = new Map<number, { x: number; y: number }>();
   private isPinching = false;
@@ -202,14 +204,14 @@ export class LdesignImageViewer {
     if (this.visible) this.setVisibleInternal(true);
     // 初始化舞台尺寸监听（影响拖拽边界）
     this.updateStageMetrics();
-    window.addEventListener('resize', this.onWindowResize, { passive: true } as any);
+    this.resources.addSafeEventListener(window, 'resize', this.onWindowResize as EventListener, { passive: true });
     // 捕获阶段监听，用于缩放≈1 时的轻扫切图/下滑关闭，不干扰内部 draggable 的事件处理
-    try {
-      this.canvasEl?.addEventListener('pointerdown', this.onStagePointerDownCapture as any, { capture: true } as any);
-      this.canvasEl?.addEventListener('pointermove', this.onStagePointerMoveCapture as any, { capture: true } as any);
-      this.canvasEl?.addEventListener('pointerup', this.onStagePointerUpCapture as any, { capture: true } as any);
-      this.canvasEl?.addEventListener('pointercancel', this.onStagePointerUpCapture as any, { capture: true } as any);
-    } catch {}
+    if (this.canvasEl) {
+      this.resources.addSafeEventListener(this.canvasEl, 'pointerdown', this.onStagePointerDownCapture as EventListener, { capture: true });
+      this.resources.addSafeEventListener(this.canvasEl, 'pointermove', this.onStagePointerMoveCapture as EventListener, { capture: true });
+      this.resources.addSafeEventListener(this.canvasEl, 'pointerup', this.onStagePointerUpCapture as EventListener, { capture: true });
+      this.resources.addSafeEventListener(this.canvasEl, 'pointercancel', this.onStagePointerUpCapture as EventListener, { capture: true });
+    }
   }
 
   componentDidRender() {
@@ -255,21 +257,13 @@ export class LdesignImageViewer {
     const right = (centerIndex + 1) % n;
     [left, right].forEach(i => {
       const it = this.list[i];
-      if (it?.src) this.preloadImage(it.src).catch(() => {});
+      if (it?.src) this.preloadImage(it.src).catch(() => { });
     });
   }
 
   disconnectedCallback() {
-    this.unbindKeydown();
     if (this.visible) unlockPageScroll();
-    if (this.fadeTimer) { clearTimeout(this.fadeTimer); this.fadeTimer = undefined as any; }
-    window.removeEventListener('resize', this.onWindowResize as any);
-    try {
-      this.canvasEl?.removeEventListener('pointerdown', this.onStagePointerDownCapture as any, { capture: true } as any);
-      this.canvasEl?.removeEventListener('pointermove', this.onStagePointerMoveCapture as any, { capture: true } as any);
-      this.canvasEl?.removeEventListener('pointerup', this.onStagePointerUpCapture as any, { capture: true } as any);
-      this.canvasEl?.removeEventListener('pointercancel', this.onStagePointerUpCapture as any, { capture: true } as any);
-    } catch {}
+    this.resources.cleanup();
   }
 
   // ── Helpers ─────────────────────────────────────────────────────
@@ -293,8 +287,8 @@ export class LdesignImageViewer {
 
   private clampIndex() { this.index = this.normalizeIndex(this.index); }
 
-  private bindKeydown() { if (!this.keyboard) return; document.addEventListener('keydown', this.onKeydown); }
-  private unbindKeydown() { document.removeEventListener('keydown', this.onKeydown); }
+  private bindKeydown() { if (!this.keyboard) return; this.resources.addSafeEventListener(document, 'keydown', this.onKeydown as EventListener); }
+  private unbindKeydown() { /* handled by cleanup */ }
 
   private setVisibleInternal(v: boolean) {
     if (v) {
@@ -327,7 +321,7 @@ export class LdesignImageViewer {
       this.unbindKeydown();
       if (this.viewerMode === 'overlay') unlockPageScroll();
       this.ldesignClose.emit();
-      window.setTimeout(() => { this.isClosing = false; }, this.transitionDuration);
+      this.resources.addSafeTimeout(() => { this.isClosing = false; }, this.transitionDuration);
     }
     this.ldesignVisibleChange.emit(!!v);
   }
@@ -348,7 +342,7 @@ export class LdesignImageViewer {
   private applyTransform() {
     // 由 Draggable 接管实际变换，这里仅用于旧图覆盖层与状态计算
     if (this.imageEl) {
-      try { this.imageEl.style.transform = this.getTransformString(); } catch {}
+      try { this.imageEl.style.transform = this.getTransformString(); } catch { }
     }
   }
 
@@ -359,7 +353,7 @@ export class LdesignImageViewer {
     this.bouncing = false;
     this.stopMomentum();
     // 交给 Draggable 重置实际变换
-    try { (this.draggableEl as any)?.reset(); } catch {}
+    try { (this.draggableEl as any)?.reset(); } catch { }
     // 不再依赖 pendingApply 触发 img transform
     this.pendingApply = false;
   }
@@ -410,7 +404,7 @@ export class LdesignImageViewer {
           requestAnimationFrame(() => { this.enterScale = 1; this.applyTransform(); });
         }
         if (this.fadeTimer) window.clearTimeout(this.fadeTimer);
-        this.fadeTimer = window.setTimeout(() => { this.crossfading = false; this.prevSrc = undefined; this.prevTransform = undefined; }, this.transitionDuration);
+        this.fadeTimer = this.resources.addSafeTimeout(() => { this.crossfading = false; this.prevSrc = undefined; this.prevTransform = undefined; }, this.transitionDuration) as any;
       }
       // 预热相邻图片
       this.prewarmNeighbors(this.index);
@@ -435,20 +429,20 @@ export class LdesignImageViewer {
   // ── Panel drag (modal) ────────────────────────────────────────────
   private onPanelPointerDown = (e: PointerEvent) => {
     if (this.viewerMode !== 'modal') return;
-    
+
     // 检查是否点击在交互元素上（按钮、链接等）
     const target = e.target as HTMLElement | null;
     if (target) {
       const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], .ldesign-image-viewer__tool, .ldesign-image-viewer__thumb, .ldesign-image-viewer__nav');
       if (isInteractive) return; // 在交互元素上不启动拖拽
     }
-    
+
     // 只允许在标题栏内启动拖动（当 panelDraggable='title' 时）
     if (this.panelDraggable === 'title') {
       const inTitle = target && target.closest && target.closest('.ldesign-image-viewer__titlebar');
       if (!inTitle) return; // 非标题区域忽略，避免与图片拖拽冲突
     }
-    
+
     this.panelDragging = true;
     this.panelStartX = e.clientX; this.panelStartY = e.clientY;
     this.panelStartOffsetX = this.panelOffsetX; this.panelStartOffsetY = this.panelOffsetY;
@@ -474,13 +468,13 @@ export class LdesignImageViewer {
       nextY = Math.min(maxY, Math.max(-maxY, nextY));
     }
     this.panelOffsetX = nextX; this.panelOffsetY = nextY;
-    try { this.panelEl?.style.setProperty('--panel-x', this.panelOffsetX + 'px'); this.panelEl?.style.setProperty('--panel-y', this.panelOffsetY + 'px'); } catch {}
+    try { this.panelEl?.style.setProperty('--panel-x', this.panelOffsetX + 'px'); this.panelEl?.style.setProperty('--panel-y', this.panelOffsetY + 'px'); } catch { }
   };
   private onPanelPointerUp = (e: PointerEvent) => {
     if (!this.panelDragging) return;
     this.panelDragging = false;
     this.panelEl?.classList.remove('is-dragging');
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { }
   };
 
   private onWheel = (e: WheelEvent) => {
@@ -489,7 +483,7 @@ export class LdesignImageViewer {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -this.zoomStep : this.zoomStep;
     const target = Math.min(this.maxScale, Math.max(this.minScale, this.scale + delta));
-    try { (this.draggableEl as any)?.zoomTo(target, e.clientX, e.clientY); } catch {}
+    try { (this.draggableEl as any)?.zoomTo(target, e.clientX, e.clientY); } catch { }
     this.showUiTemporarily();
   };
 
@@ -503,7 +497,7 @@ export class LdesignImageViewer {
     let next = Math.min(this.maxScale, Math.max(this.minScale, nextScale));
     if (Math.abs(next - 1) < 0.02) next = 1;
     next = Number(next.toFixed(4));
-    try { (this.draggableEl as any)?.zoomTo(next, clientX, clientY); } catch {}
+    try { (this.draggableEl as any)?.zoomTo(next, clientX, clientY); } catch { }
     // 状态更新由 onDraggableTransformChange 同步
   }
 
@@ -543,8 +537,8 @@ export class LdesignImageViewer {
     this.applyTransform();
   }
 
-  private rotateLeft = () => { const next = (this.rotate - 90) % 360; try { (this.draggableEl as any)?.setRotate(next); } catch {} this.rotate = next; };
-  private rotateRight = () => { const next = (this.rotate + 90) % 360; try { (this.draggableEl as any)?.setRotate(next); } catch {} this.rotate = next; };
+  private rotateLeft = () => { const next = (this.rotate - 90) % 360; try { (this.draggableEl as any)?.setRotate(next); } catch { } this.rotate = next; };
+  private rotateRight = () => { const next = (this.rotate + 90) % 360; try { (this.draggableEl as any)?.setRotate(next); } catch { } this.rotate = next; };
   private flipHorizontal = () => { this.flipX = !this.flipX; /* 翻转通过外层包裹容器实现 */ };
   private flipVertical = () => { this.flipY = !this.flipY; /* 翻转通过外层包裹容器实现 */ };
 
@@ -552,7 +546,7 @@ export class LdesignImageViewer {
     // 由 Draggable 自行处理双击缩放；这里保留兜底调用以保持一致体验
     e.preventDefault();
     const target = this.scale === 1 ? 2 : 1;
-    try { (this.draggableEl as any)?.zoomTo(target, (e as any).clientX, (e as any).clientY); } catch {}
+    try { (this.draggableEl as any)?.zoomTo(target, (e as any).clientX, (e as any).clientY); } catch { }
     this.showUiTemporarily();
   };
 
@@ -562,7 +556,7 @@ export class LdesignImageViewer {
     // 仅在小屏设备或触摸操作时自动隐藏
     const isSmallScreen = window.innerWidth <= 900;
     if (isSmallScreen) {
-      this.uiTimer = window.setTimeout(() => { this.uiHidden = true; }, 2200);
+      this.uiTimer = this.resources.addSafeTimeout(() => { this.uiHidden = true; }, 2200) as any;
     }
   }
 
@@ -609,7 +603,7 @@ export class LdesignImageViewer {
       const a = document.createElement('a');
       a.href = item.src; a.download = item.name || `image_${this.index + 1}`; a.rel = 'noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    } catch {}
+    } catch { }
   };
 
   private selectIndex(i: number) { if (i === this.index) return; this.startSwitch(this.normalizeIndex(i)); }
@@ -658,7 +652,7 @@ export class LdesignImageViewer {
     const prev = this.prevSrc ? this.list.find(it => it.src === this.prevSrc) : undefined;
     const captionItem = (this.loading && prev) ? prev : this.current();
     if (!captionItem || (!captionItem.title && !captionItem.description)) return null;
-    
+
     return (
       <div class={`ldesign-image-viewer__caption ldesign-image-viewer__caption--${this.captionPosition} ldesign-image-viewer__caption--${this.captionAlign}`}>
         {captionItem.title ? <div class="ldesign-image-viewer__caption-title">{captionItem.title}</div> : null}
@@ -670,13 +664,13 @@ export class LdesignImageViewer {
   render() {
     if (!this.visible && !this.isClosing) return null as any;
     const item = this.current();
-    
+
     // 动画相关
     const openAnim = this.openAnimation;
     const closeAnim = this.closeAnimation || this.openAnimation;
     const openDur = this.openDuration || this.transitionDuration;
     const closeDur = this.closeDuration || this.openDuration || this.transitionDuration;
-    
+
     const classes = [
       'ldesign-image-viewer',
       this.backdrop === 'dark' ? 'ldesign-image-viewer--dark' : 'ldesign-image-viewer--light',
@@ -686,11 +680,11 @@ export class LdesignImageViewer {
       `ldesign-image-viewer--open-${openAnim}`,
       `ldesign-image-viewer--close-${closeAnim}`
     ].filter(c => c).join(' ');
-    
+
     // 调试日志
-    
-    
-    
+
+
+
 
     const panelStyle: any = this.viewerMode === 'modal' ? { width: this.toPx(this.panelWidth) || '80vw', height: this.toPx(this.panelHeight) || '70vh' } : this.viewerMode === 'embedded' ? { width: '100%', height: '100%' } : { width: '100%', height: '100%' };
 
@@ -700,13 +694,13 @@ export class LdesignImageViewer {
 
     return (
       <Host>
-        <div class={classes} data-motion={this.motion} style={{ 
-          zIndex: String(this.zIndex), 
-          ['--iv-duration' as any]: `${this.transitionDuration}ms`, 
+        <div class={classes} data-motion={this.motion} style={{
+          zIndex: String(this.zIndex),
+          ['--iv-duration' as any]: `${this.transitionDuration}ms`,
           ['--iv-ease' as any]: this.transitionEasing,
           ['--iv-open-duration' as any]: `${openDur}ms`,
           ['--iv-close-duration' as any]: `${closeDur}ms`
-        }} onClick={this.viewerMode==='overlay' ? this.onMaskClick : undefined}>
+        }} onClick={this.viewerMode === 'overlay' ? this.onMaskClick : undefined}>
           <div
             ref={el => (this.panelEl = el as HTMLElement)}
             class="ldesign-image-viewer__panel"
@@ -729,55 +723,55 @@ export class LdesignImageViewer {
 
             {/* 顶部：缩略图与计数（embedded 隐藏） */}
             {this.viewerMode !== 'embedded' && (
-            <div class="ldesign-image-viewer__top">
-              {this.renderHeader()}
-              <div class="ldesign-image-viewer__counter">{this.index + 1}/{this.list.length}</div>
-              {/* top 位置的 caption */}
-              {this.captionPosition === 'top' && this.renderCaption()}
-            </div>
+              <div class="ldesign-image-viewer__top">
+                {this.renderHeader()}
+                <div class="ldesign-image-viewer__counter">{this.index + 1}/{this.list.length}</div>
+                {/* top 位置的 caption */}
+                {this.captionPosition === 'top' && this.renderCaption()}
+              </div>
             )}
 
             {/* 中部：舞台与导航 */}
             <div class="ldesign-image-viewer__stage">
-            {this.list.length > 1 && (
-              <button class="ldesign-image-viewer__nav ldesign-image-viewer__nav--prev" onClick={() => this.prev()} aria-label="上一张">
-                <ldesign-icon name="chevron-left" />
-              </button>
-            )}
-            <div class="ldesign-image-viewer__canvas" ref={el => (this.canvasEl = el as HTMLElement)} onWheel={this.onWheel} onDblClick={this.onDblClick}>
-              {(this.loading || this.crossfading) && this.prevSrc ? (
-                <img class={{ 'ldesign-image-viewer__img': true, 'fade-leave': this.crossfading }} src={this.prevSrc} alt="prev" draggable={false} style={{ transform: this.prevTransform || this.getTransformString() }} />
-              ) : null}
-              {item ? (
-                <div style={{ ...flipStyle, width: '100%', height: '100%' }}>
-                  <ldesign-draggable
-                    ref={el => (this.draggableEl = el as any)}
-                    src={item.src}
-                    alt={item.alt || ''}
-                    wheelZoom={this.wheelZoom}
-                    zoomStep={this.zoomStep}
-                    minScale={this.minScale}
-                    maxScale={this.maxScale}
-                    enableRotate={true}
-                    doubleTapZoom={2}
-                    onLdesignTransformChange={(e: any) => this.onDraggableTransformChange(e)}
-                    onLdesignGestureStart={() => { this.gesturing = true; this.showUiTemporarily(); }}
-                    onLdesignGestureEnd={() => { this.gesturing = false; this.showUiTemporarily(); }}
-                    style={{ width: '100%', height: '100%', ...draggableFadeStyle }}
-                  />
-                </div>
-              ) : null}
-              {this.loading ? (
-                <div class="ldesign-image-viewer__loading" aria-live="polite" aria-busy="true">
-                  <div class="ldesign-image-viewer__spinner" />
-                </div>
-              ) : null}
-            </div>
-            {this.list.length > 1 && (
-              <button class="ldesign-image-viewer__nav ldesign-image-viewer__nav--next" onClick={() => this.next()} aria-label="下一张">
-                <ldesign-icon name="chevron-right" />
-              </button>
-            )}
+              {this.list.length > 1 && (
+                <button class="ldesign-image-viewer__nav ldesign-image-viewer__nav--prev" onClick={() => this.prev()} aria-label="上一张">
+                  <ldesign-icon name="chevron-left" />
+                </button>
+              )}
+              <div class="ldesign-image-viewer__canvas" ref={el => (this.canvasEl = el as HTMLElement)} onWheel={this.onWheel} onDblClick={this.onDblClick}>
+                {(this.loading || this.crossfading) && this.prevSrc ? (
+                  <img class={{ 'ldesign-image-viewer__img': true, 'fade-leave': this.crossfading }} src={this.prevSrc} alt="prev" draggable={false} style={{ transform: this.prevTransform || this.getTransformString() }} />
+                ) : null}
+                {item ? (
+                  <div style={{ ...flipStyle, width: '100%', height: '100%' }}>
+                    <ldesign-draggable
+                      ref={el => (this.draggableEl = el as any)}
+                      src={item.src}
+                      alt={item.alt || ''}
+                      wheelZoom={this.wheelZoom}
+                      zoomStep={this.zoomStep}
+                      minScale={this.minScale}
+                      maxScale={this.maxScale}
+                      enableRotate={true}
+                      doubleTapZoom={2}
+                      onLdesignTransformChange={(e: any) => this.onDraggableTransformChange(e)}
+                      onLdesignGestureStart={() => { this.gesturing = true; this.showUiTemporarily(); }}
+                      onLdesignGestureEnd={() => { this.gesturing = false; this.showUiTemporarily(); }}
+                      style={{ width: '100%', height: '100%', ...draggableFadeStyle }}
+                    />
+                  </div>
+                ) : null}
+                {this.loading ? (
+                  <div class="ldesign-image-viewer__loading" aria-live="polite" aria-busy="true">
+                    <div class="ldesign-image-viewer__spinner" />
+                  </div>
+                ) : null}
+              </div>
+              {this.list.length > 1 && (
+                <button class="ldesign-image-viewer__nav ldesign-image-viewer__nav--next" onClick={() => this.next()} aria-label="下一张">
+                  <ldesign-icon name="chevron-right" />
+                </button>
+              )}
             </div>
 
             {/* 底部：标题/描述 + 工具栏 */}
@@ -855,7 +849,7 @@ export class LdesignImageViewer {
   private stopMomentum() {
     this.momentumRunning = false;
     if (this.momentumRaf) { cancelAnimationFrame(this.momentumRaf); this.momentumRaf = undefined; }
-    try { this.imageEl?.classList.remove('is-kinetic'); } catch {}
+    try { this.imageEl?.classList.remove('is-kinetic'); } catch { }
   }
 
   // ── 与 Draggable 交互：同步状态 ───────────────────────────────

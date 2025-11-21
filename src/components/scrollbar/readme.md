@@ -54,7 +54,7 @@ ldesign-scrollbar 自定义滚动条
 
 | Event                | Description   | Type                                                                                                                                            |
 | -------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ldesignReach`       | 触达边缘事件        | `CustomEvent<{ edge: "top" \| "left" \| "right" \| "bottom"; }>`                                                                                |
+| `ldesignReach`       | 触达边缘事件        | `CustomEvent<{ edge: "left" \| "right" \| "top" \| "bottom"; }>`                                                                                |
 | `ldesignScroll`      | 滚动事件（代理自内容容器） | `CustomEvent<{ scrollTop: number; scrollLeft: number; clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number; }>` |
 | `ldesignScrollEnd`   |               | `CustomEvent<void>`                                                                                                                             |
 | `ldesignScrollStart` | 滚动开始/结束       | `CustomEvent<void>`                                                                                                                             |
@@ -107,7 +107,7 @@ Type: `Promise<void>`
 | Name      | Type                                                                                                          | Description |
 | --------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
 | `target`  | `string \| Element`                                                                                           |             |
-| `options` | `{ behavior?: ScrollBehavior; block?: "start" \| "end" \| "center"; inline?: "start" \| "end" \| "center"; }` |             |
+| `options` | `{ behavior?: ScrollBehavior; block?: "center" \| "start" \| "end"; inline?: "center" \| "start" \| "end"; }` |             |
 
 #### Returns
 

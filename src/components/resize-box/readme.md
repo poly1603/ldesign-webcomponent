@@ -16,7 +16,7 @@ ResizeBox 伸缩框
 | ------------ | ------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------- |
 | `controlled` | `controlled` | 受控模式：为 true 时，不会修改 width/height，外部应在事件中设置新值传回                               | `boolean`                                                                    | `false`          |
 | `corners`    | `corners`    | 角落把手：top-left/top-right/bottom-right/bottom-left。字符串或数组。默认仅启用 bottom-right。 | `("top-left" \| "top-right" \| "bottom-left" \| "bottom-right")[] \| string` | `'bottom-right'` |
-| `directions` | `directions` | 允许伸缩的边：top/right/bottom/left。默认允许 right 与 bottom，满足常见的“右/下/右下角”拖拽需求         | `("top" \| "left" \| "right" \| "bottom")[] \| string`                       | `'right,bottom'` |
+| `directions` | `directions` | 允许伸缩的边：top/right/bottom/left。默认允许 right 与 bottom，满足常见的“右/下/右下角”拖拽需求         | `("left" \| "right" \| "top" \| "bottom")[] \| string`                       | `'right,bottom'` |
 | `disabled`   | `disabled`   | 是否禁用伸缩                                                                      | `boolean`                                                                    | `false`          |
 | `height`     | `height`     | 初始高度。可传数字（px）或任何合法 CSS 高度值（如 'auto'）。拖拽后以 px 写回。                            | `number \| string`                                                           | `200`            |
 | `maxHeight`  | `max-height` |                                                                             | `number`                                                                     | `undefined`      |

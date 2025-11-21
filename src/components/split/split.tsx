@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Fragment } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Split 面板分割
@@ -55,6 +56,7 @@ export class LdesignSplit {
 
   @State() private dragging = false;
   @State() private lastValueBeforeCollapse: number | undefined;
+  private resources = new ResourceManager();
 
   private onSplitterPointerDown = (e: PointerEvent) => {
     if (this.disabled) return;
@@ -73,8 +75,8 @@ export class LdesignSplit {
 
     this.dragging = true;
     this.ldesignSplitStart.emit({ value: this.value, direction: this.direction });
-    window.addEventListener('pointermove', this.onWindowPointerMove, { passive: false });
-    window.addEventListener('pointerup', this.onWindowPointerUp, { passive: false });
+    this.resources.addSafeEventListener(window, 'pointermove', this.onWindowPointerMove as EventListener, { passive: false });
+    this.resources.addSafeEventListener(window, 'pointerup', this.onWindowPointerUp as EventListener, { passive: false });
   };
 
   private clampRatio(r: number, rect: DOMRect): number {
@@ -113,9 +115,12 @@ export class LdesignSplit {
     if (!this.dragging) return;
     this.dragging = false;
     this.ldesignSplitEnd.emit({ value: this.value, direction: this.direction });
-    window.removeEventListener('pointermove', this.onWindowPointerMove as any);
-    window.removeEventListener('pointerup', this.onWindowPointerUp as any);
+    // 事件监听器会在cleanup时自动移除
   };
+
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
 
   private getRootClass() {
     const cls = ['ldesign-split', `ldesign-split--${this.direction}`];

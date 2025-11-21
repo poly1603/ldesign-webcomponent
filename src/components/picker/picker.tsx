@@ -1,4 +1,5 @@
-import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch, Method } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, Method, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export interface PickerOption {
   value: string;
@@ -111,8 +112,8 @@ export class LdesignPicker {
   @State() quickJumpTimer?: number;
 
   private listEl?: HTMLElement;     // 作为 transform 轨道的元素（ul）
-  private containerEl?: HTMLElement; // 外层容器（用于精确测量高度）
-  private itemH = 36;
+  private containerEl?: HTMLDivElement;
+  private resources = new ResourceManager();
   private actualItemHeight?: number; // 实际渲染后的项目高度
   private lastDragTime = 0; // 上一次 pointermove 的时间，用于平滑计算
 
@@ -122,7 +123,7 @@ export class LdesignPicker {
   // 动画/惯性
   private snapAnim: { raf: number; start: number; from: number; to: number; duration: number; idx: number; trigger?: 'click' | 'wheel' | 'keyboard' | 'touch' | 'scroll'; silent: boolean } | null = null;
   private inertia: { raf?: number; v: number; last: number } | null = null;
-  
+
   // 性能优化
   private rafId?: number;
   private lastUpdateTime = 0;
@@ -183,7 +184,7 @@ export class LdesignPicker {
   componentDidLoad() {
     // 初始化音频上下文
     this.initAudioContext();
-    
+
     // 确保DOM完全渲染后进行初始化
     requestAnimationFrame(() => {
       // 测量实际的项目高度
@@ -208,15 +209,16 @@ export class LdesignPicker {
         this.current = this.visual;
       }
     });
-    window.addEventListener('resize', this.onResize);
-    
+    this.resources.addSafeEventListener(window, 'resize', this.onResize as EventListener);
+
     // 阻止页面滚动
     if (this.containerEl) {
-      this.containerEl.addEventListener('touchmove', this.preventPageScroll, { passive: false });
+      this.resources.addSafeEventListener(this.containerEl, 'touchmove', this.preventPageScroll as EventListener, { passive: false });
     }
   }
 
   disconnectedCallback() {
+    this.resources.cleanup();
     window.removeEventListener('resize', this.onResize);
     if (this.containerEl) {
       this.containerEl.removeEventListener('touchmove', this.preventPageScroll);
@@ -245,14 +247,14 @@ export class LdesignPicker {
       default: return 36;
     }
   }
-  
+
   private measureActualItemHeight() {
     if (!this.listEl) return;
-    
+
     // 临时重置transform以获取准确测量
     const savedTransform = this.listEl.style.transform;
     this.listEl.style.transform = 'none';
-    
+
     const items = this.listEl.querySelectorAll('li');
     if (items.length >= 2) {
       // 测量两个相邻项目顶部之间的距离（即实际的行高）
@@ -260,10 +262,10 @@ export class LdesignPicker {
       const second = items[1] as HTMLElement;
       const firstRect = first.getBoundingClientRect();
       const secondRect = second.getBoundingClientRect();
-      
+
       // 使用精确浮点值，不做取整，避免累计误差
       const actualSpacing = (secondRect.top - firstRect.top);
-      
+
       if (actualSpacing > 0) {
         this.actualItemHeight = actualSpacing;
       } else {
@@ -274,7 +276,7 @@ export class LdesignPicker {
       const rect = first.getBoundingClientRect();
       this.actualItemHeight = rect.height;
     }
-    
+
     // 恢复transform
     this.listEl.style.transform = savedTransform;
   }
@@ -310,7 +312,7 @@ export class LdesignPicker {
     // 当第0项在中心时，列表顶部应该在 (h/2 - itemHeight/2) 的位置
     return (h - itemH) / 2; // 不取整，保持精度
   }
-  
+
   private preventPageScroll = (e: TouchEvent) => {
     // 移动端触摸时阻止页面滚动
     if (this.isPointerDown) {
@@ -381,12 +383,12 @@ export class LdesignPicker {
   private rubberBand(over: number, dim: number, c: number) {
     const sign = over < 0 ? -1 : 1;
     const x = Math.abs(over);
-    
+
     // 真实弹簧物理模拟
     // 使用双曲正切函数创建平滑的S型曲线
     // 这模拟了真实弹簧的特性：开始容易拉，越拉越难
     const normalizedX = x / dim;
-    
+
     // 使用 tanh 函数创建非常平滑的曲线
     // tanh 的特点：
     // - 在 0 附近接近线性（容易拉动）
@@ -394,7 +396,7 @@ export class LdesignPicker {
     // - 完全连续可导，没有任何突变点
     const steepness = 2.0; // 增加陡峭程度，让阻力增长更快
     const tanhX = Math.tanh(normalizedX * steepness);
-    
+
     // 应用阻力系数
     // c 控制总体阻力大小
     const result = dim * c * tanhX;
@@ -403,7 +405,7 @@ export class LdesignPicker {
 
   private setTrackTransform(y: number, animate = false, mode: 'normal' | 'drag' | 'inertia' = 'normal') {
     if (!this.listEl || this.parsed.length === 0) return;
-    
+
     // 拖拽模式已经在 onPointerMove 中完全处理，这里不再特殊处理
     if (mode === 'drag') {
       // 拖拽模式由 onPointerMove 直接控制，不经过这里
@@ -538,12 +540,12 @@ export class LdesignPicker {
 
     const centerFloat = (this.centerOffset - this.trackY) / this.itemHeightBySize;
     const half = Math.max(1, Math.floor(this.visibleItems / 2));
-    
+
     // 根据visible-items自动调整旋转步长（让可见项目均匀分布）
     // 对于visibleItems=3时，步长更大，避免项目过于聚集
     const defaultStep = this.visibleItems <= 3 ? 30 : Math.min(25, Math.max(10, 80 / this.visibleItems));
     const step = this.rotateStep || (this._stepDeg !== null ? this._stepDeg : defaultStep);
-    
+
     // 最大旋转角：根据可见项数调整
     const defaultMaxA = step * Math.min(half, 2); // 限制最大角度，避免过度旋转
     const maxA = this._maxRotateDeg !== null ? this._maxRotateDeg : defaultMaxA;
@@ -554,12 +556,12 @@ export class LdesignPicker {
     const defaultRadius = this.panelHeightPx * radiusFactor;
     const radius = this.cylinderRadius || (this._radiusPx !== null ? this._radiusPx : defaultRadius);
     this._radiusPx = radius;
-    
+
     const sMin = this._scaleMin ?? this.readCssVarNum('--ldesign-picker-3d-scale-min', 0.85); this._scaleMin = sMin;
     const sMax = this._scaleMax ?? this.readCssVarNum('--ldesign-picker-3d-scale-max', 1.0); this._scaleMax = sMax;
     const opacityMin = this.readCssVarNum('--ldesign-picker-3d-opacity-min', 0.6);
     const opacityMax = this.readCssVarNum('--ldesign-picker-3d-opacity-max', 1);
-    
+
     // 可视角度范围：根据可见项数自动调整（确保只显示正确数量的项目）
     // 对于少量项目，增加可视范围以避免隐藏
     const visibilityFactor = this.visibleItems <= 3 ? 1.5 : 1;
@@ -571,13 +573,13 @@ export class LdesignPicker {
       const idxAttr = li.getAttribute('data-index');
       const idx = idxAttr ? parseInt(idxAttr, 10) : i;
       const delta = idx - centerFloat; // 相对中心的偏移（可为小数）
-      
+
       // 计算角度：使用线性步长
       let ang = delta * step;
-      
+
       // 判断是否在可见范围内（基于角度）
       const isVisible = Math.abs(ang) <= visibleAngleRange / 2;
-      
+
       // 如果角度超出可见范围，隐藏该项
       if (!isVisible) {
         li.style.visibility = 'hidden';
@@ -588,29 +590,29 @@ export class LdesignPicker {
         li.style.visibility = 'visible';
         li.style.pointerEvents = 'auto';
       }
-      
+
       // 限制角度在最大值范围内（用于实际显示的项）
       if (ang > maxA) ang = maxA;
       else if (ang < -maxA) ang = -maxA;
 
       // 缩放和透明度计算
       const distFromCenter = Math.abs(delta);
-      
+
       // 对于可视范围内的项，使用平滑的缓动
       if (distFromCenter <= half) {
         const t = distFromCenter / half;
         const easedT = 1 - Math.cos(t * Math.PI / 2); // easeOutSine
         const scale = sMax - (sMax - sMin) * easedT;
         const opacity = opacityMax - (opacityMax - opacityMin) * easedT;
-        
+
         // 根据size调整基础字体大小
         let baseFontSize = 14;
         if (this.size === 'small') baseFontSize = 13;
         else if (this.size === 'large') baseFontSize = 15;
-        
+
         // 更微妙的字体大小变化（最多增加2px）
         const fontSize = baseFontSize + (1 - easedT) * 2;
-        
+
         li.style.setProperty('--ld-pk-3d-scale', `${scale.toFixed(3)}`);
         li.style.setProperty('--ld-pk-3d-opacity', `${opacity.toFixed(3)}`);
         li.style.fontSize = `${fontSize.toFixed(1)}px`;
@@ -620,7 +622,7 @@ export class LdesignPicker {
         li.style.setProperty('--ld-pk-3d-scale', `${sMin.toFixed(3)}`);
         li.style.setProperty('--ld-pk-3d-opacity', `${opacityMin.toFixed(3)}`);
         li.style.opacity = `${opacityMin.toFixed(3)}`;
-        
+
         // 根据size设置基础字体
         let baseFontSize = 14;
         if (this.size === 'small') baseFontSize = 13;
@@ -642,15 +644,15 @@ export class LdesignPicker {
     if (!this.listEl) return;
     this.cancelInertia();
     this.cancelSnapAnim();
-    
+
     const from = this.trackY;
     const to = this.yForIndex(idx);
     const distance = Math.abs(to - from);
-    
+
     // 根据回弹模式和距离动态调整动画时间
     let baseDuration: number;
     let maxDuration: number;
-    
+
     if (this.springBackMode === 'ease') {
       // 缓慢恢复模式：时间稍长，更平滑
       baseDuration = this.springBackDuration || 600;
@@ -660,18 +662,18 @@ export class LdesignPicker {
       baseDuration = this.springBackDuration || 500;
       maxDuration = baseDuration * 1.6;
     }
-    
+
     // 根据距离调整时间
     const duration = Math.min(maxDuration, baseDuration + distance * 0.3);
-    
+
     const start = performance.now();
     const state = { raf: 0, start, from, to, duration, idx, trigger: 'touch' as const, silent: false };
     this.snapAnim = state as any;
-    
+
     const step = (now: number) => {
       if (!this.snapAnim) return;
       const t = Math.max(0, Math.min(1, (now - state.start) / state.duration));
-      
+
       // 根据模式选择不同的缓动函数
       let easedT: number;
       if (this.springBackMode === 'ease') {
@@ -681,15 +683,15 @@ export class LdesignPicker {
         // 弹簧回弹：使用 spring 缓动，有弹性效果
         easedT = this.easeOutSpring(t);
       }
-      
+
       const y = state.from + (state.to - state.from) * easedT;
       this.setTrackTransform(y, false, 'normal');
-      
+
       // 实时更新视觉状态
       const idxLive = this.clampIndex((this.centerOffset - y) / this.itemHeightBySize);
       const vLive = this.parsed[idxLive]?.value;
       if (vLive !== this.visual) this.visual = vLive;
-      
+
       if (t >= 1) {
         this.setTrackTransform(state.to, false, 'normal');
         const nextVal = this.parsed[state.idx]?.value;
@@ -706,7 +708,7 @@ export class LdesignPicker {
     };
     state.raf = requestAnimationFrame(step);
   }
-  
+
   private startSnapAnim(idx: number, opts?: { trigger?: 'click' | 'wheel' | 'keyboard' | 'touch' | 'scroll'; silent?: boolean }) {
     if (!this.listEl) return;
     this.cancelInertia();
@@ -714,19 +716,19 @@ export class LdesignPicker {
 
     // 确保索引在有效范围内
     const safeIdx = this.clampIndex(idx);
-    
+
     const from = this.trackY;
     const to = this.yForIndex(safeIdx);
-    
+
     // 检查目标位置是否在合法范围内
     const maxY = this.centerOffset;
     const minY = this.centerOffset - (this.parsed.length - 1) * this.itemHeightBySize;
-    
+
     // 如果目标位置超出边界，直接返回
     if (to > maxY || to < minY) {
       return;
     }
-    
+
     // 根据触发源调整动画时长；提供可配置项，默认触摸/键盘/滚动 300ms，滚轮 150ms（更灵敏）
     const dWheel = (typeof this.snapDurationWheel === 'number' && isFinite(this.snapDurationWheel) && this.snapDurationWheel! > 0) ? this.snapDurationWheel! : 150;
     const dDefault = (typeof this.snapDuration === 'number' && isFinite(this.snapDuration) && this.snapDuration! > 0) ? this.snapDuration! : 300;
@@ -755,7 +757,7 @@ export class LdesignPicker {
       if (t >= 1) {
         // 结束时精确吸附到目标位置（state.to 已经是整数）
         this.setTrackTransform(state.to, false, 'normal');
-        
+
         const nextVal = this.parsed[state.idx]?.value;
         this.visual = nextVal;
         if (nextVal !== this.current) {
@@ -779,22 +781,22 @@ export class LdesignPicker {
 
   private setIndex(i: number, opts?: { animate?: boolean; silent?: boolean; trigger?: 'click' | 'wheel' | 'keyboard' | 'touch' | 'scroll' }) {
     if (!this.listEl || this.parsed.length === 0) return;
-    
+
     // 严格限制索引范围 [0, length-1]
     const idx = this.clampIndex(i);
     const enabledIdx = this.firstEnabledFrom(idx);
-    
+
     // 精确检查是否已经在目标位置（基于实际Y坐标）
     const targetY = this.yForIndex(enabledIdx);
     const tolerance = 0.5; // 允许0.5像素的误差
-    
+
     // 只有在不是动画模式且已经在目标位置时才跳过
     if (opts?.animate === false && Math.abs(this.trackY - targetY) < tolerance) {
       // 更新视觉状态确保一致
       this.visual = this.parsed[enabledIdx]?.value;
       return;
     }
-    
+
     // 如果需要动画，用 snapAnim；否则直接设置
     if (opts?.animate !== false) {
       this.startSnapAnim(enabledIdx, { trigger: opts?.trigger, silent: !!opts?.silent });
@@ -839,8 +841,8 @@ export class LdesignPicker {
     // 根据当前的 trackY 精确判断索引
     const currentFloat = (this.centerOffset - this.trackY) / itemH;
     const currentIdx = Math.round(currentFloat);
-    
-    
+
+
     // 计算步数
     let steps = 0;
     if (e.deltaMode === 1) {
@@ -859,15 +861,15 @@ export class LdesignPicker {
         this.wheelAccumLines = 0;
       }
     }
-    
+
     if (steps === 0) {
       return;
     }
-    
+
     // 计算目标索引
     const targetIdx = currentIdx + steps;
     const clampedTargetIdx = this.clampIndex(targetIdx);
-    
+
     if (clampedTargetIdx === currentIdx) {
       const exactY = this.yForIndex(currentIdx);
       if (Math.abs(this.trackY - Math.round(exactY)) > 0.5) {
@@ -875,7 +877,7 @@ export class LdesignPicker {
       }
       return;
     }
-    
+
     // 正常滚动到目标索引
     this.setIndex(clampedTargetIdx, { animate: true, trigger: 'wheel' });
   };
@@ -919,15 +921,15 @@ export class LdesignPicker {
     // 基础位移
     const baseTarget = this.startTrackY + dy;
     let target = baseTarget;
-    
+
     // 获取边界
     const { minY, maxY } = this.getBounds();
-    
+
     // 在边界处应用橡皮筋效果
     // 使用配置的阻力系数，但确保范围合理
     const c = Math.min(0.95, Math.max(0.1, this.resistance));
     const dim = this.panelHeightPx;
-    
+
     if (baseTarget > maxY) {
       // 顶部越界
       const over = baseTarget - maxY;
@@ -945,12 +947,12 @@ export class LdesignPicker {
     // 直接设置位置，不使用时间平滑（平滑会导致延迟和抖动）
     // 拖动应该是1:1跟手的，橡皮筋效果已经提供了阻力感
     this.trackY = target;
-    
+
     // 更新transform
     const el = this.listEl as HTMLElement;
     el.style.transition = 'none';
     el.style.transform = `translate3d(0, ${Math.round(target)}px, 0)`;
-    
+
     // 更新3D效果
     if (this.enable3d) {
       this.update3DEffects();
@@ -992,11 +994,11 @@ export class LdesignPicker {
   }
 
   private startInertiaTransform(v0: number) {
-    if (!this.momentum) { 
+    if (!this.momentum) {
       const floatIdx = (this.centerOffset - this.trackY) / this.itemHeightBySize;
       const idx = this.clampIndex(Math.round(floatIdx));
-      this.setIndex(idx, { animate: true }); 
-      return; 
+      this.setIndex(idx, { animate: true });
+      return;
     }
     this.cancelInertia();
     // 速度单位统一为 px/ms，去掉过小的速度上限以保留更自然的甩动感，但设定合理的上限避免异常值
@@ -1025,19 +1027,19 @@ export class LdesignPicker {
         const c = Math.min(0.95, Math.max(0.05, this.resistance));
         const rb = this.rubberBand(over, dim, c);
         next = maxY + Math.min(maxOverscroll, rb);
-        
+
         // 如果速度很小且越界较深，直接启动回弹动画
         if (Math.abs(state.v) < 0.5 && over > maxOverscroll * 0.3) {
           this.inertia = null;
           this.startBoundarySpringBack(0);
           return;
         }
-        
+
         // 渐进式减速，速度越大减速越快
         const velocityFactor = Math.min(1, Math.abs(state.v) / 2);
         const baseSpringK = 0.0008 * (1 + velocityFactor);
         const springForce = -baseSpringK * over * dt;
-        
+
         // 平滑地减少速度
         state.v += springForce;
         state.v *= 0.92; // 更温和的阻尼
@@ -1047,19 +1049,19 @@ export class LdesignPicker {
         const c = Math.min(0.95, Math.max(0.05, this.resistance));
         const rb = this.rubberBand(over, dim, c);
         next = minY + Math.max(-maxOverscroll, rb);
-        
+
         // 如果速度很小且越界较深，直接启动回弹动画
         if (Math.abs(state.v) < 0.5 && Math.abs(over) > maxOverscroll * 0.3) {
           this.inertia = null;
           this.startBoundarySpringBack(this.parsed.length - 1);
           return;
         }
-        
+
         // 渐进式减速
         const velocityFactor = Math.min(1, Math.abs(state.v) / 2);
         const baseSpringK = 0.0008 * (1 + velocityFactor);
         const springForce = -baseSpringK * over * dt;
-        
+
         state.v += springForce;
         state.v *= 0.92;
       }
@@ -1081,11 +1083,11 @@ export class LdesignPicker {
       const idxFinal = this.clampIndex(Math.round(finalFloat));
       const targetY = this.yForIndex(idxFinal);
       const nearSnap = Math.abs(this.trackY - targetY) <= 0.5;
-      
+
       // 检查是否越界
       const isOverTop = this.trackY > this.centerOffset;
       const isOverBottom = this.trackY < this.centerOffset - (this.parsed.length - 1) * this.itemHeightBySize;
-      
+
       // 如果越界且速度很小，使用特殊的回弹动画
       if ((isOverTop || isOverBottom) && Math.abs(state.v) < 0.1) {
         const targetIdx = isOverTop ? 0 : this.parsed.length - 1;
@@ -1093,14 +1095,14 @@ export class LdesignPicker {
         this.inertia = null;
         return;
       }
-      
+
       // 检查是否在边界附近（第一个或最后一个项目）
       const nearTopBoundary = idxFinal === 0 && this.trackY > targetY - this.itemHeightBySize * 0.5;
       const nearBottomBoundary = idxFinal === this.parsed.length - 1 && this.trackY < targetY + this.itemHeightBySize * 0.5;
-      
+
       // 在边界附近时，使用更宽松的停止条件，避免过度振荡
       const boundaryStopVelocity = 0.05; // 边界附近更早停止
-      const shouldStop = (nearTopBoundary || nearBottomBoundary) 
+      const shouldStop = (nearTopBoundary || nearBottomBoundary)
         ? Math.abs(state.v) < boundaryStopVelocity
         : (nearlyStopped || nearSnap);
 
@@ -1137,7 +1139,7 @@ export class LdesignPicker {
         const clickedIdx = Math.round(offsetFromCenter / this.itemHeightBySize);
         const currentIdx = Math.round((this.centerOffset - this.trackY) / this.itemHeightBySize);
         const targetIdx = this.clampIndex(currentIdx + clickedIdx);
-        
+
         // 如果点击的不是当前项，则滚动到该项
         if (targetIdx !== currentIdx && !this.parsed[targetIdx]?.disabled) {
           this.setIndex(targetIdx, { animate: true, trigger: 'touch' });
@@ -1149,7 +1151,7 @@ export class LdesignPicker {
     // 检查是否在边界越界状态
     const { minY, maxY } = this.getBounds();
     const isOverBoundary = this.trackY > maxY || this.trackY < minY;
-    
+
     // 如果在边界越界状态，使用特殊的回弹动画
     if (isOverBoundary) {
       // 计算最近的有效位置
@@ -1162,14 +1164,14 @@ export class LdesignPicker {
     // 拖动释放：根据速度决定是否惯性，否则就近吸附
     const currentFloat = (this.centerOffset - this.trackY) / this.itemHeightBySize;
     const idx = this.clampIndex(Math.round(currentFloat));
-    
+
     const v0 = this.estimateVelocity();
     if (wasDragging && this.momentum && Math.abs(v0) > 0.1) {
       this.startInertiaTransform(v0);
       this.emitPick('touch');
       return;
     }
-    
+
     this.setIndex(idx, { animate: true, trigger: 'touch' });
   };
 
@@ -1178,8 +1180,8 @@ export class LdesignPicker {
     if (!this.listEl || this.disabled) return;
     const idxFloat = (this.centerOffset - this.trackY) / this.itemHeightBySize;
     const currentIdx = this.clampIndex(idxFloat);
-    
-    switch(e.key) {
+
+    switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         this.setIndex(currentIdx + 1, { animate: true, trigger: 'keyboard' });
@@ -1233,13 +1235,13 @@ export class LdesignPicker {
   /* ---------------- 体验优化方法 ---------------- */
   private audioContext?: AudioContext;
   private clickSound?: AudioBuffer;
-  
+
   private initAudioContext() {
     if (!this.soundEffects || this.audioContext) return;
-    
+
     try {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+
       if (this.soundUrl) {
         // 加载自定义音效
         fetch(this.soundUrl)
@@ -1257,47 +1259,47 @@ export class LdesignPicker {
       console.warn('初始化音频上下文失败:', err);
     }
   }
-  
+
   private createSyntheticSound() {
     if (!this.audioContext) return;
-    
+
     // 创建一个简单的点击音
     const duration = 0.05;
     const sampleRate = this.audioContext.sampleRate;
     const buffer = this.audioContext.createBuffer(1, duration * sampleRate, sampleRate);
     const channel = buffer.getChannelData(0);
-    
+
     for (let i = 0; i < channel.length; i++) {
-        // 生成一个更清脆的点击音（iOS风格）
-        const frequency = 1200; // 提高频率以获得更清脆的音效
-        channel[i] = Math.sin(2 * Math.PI * frequency * i / sampleRate) * Math.exp(-i / (channel.length * 0.05));
+      // 生成一个更清脆的点击音（iOS风格）
+      const frequency = 1200; // 提高频率以获得更清脆的音效
+      channel[i] = Math.sin(2 * Math.PI * frequency * i / sampleRate) * Math.exp(-i / (channel.length * 0.05));
     }
-    
+
     this.clickSound = buffer;
   }
-  
+
   private playSound() {
     if (!this.soundEffects || !this.audioContext || !this.clickSound) return;
-    
+
     try {
       const source = this.audioContext.createBufferSource();
       const gainNode = this.audioContext.createGain();
-      
+
       source.buffer = this.clickSound;
       gainNode.gain.value = this.soundVolume;
-      
+
       source.connect(gainNode);
       gainNode.connect(this.audioContext.destination);
-      
+
       source.start(0);
     } catch (err) {
       console.warn('播放音效失败:', err);
     }
   }
-  
+
   private triggerHaptic(intensity?: number) {
     if (!this.hapticFeedback) return;
-    
+
     // 优先使用现代的触觉反馈API（iOS 13+）
     if ('ontouchstart' in window && (window as any).webkit?.messageHandlers?.haptic) {
       try {
@@ -1308,7 +1310,7 @@ export class LdesignPicker {
         // 静默失败，尝试其他方法
       }
     }
-    
+
     // 检查是否支持 Vibration API（Android）
     if ('vibrate' in navigator) {
       try {
@@ -1320,7 +1322,7 @@ export class LdesignPicker {
       }
     }
   }
-  
+
   private onItemChange() {
     // 触发触觉反馈
     this.triggerHaptic();
@@ -1330,38 +1332,38 @@ export class LdesignPicker {
 
   /* ---------------- 搜索和筛选方法 ---------------- */
   private searchDebounceTimer?: number;
-  
+
   private onSearchInput = (e: Event) => {
     const input = e.target as HTMLInputElement;
     const value = input.value;
     this.searchValue = value;
-    
+
     // 清除之前的防抖计时器
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
     }
-    
+
     // 防抖处理
-    this.searchDebounceTimer = setTimeout(() => {
+    this.searchDebounceTimer = this.resources.addSafeTimeout(() => {
       this.performSearch(value);
     }, this.searchDebounce) as any;
   };
-  
+
   private performSearch(query: string) {
     if (!query) {
       this.filteredOptions = this.parsed;
       this.isSearching = false;
       return;
     }
-    
+
     this.isSearching = true;
     const searchStr = this.searchIgnoreCase ? query.toLowerCase() : query;
-    
+
     this.filteredOptions = this.parsed.filter(opt => {
       const label = this.searchIgnoreCase ? opt.label.toLowerCase() : opt.label;
       return label.includes(searchStr);
     });
-    
+
     // 如果搜索结果不为空，自动选中第一个匹配项
     if (this.filteredOptions.length > 0) {
       const firstMatch = this.filteredOptions[0];
@@ -1371,29 +1373,29 @@ export class LdesignPicker {
       }
     }
   }
-  
+
   private onQuickJumpKey = (key: string) => {
     if (!this.keyboardQuickJump) return;
-    
+
     // 清除之前的计时器
     if (this.quickJumpTimer) {
       clearTimeout(this.quickJumpTimer);
     }
-    
+
     // 累积输入的字母
     this.quickJumpBuffer += key.toLowerCase();
-    
+
     // 找到第一个匹配的选项
-    const matchIdx = this.parsed.findIndex(opt => 
+    const matchIdx = this.parsed.findIndex(opt =>
       opt.label.toLowerCase().startsWith(this.quickJumpBuffer)
     );
-    
+
     if (matchIdx >= 0) {
       this.setIndex(matchIdx, { animate: true, trigger: 'keyboard' });
     }
-    
+
     // 1秒后清空缓冲区
-    this.quickJumpTimer = setTimeout(() => {
+    this.quickJumpTimer = this.resources.addSafeTimeout(() => {
       this.quickJumpBuffer = '';
       this.quickJumpTimer = undefined;
     }, 1000) as any;
@@ -1414,7 +1416,7 @@ export class LdesignPicker {
     const idx = this.getIndexByValue(this.current);
     const finalIdx = this.clampIndex(idx >= 0 ? idx : 0);
     const enabledIdx = this.firstEnabledFrom(finalIdx);
-    
+
     if (smooth) {
       this.startSnapAnim(enabledIdx, { silent: true });
     } else {
@@ -1457,9 +1459,9 @@ export class LdesignPicker {
     const displayOptions = this.isSearching ? this.filteredOptions : this.parsed;
 
     return (
-      <Host 
-        class={{ 
-          'ldesign-picker': true, 
+      <Host
+        class={{
+          'ldesign-picker': true,
           'ldesign-picker--disabled': this.disabled,
           'ldesign-picker--3d': this.enable3d
         }}
@@ -1492,10 +1494,10 @@ export class LdesignPicker {
             )}
           </div>
         )}
-        
-        <div 
-          class="ldesign-picker__picker" 
-          ref={(el) => { this.containerEl = el as HTMLElement; }} 
+
+        <div
+          class="ldesign-picker__picker"
+          ref={(el) => { this.containerEl = el as HTMLElement; }}
           style={{ height: `${heightPx}px`, ['--ld-pk-item-height' as any]: `${this.itemH}px` }}
           onWheel={this.onWheel as any}
           onPointerDown={this.onPointerDown as any}
@@ -1513,7 +1515,7 @@ export class LdesignPicker {
           <ul
             class="ldesign-picker__column"
             ref={(el) => { this.listEl = el as HTMLElement; }}
-            style={{ 
+            style={{
               transform: `translate3d(0, ${this.trackY}px, 0)`,
               // 确保列表的起始位置
               paddingTop: '0',
@@ -1523,19 +1525,19 @@ export class LdesignPicker {
             {displayOptions.map((opt, i) => {
               const isActive = opt.value === (this.visual ?? this.current);
               const shouldHighlight = this.highlightMatch && this.searchValue && this.isSearching;
-              
+
               // 高亮匹配文本
               let labelContent = opt.label;
               if (shouldHighlight) {
                 const searchStr = this.searchIgnoreCase ? this.searchValue.toLowerCase() : this.searchValue;
                 const label = this.searchIgnoreCase ? opt.label.toLowerCase() : opt.label;
                 const index = label.indexOf(searchStr);
-                
+
                 if (index >= 0) {
                   const before = opt.label.substring(0, index);
                   const match = opt.label.substring(index, index + this.searchValue.length);
                   const after = opt.label.substring(index + this.searchValue.length);
-                  
+
                   labelContent = (
                     <span>
                       {before}
@@ -1545,16 +1547,16 @@ export class LdesignPicker {
                   ) as any;
                 }
               }
-              
+
               return (
                 <li
                   id={`picker-item-${opt.value}`}
                   data-value={opt.value}
                   data-index={String(i)}
-                  class={{ 
-                    'ldesign-picker__item': true, 
-                    'ldesign-picker__item--active': isActive, 
-                    'ldesign-picker__item--disabled': !!opt.disabled 
+                  class={{
+                    'ldesign-picker__item': true,
+                    'ldesign-picker__item--active': isActive,
+                    'ldesign-picker__item--disabled': !!opt.disabled
                   }}
                   role="option"
                   aria-selected={isActive}

@@ -1,4 +1,5 @@
-import { Component, Prop, State, Element, h, Host, Listen } from '@stencil/core';
+import { Component, Prop, State, Element, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Anchor 锚点组件
@@ -33,6 +34,7 @@ export class LdesignAnchor {
   @State() activeLink: string = '';
 
   private scrollContainer?: HTMLElement | Window;
+  private resources = new ResourceManager();
   private links: Map<string, HTMLElement> = new Map();
 
   componentDidLoad(): void {
@@ -42,9 +44,7 @@ export class LdesignAnchor {
   }
 
   disconnectedCallback(): void {
-    if (this.scrollContainer) {
-      this.scrollContainer.removeEventListener('scroll', this.handleScroll);
-    }
+    this.resources.cleanup();
   }
 
   /**
@@ -52,10 +52,12 @@ export class LdesignAnchor {
    */
   private initScrollContainer(): void {
     this.scrollContainer = this.container
-      ? document.querySelector(this.container) || window
+      ? (document.querySelector(this.container) as HTMLElement) || window
       : window;
 
-    this.scrollContainer.addEventListener('scroll', this.handleScroll, { passive: true });
+    if (this.scrollContainer) {
+      this.resources.addSafeEventListener(this.scrollContainer, 'scroll', this.handleScroll as EventListener, { passive: true });
+    }
   }
 
   /**
@@ -78,9 +80,6 @@ export class LdesignAnchor {
    * 处理滚动
    */
   private handleScroll = (): void => {
-    const scrollTop = this.scrollContainer instanceof Window
-      ? window.pageYOffset
-      : (this.scrollContainer as HTMLElement).scrollTop;
 
     let activeHref = '';
     let minDistance = Infinity;
@@ -113,60 +112,3 @@ export class LdesignAnchor {
     );
   }
 }
-
-/**
- * AnchorLink 锚点链接
- */
-@Component({
-  tag: 'ldesign-anchor-link',
-  styleUrl: 'anchor.less',
-  shadow: false,
-})
-export class LdesignAnchorLink {
-  /**
-   * 链接地址
-   */
-  @Prop() href!: string;
-
-  /**
-   * 链接标题
-   */
-  @Prop() title!: string;
-
-  /**
-   * 处理点击
-   */
-  @Listen('click')
-  handleClick(e: MouseEvent): void {
-    e.preventDefault();
-
-    const target = document.querySelector(this.href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  render(): any {
-    const anchor = (this as any).el.closest('ldesign-anchor');
-    const isActive = anchor?.activeLink === this.href;
-
-    const classes = {
-      'ldesign-anchor-link': true,
-      'ldesign-anchor-link--active': isActive,
-    };
-
-    return (
-      <Host class={classes}>
-        <a href={this.href} class="ldesign-anchor-link__title">
-          {this.title}
-        </a>
-        <div class="ldesign-anchor-link__children">
-          <slot />
-        </div>
-      </Host>
-    );
-  }
-}
-
-
-

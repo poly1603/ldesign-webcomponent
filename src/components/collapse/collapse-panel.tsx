@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 let idSeed = 0;
 
@@ -12,6 +13,7 @@ let idSeed = 0;
 })
 export class LdesignCollapsePanel {
   @Element() el!: HTMLElement;
+  private resources = new ResourceManager();
 
   /** 面板唯一标识（由父级匹配） */
   @Prop({ mutable: true }) name?: string;
@@ -33,7 +35,7 @@ export class LdesignCollapsePanel {
 
   /** 激活状态（由父级控制） */
   @Prop({ mutable: true, reflect: true }) active: boolean = false;
-  
+
   /** 以下属性由父级传递 */
   /** 是否显示展开图标 */
   @Prop({ mutable: true }) showExpandIcon: boolean = true;
@@ -111,11 +113,11 @@ export class LdesignCollapsePanel {
     // 初始化内容高度，无闪烁
     const el = this.contentRef;
     if (!el) return;
-    
+
     const easing = this.getAnimationEasing();
     el.style.display = 'block';
     el.style.transition = `height ${this.animationDuration}ms ${easing}`;
-    
+
     if (this.active) {
       el.style.overflow = '';
       el.style.height = 'auto';
@@ -146,7 +148,7 @@ export class LdesignCollapsePanel {
       return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch { return false; }
   }
-  
+
   private getAnimationEasing(): string {
     switch (this.animationPreset) {
       case 'spring':
@@ -161,7 +163,7 @@ export class LdesignCollapsePanel {
         return this.animationEasing;
     }
   }
-  
+
   private animateIcon(open: boolean) {
     const rotation = open ? this.iconRotation : 0;
     this.iconRotationDeg = this.reverseIconRotation ? -rotation : rotation;
@@ -173,7 +175,7 @@ export class LdesignCollapsePanel {
 
     this.isAnimating = true;
     this.animateIcon(true);
-    
+
     // 若用户偏好减少动画，直接展开
     if (this.prefersReduceMotion()) {
       el.style.display = 'block';
@@ -186,7 +188,7 @@ export class LdesignCollapsePanel {
     }
 
     const easing = this.getAnimationEasing();
-    
+
     // 设置动画延迟
     if (this.animationDelay > 0) {
       setTimeout(() => this.performOpenAnimation(el, easing), this.animationDelay);
@@ -194,18 +196,18 @@ export class LdesignCollapsePanel {
       this.performOpenAnimation(el, easing);
     }
   }
-  
+
   private performOpenAnimation(el: HTMLDivElement, easing: string) {
     el.style.display = 'block';
     el.style.overflow = 'hidden';
     el.style.height = '0px';
     el.style.transition = `height ${this.animationDuration}ms ${easing}`;
-    
+
     requestAnimationFrame(() => {
       const sh = el.scrollHeight;
       el.style.height = `${sh}px`;
       this.contentHeight = `${sh}px`;
-      
+
       // 内容渐显动画
       if (this.contentAnimation !== 'none') {
         setTimeout(() => {
@@ -215,16 +217,15 @@ export class LdesignCollapsePanel {
         this.contentVisible = true;
       }
     });
-    
+
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       el.style.height = 'auto';
       el.style.overflow = '';
       this.contentHeight = 'auto';
       this.isAnimating = false;
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
   }
 
   private animateClose() {
@@ -234,7 +235,7 @@ export class LdesignCollapsePanel {
     this.isAnimating = true;
     this.animateIcon(false);
     this.contentVisible = false;
-    
+
     if (this.prefersReduceMotion()) {
       // 直接收起
       el.style.overflow = 'hidden';
@@ -249,23 +250,22 @@ export class LdesignCollapsePanel {
     el.style.overflow = 'hidden';
     el.style.height = `${h}px`;
     el.style.transition = `height ${this.animationDuration}ms ${easing}`;
-    
+
     // 先隐藏内容，再收起高度
     if (this.contentAnimation !== 'none') {
       this.contentVisible = false;
     }
-    
+
     requestAnimationFrame(() => {
       el.style.height = '0px';
       this.contentHeight = '0px';
     });
-    
+
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       this.isAnimating = false;
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
   }
 
   private shouldRender() {
@@ -287,60 +287,60 @@ export class LdesignCollapsePanel {
       this.ldesignCollapseItemToggle.emit({ name: this.name! });
     }
   };
-  
+
   private onTouchStart = (e: TouchEvent) => {
     if (this.disabled) return;
     this.touchStartY = e.touches[0].clientY;
   };
-  
+
   private onTouchMove = (e: TouchEvent) => {
     if (this.disabled) return;
     const touchY = e.touches[0].clientY;
     const deltaY = touchY - this.touchStartY;
-    
+
     if (Math.abs(deltaY) > 30) {
       this.swipeDirection = deltaY > 0 ? 'down' : 'up';
     }
   };
-  
+
   private onTouchEnd = (e: TouchEvent) => {
     if (this.disabled || !this.swipeDirection) return;
-    
+
     // 向下滑动展开，向上滑动收起
-    if ((this.swipeDirection === 'down' && !this.active) || 
-        (this.swipeDirection === 'up' && this.active)) {
+    if ((this.swipeDirection === 'down' && !this.active) ||
+      (this.swipeDirection === 'up' && this.active)) {
       e.preventDefault();
       this.ldesignCollapseItemToggle.emit({ name: this.name! });
     }
-    
+
     this.swipeDirection = null;
   };
-  
+
   // 拖拽事件处理
   private handleDragStart = (e: DragEvent) => {
     if (!this.sortable || this.disabled) return;
     e.stopPropagation();
     this.ldesignPanelDragStart.emit({ name: this.name!, event: e });
   };
-  
+
   private handleDragEnd = (e: DragEvent) => {
     if (!this.sortable) return;
     e.stopPropagation();
     this.ldesignPanelDragEnd.emit({ event: e });
   };
-  
+
   private handleDragOver = (e: DragEvent) => {
     if (!this.sortable) return;
     e.stopPropagation();
     this.ldesignPanelDragOver.emit({ name: this.name!, event: e });
   };
-  
+
   private handleDragLeave = (e: DragEvent) => {
     if (!this.sortable) return;
     e.stopPropagation();
     this.ldesignPanelDragLeave.emit({ name: this.name!, event: e });
   };
-  
+
   private handleDrop = (e: DragEvent) => {
     if (!this.sortable) return;
     e.stopPropagation();
@@ -349,31 +349,31 @@ export class LdesignCollapsePanel {
 
   private getIcon() {
     if (!this.showExpandIcon) return null;
-    
+
     let iconName = this.expandIcon;
     if (this.active && this.expandedIcon) {
       iconName = this.expandedIcon;
     } else if (!this.active && this.collapsedIcon) {
       iconName = this.collapsedIcon;
     }
-    
+
     // 使用CSS类来处理动画，不使用内联样式
     return (
-      <span 
+      <span
         class={{
           'ldesign-collapse-panel__arrow': true,
           'ldesign-collapse-panel__arrow--animating': this.isAnimating,
-        }} 
+        }}
         aria-hidden="true"
       >
         <ldesign-icon name={iconName} size="small" />
       </span>
     );
   }
-  
+
   private renderContent() {
     if (!this.shouldRender()) return null;
-    
+
     if (this.loading) {
       return (
         <div class="ldesign-collapse-panel__loading">
@@ -382,10 +382,10 @@ export class LdesignCollapsePanel {
         </div>
       );
     }
-    
+
     const content = <slot></slot>;
     const isEmpty = !this.el.querySelector('[slot]:not([slot="header"]):not([slot="extra"])');
-    
+
     if (isEmpty && this.emptyText) {
       return (
         <div class="ldesign-collapse-panel__empty">
@@ -394,21 +394,21 @@ export class LdesignCollapsePanel {
         </div>
       );
     }
-    
+
     // 内容动画包装器
     const contentClass = {
       'ldesign-collapse-panel__content-wrapper': true,
       [`ldesign-collapse-panel__content-wrapper--${this.contentAnimation}`]: this.contentAnimation !== 'none',
       'ldesign-collapse-panel__content-wrapper--visible': this.contentVisible,
     };
-    
+
     return (
       <div class={contentClass}>
         {content}
       </div>
     );
   }
-  
+
   render() {
     const cls = {
       'ldesign-collapse-panel': true,
@@ -426,7 +426,7 @@ export class LdesignCollapsePanel {
     const icon = this.getIcon();
 
     return (
-      <Host 
+      <Host
         class={cls}
         onDragOver={(e) => this.handleDragOver(e)}
         onDragLeave={(e) => this.handleDragLeave(e)}
@@ -471,7 +471,7 @@ export class LdesignCollapsePanel {
           aria-live={this.loading ? 'polite' : undefined}
           ref={el => (this.contentRef = el as HTMLDivElement)}
         >
-          <div 
+          <div
             class="ldesign-collapse-panel__content-inner"
             style={{ padding: this.contentPadding }}
           >

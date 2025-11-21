@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Method, Element, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 export type NotificationPlacement = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -49,6 +50,7 @@ export class LdesignNotification {
   @Event() ldesignClose!: EventEmitter<void>;
 
   private closeTimer?: number;
+  private resources = new ResourceManager();
 
   connectedCallback() {
     // 将自身移动到对应的全局容器，保证堆叠与定位
@@ -66,6 +68,7 @@ export class LdesignNotification {
 
   disconnectedCallback() {
     this.clearTimer();
+    this.resources.cleanup();
   }
 
   /** 手动关闭（带高度收起动画，带动后续通知平滑归位） */
@@ -95,16 +98,15 @@ export class LdesignNotification {
 
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      root.removeEventListener('transitionend', onEnd);
       this.ldesignClose.emit();
       root.remove();
     };
-    root.addEventListener('transitionend', onEnd, { once: true } as any);
+    this.resources.addSafeEventListener(root, 'transitionend', onEnd as EventListener, { once: true });
   }
 
   private startTimer() {
     if (this.duration && this.duration > 0) {
-      this.closeTimer = (setTimeout(() => this.close(), this.duration) as unknown) as number;
+      this.closeTimer = this.resources.addSafeTimeout(() => this.close(), this.duration) as any;
     }
   }
 

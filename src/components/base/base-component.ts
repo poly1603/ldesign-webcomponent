@@ -1,15 +1,12 @@
-import { Component, Element, Prop, State, Watch } from '@stencil/core';
+import { Element, Prop, State, Watch } from '@stencil/core';
 import { bem, classNames, generateId, debounce, throttle } from '../../utils';
 import { Size, Theme } from '../../types';
 
 /**
  * 组件基类
  * 提供通用的属性和方法
+ * 注意：这是一个普通的 TypeScript 类，不是 Stencil 组件
  */
-@Component({
-  tag: 'base-component',
-  shadow: false
-})
 export class BaseComponent {
   @Element() el!: HTMLElement;
 
@@ -69,6 +66,21 @@ export class BaseComponent {
   private resizeObserver?: ResizeObserver;
 
   /**
+   * 存储 MutationObserver 实例
+   */
+  private mutationObservers: Set<MutationObserver> = new Set();
+
+  /**
+   * 存储 IntersectionObserver 实例
+   */
+  private intersectionObservers: Set<IntersectionObserver> = new Set();
+
+  /**
+   * 存储 requestAnimationFrame ID
+   */
+  private rafIds: Set<number> = new Set();
+
+  /**
    * 监听disabled属性变化
    */
   @Watch('disabled')
@@ -117,6 +129,18 @@ export class BaseComponent {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
     }
+
+    // 清理 MutationObserver
+    this.mutationObservers.forEach(observer => observer.disconnect());
+    this.mutationObservers.clear();
+
+    // 清理 IntersectionObserver
+    this.intersectionObservers.forEach(observer => observer.disconnect());
+    this.intersectionObservers.clear();
+
+    // 清理 requestAnimationFrame
+    this.rafIds.forEach(id => cancelAnimationFrame(id));
+    this.rafIds.clear();
   }
 
   /**
@@ -142,6 +166,7 @@ export class BaseComponent {
 
   /**
    * 安全地添加事件监听器（自动清理）
+   * @deprecated 使用 addSafeEventListener 代替
    */
   protected addEventListener<K extends keyof HTMLElementEventMap>(
     target: HTMLElement | Window | Document,
@@ -151,6 +176,33 @@ export class BaseComponent {
   ): void {
     target.addEventListener(event, handler, options);
     this.eventListeners.push({ target, event, handler, options });
+  }
+
+  /**
+   * 安全地添加事件监听器（自动清理） - 推荐使用
+   */
+  protected addSafeEventListener<K extends keyof HTMLElementEventMap>(
+    target: HTMLElement | Window | Document,
+    event: K | string,
+    handler: EventListener,
+    options?: AddEventListenerOptions
+  ): void {
+    target.addEventListener(event, handler, options);
+    this.eventListeners.push({ target, event, handler, options });
+  }
+
+  /**
+   * 安全地设置 setTimeout（自动清理） - 推荐使用
+   */
+  protected addSafeTimeout(callback: () => void, delay: number): ReturnType<typeof setTimeout> {
+    return this.setTimeout(callback, delay);
+  }
+
+  /**
+   * 安全地设置 setInterval（自动清理） - 推荐使用
+   */
+  protected addSafeInterval(callback: () => void, delay: number): ReturnType<typeof setInterval> {
+    return this.setInterval(callback, delay);
   }
 
   /**
@@ -183,6 +235,54 @@ export class BaseComponent {
     });
 
     this.resizeObserver.observe(this.el);
+  }
+
+  /**
+   * 安全地观察 DOM 变化（自动清理）
+   */
+  protected observeMutation(
+    target: Node,
+    callback: MutationCallback,
+    options?: MutationObserverInit
+  ): MutationObserver {
+    const observer = new MutationObserver(callback);
+    observer.observe(target, options);
+    this.mutationObservers.add(observer);
+    return observer;
+  }
+
+  /**
+   * 安全地观察元素可见性（自动清理）
+   */
+  protected observeIntersection(
+    target: Element,
+    callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit
+  ): IntersectionObserver {
+    const observer = new IntersectionObserver(callback, options);
+    observer.observe(target);
+    this.intersectionObservers.add(observer);
+    return observer;
+  }
+
+  /**
+   * 安全地使用 requestAnimationFrame（自动清理）
+   */
+  protected addSafeRAF(callback: FrameRequestCallback): number {
+    const id = requestAnimationFrame((time) => {
+      this.rafIds.delete(id);
+      callback(time);
+    });
+    this.rafIds.add(id);
+    return id;
+  }
+
+  /**
+   * 取消 requestAnimationFrame
+   */
+  protected cancelSafeRAF(id: number): void {
+    cancelAnimationFrame(id);
+    this.rafIds.delete(id);
   }
 
   /**

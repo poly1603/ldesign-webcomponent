@@ -2,6 +2,7 @@ import { Component, Prop, Event, EventEmitter, h, Host, Element, State, Watch } 
 import { ButtonType, ButtonShape, ButtonIconPosition } from '../../types';
 import { ButtonSize, ButtonHTMLType, ButtonVariant, ButtonColor, PresetColors, LoadingConfig } from './interface';
 import { getLoadingConfig, isTwoCNChar, spaceChildren, isUnBorderedButtonType, getSizeSuffix, combineClasses } from './utils';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Button 按钮组件
@@ -63,12 +64,12 @@ export class LdesignButton {
    * @default false
    */
   @Prop() loading: boolean = false;
-  
+
   /**
    * 加载延迟时间（毫秒）
    */
   @Prop() loadingDelay?: number;
-  
+
   /**
    * 自定义加载图标
    */
@@ -163,6 +164,7 @@ export class LdesignButton {
   // ==================== Private Properties ====================
   private loadingDelayTimer?: ReturnType<typeof setTimeout>;
   private buttonRef?: HTMLButtonElement | HTMLAnchorElement;
+  private resources = new ResourceManager();
 
   // ==================== Lifecycle ====================
   componentWillLoad() {
@@ -182,10 +184,7 @@ export class LdesignButton {
   }
 
   disconnectedCallback() {
-    // 清理定时器
-    if (this.loadingDelayTimer) {
-      clearTimeout(this.loadingDelayTimer);
-    }
+    this.resources.cleanup();
   }
 
   // ==================== Watchers ====================
@@ -197,11 +196,11 @@ export class LdesignButton {
       clearTimeout(this.loadingDelayTimer);
       this.loadingDelayTimer = undefined;
     }
-    
+
     if (this.loading && this.loadingDelay && this.loadingDelay > 0) {
-      this.loadingDelayTimer = setTimeout(() => {
+      this.loadingDelayTimer = this.resources.addSafeTimeout(() => {
         this.innerLoading = true;
-      }, this.loadingDelay);
+      }, this.loadingDelay) as any;
     } else {
       this.innerLoading = this.loading;
     }
@@ -214,7 +213,7 @@ export class LdesignButton {
   private checkTwoCNChar() {
     const buttonText = this.el?.textContent?.trim() || '';
     const needInsertSpace = this.autoInsertSpace && !this.icon && buttonText;
-    
+
     if (needInsertSpace && isTwoCNChar(buttonText)) {
       if (!this.hasTwoCNChar) {
         this.hasTwoCNChar = true;
@@ -243,7 +242,7 @@ export class LdesignButton {
     if (this.disabled || this.innerLoading) {
       return;
     }
-    
+
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       const mouseEvent = new MouseEvent('click', {
@@ -260,11 +259,11 @@ export class LdesignButton {
   private getButtonClass(): string {
     const prefixCls = 'ldesign-button';
     const sizeSuffix = getSizeSuffix(this.size);
-    
+
     // 智能映射：type -> variant + color
     let effectiveVariant = this.variant;
     let effectiveColor = this.color;
-    
+
     // 如果没有指定 variant，根据 type 推断
     if (!effectiveVariant) {
       switch (this.type) {
@@ -291,17 +290,17 @@ export class LdesignButton {
           break;
       }
     }
-    
+
     // 处理 danger 属性
     if (this.danger && !effectiveColor) {
       effectiveColor = 'danger';
     }
-    
+
     // 默认颜色
     if (!effectiveColor) {
       effectiveColor = 'default';
     }
-    
+
     return combineClasses(
       prefixCls,
       // 保留 type 类名以保持向后兼容
@@ -336,10 +335,10 @@ export class LdesignButton {
     if (this.innerLoading) {
       // 支持自定义加载图标
       const loadingIconName = this.loadingIcon || 'loader-2';
-      
+
       return (
-        <ldesign-icon 
-          name={loadingIconName} 
+        <ldesign-icon
+          name={loadingIconName}
           class="ldesign-button__icon ldesign-button__icon--loading"
         />
       );
@@ -347,8 +346,8 @@ export class LdesignButton {
 
     if (this.icon) {
       return (
-        <ldesign-icon 
-          name={this.icon} 
+        <ldesign-icon
+          name={this.icon}
           class="ldesign-button__icon"
         />
       );
@@ -363,12 +362,12 @@ export class LdesignButton {
   private renderContent() {
     const hasIcon = !!(this.icon || this.innerLoading);
     const children = <slot />;
-    
+
     // 如果需要插入空格且是两个中文字符
     const processedChildren = this.hasTwoCNChar && this.autoInsertSpace
       ? spaceChildren(children, true)
       : children;
-    
+
     // 圆形按钮只显示图标
     if (this.shape === 'circle' && hasIcon) {
       return (

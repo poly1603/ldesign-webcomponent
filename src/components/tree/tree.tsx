@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element, Method } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export interface TreeNode {
   key: string;
@@ -109,6 +110,7 @@ export class LdesignTree {
   @State() overAllowed?: boolean;
   @State() loadingKeys: string[] = [];
   private dragTimers: Map<string, number> = new Map();
+  private resources = new ResourceManager();
 
   private keyNodeMap = new Map<string, TreeNode>();
   private parentMap = new Map<string, string | null>();
@@ -459,7 +461,7 @@ export class LdesignTree {
       const needLoad = !node?.children || node.children.length === 0;
       if (needLoad && (!node?.isLeaf)) {
         // 标记 loading
-        this.loadingKeys = Array.from(new Set([ ...this.loadingKeys, key ]));
+        this.loadingKeys = Array.from(new Set([...this.loadingKeys, key]));
         try {
           if (this.loadData) {
             const children = await this.loadData(node);
@@ -616,14 +618,14 @@ export class LdesignTree {
     return result;
   }
 
-  private canDrop(dragKey: string, dropKey: string, pos: 'before'|'after'|'inside'): boolean {
+  private canDrop(dragKey: string, dropKey: string, pos: 'before' | 'after' | 'inside'): boolean {
     if (!dragKey || !dropKey) return false;
     if (dragKey === dropKey) return false;
     if (this.isDescendant(dragKey, dropKey)) return false;
     const dragNode = this.keyNodeMap.get(dragKey)!;
     const dropNode = this.keyNodeMap.get(dropKey)!;
     // global
-    const treeAllow = (p: 'before'|'after'|'inside') => p==='before'?this.allowBefore: p==='after'?this.allowAfter:this.allowInside;
+    const treeAllow = (p: 'before' | 'after' | 'inside') => p === 'before' ? this.allowBefore : p === 'after' ? this.allowAfter : this.allowInside;
     if (!treeAllow(pos)) return false;
     // node level
     if (pos === 'inside') {
@@ -631,7 +633,7 @@ export class LdesignTree {
       if (dropNode.allowDropInside === false) return false;
     }
     if (pos === 'before' && dropNode.allowDropBefore === false) return false;
-    if (pos === 'after'  && dropNode.allowDropAfter  === false) return false;
+    if (pos === 'after' && dropNode.allowDropAfter === false) return false;
     // 深度限制（如果设置）
     if (this.maxDepth && this.maxDepth > 0) {
       const subtree = this.getSubtreeHeight(dragKey);
@@ -707,7 +709,7 @@ export class LdesignTree {
     if (node && node.draggable === false) { e.preventDefault(); return; }
     if (this.allowDrag && node && this.allowDrag(node) === false) { e.preventDefault(); return; }
     this.draggingKey = key;
-    try { e.dataTransfer?.setData('text/plain', key); } catch {}
+    try { e.dataTransfer?.setData('text/plain', key); } catch { }
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -727,15 +729,15 @@ export class LdesignTree {
     else pos = 'inside';
 
     // 全局/节点级位置限制
-    const treeAllow = (p: 'before'|'after'|'inside') => p==='before'?this.allowBefore: p==='after'?this.allowAfter:this.allowInside;
-    const nodeAllow = (p: 'before'|'after'|'inside') => {
-      if (p==='inside') {
+    const treeAllow = (p: 'before' | 'after' | 'inside') => p === 'before' ? this.allowBefore : p === 'after' ? this.allowAfter : this.allowInside;
+    const nodeAllow = (p: 'before' | 'after' | 'inside') => {
+      if (p === 'inside') {
         if (dropNode.droppable === false) return false;
         if (dropNode.allowDropInside === false) return false;
         return true;
       }
-      if (p==='before') return dropNode.allowDropBefore !== false;
-      if (p==='after')  return dropNode.allowDropAfter  !== false;
+      if (p === 'before') return dropNode.allowDropBefore !== false;
+      if (p === 'after') return dropNode.allowDropAfter !== false;
       return true;
     };
     if (!treeAllow(pos) || !nodeAllow(pos)) return;
@@ -759,13 +761,13 @@ export class LdesignTree {
     const t = this.dragTimers.get(key);
     if (t) { clearTimeout(t); this.dragTimers.delete(key); }
     if (pos === 'inside' && !this.isExpanded(key) && !dropNode.isLeaf) {
-      const timer = window.setTimeout(() => {
+      const timer = this.resources.addSafeTimeout(() => {
         // 再次确认仍然悬停该节点
         if (this.overKey === key && this.overPos === 'inside') {
           this.toggleExpand(key);
         }
         this.dragTimers.delete(key);
-      }, Math.max(0, this.dragExpandDelay || 0));
+      }, Math.max(0, this.dragExpandDelay || 0)) as any;
       this.dragTimers.set(key, timer as unknown as number);
     }
   };
@@ -782,16 +784,16 @@ export class LdesignTree {
     const dropNode = this.keyNodeMap.get(key);
 
     // 全局/节点级位置限制再次校验
-    const treeAllow = (p: 'before'|'after'|'inside') => p==='before'?this.allowBefore: p==='after'?this.allowAfter:this.allowInside;
-    const nodeAllow = (p: 'before'|'after'|'inside') => {
+    const treeAllow = (p: 'before' | 'after' | 'inside') => p === 'before' ? this.allowBefore : p === 'after' ? this.allowAfter : this.allowInside;
+    const nodeAllow = (p: 'before' | 'after' | 'inside') => {
       if (!dropNode) return true;
-      if (p==='inside') {
+      if (p === 'inside') {
         if (dropNode.droppable === false) return false;
         if (dropNode.allowDropInside === false) return false;
         return true;
       }
-      if (p==='before') return dropNode.allowDropBefore !== false;
-      if (p==='after')  return dropNode.allowDropAfter  !== false;
+      if (p === 'before') return dropNode.allowDropBefore !== false;
+      if (p === 'after') return dropNode.allowDropAfter !== false;
       return true;
     };
 
@@ -893,7 +895,7 @@ export class LdesignTree {
         </div>
 
         {!leaf && (
-<ul
+          <ul
             class="ldesign-tree__children"
             role="group"
             ref={el => { if (el) this.childrenRefs.set(k, el); else this.childrenRefs.delete(k); }}
@@ -929,11 +931,10 @@ export class LdesignTree {
     });
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       el.style.height = 'auto';
       el.style.overflow = '';
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
   }
 
   private animateClose(key: string) {
@@ -947,11 +948,17 @@ export class LdesignTree {
     });
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       el.style.display = 'block';
       el.style.overflow = 'hidden';
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
+  }
+
+  disconnectedCallback() {
+    // 清理所有拖拽定时器
+    this.dragTimers.forEach(v => clearTimeout(v));
+    this.dragTimers.clear();
+    this.resources.cleanup();
   }
 
   componentDidRender() {
@@ -980,7 +987,7 @@ export class LdesignTree {
   @Method() async collapse(key: string): Promise<void> { if (this.isExpanded(key)) await this.toggleExpand(key); }
   @Method() async expandAll(): Promise<void> { const allKeys = Array.from(this.keyNodeMap.keys()).filter(k => !this.isLeaf(k)); this.setExpandedKeys(allKeys); }
   @Method() async collapseAll(): Promise<void> { this.setExpandedKeys([]); }
-  @Method() async move(dragKey: string, dropKey: string, position: 'before'|'after'|'inside'): Promise<boolean> { if (!this.canDrop(dragKey, dropKey, position)) return false; return this.moveNode(dragKey, dropKey, position, 'api'); }
+  @Method() async move(dragKey: string, dropKey: string, position: 'before' | 'after' | 'inside'): Promise<boolean> { if (!this.canDrop(dragKey, dropKey, position)) return false; return this.moveNode(dragKey, dropKey, position, 'api'); }
   @Method() async focusKey(key: string): Promise<void> { const el = this.el.querySelector(`.ldesign-tree__item[data-key="${key}"]`) as HTMLElement | null; if (el) el.focus(); }
 
   render() {

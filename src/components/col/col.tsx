@@ -1,4 +1,5 @@
 import { Component, Prop, h, Host, Element, State } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Col 列
@@ -20,14 +21,14 @@ export class LdesignCol {
 
   private rowObserver?: MutationObserver;
   private gridObserver?: MutationObserver;
+  private resources = new ResourceManager();
 
   connectedCallback() {
     this.updateParentCols(true);
   }
 
   disconnectedCallback() {
-    if (this.rowObserver) { this.rowObserver.disconnect(); this.rowObserver = undefined; }
-    if (this.gridObserver) { this.gridObserver.disconnect(); this.gridObserver = undefined; }
+    this.resources.cleanup();
   }
 
   private parseColsFrom(el: HTMLElement | null | undefined): number | undefined {
@@ -48,7 +49,7 @@ export class LdesignCol {
 
     if (setupWatchers) {
       if (row && !this.rowObserver) {
-        this.rowObserver = new MutationObserver((mutations) => {
+        this.rowObserver = this.resources.observeMutation((mutations) => {
           for (const m of mutations) {
             if (m.type === 'attributes' && m.attributeName === 'cols') {
               const next = this.parseColsFrom(row);
@@ -62,12 +63,11 @@ export class LdesignCol {
               }
             }
           }
-        });
-        this.rowObserver.observe(row, { attributes: true, attributeFilter: ['cols'] });
+        }, row, { attributes: true, attributeFilter: ['cols'] });
       }
 
       if (grid && !this.gridObserver) {
-        this.gridObserver = new MutationObserver((mutations) => {
+        this.gridObserver = this.resources.observeMutation((mutations) => {
           for (const m of mutations) {
             if (m.type === 'attributes' && m.attributeName === 'cols') {
               const nextFromRow = this.parseColsFrom(this.el.closest('ldesign-row') as any as HTMLElement | null);
@@ -79,8 +79,7 @@ export class LdesignCol {
               }
             }
           }
-        });
-        this.gridObserver.observe(grid, { attributes: true, attributeFilter: ['cols'] });
+        }, grid, { attributes: true, attributeFilter: ['cols'] });
       }
     }
   }

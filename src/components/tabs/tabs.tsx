@@ -1,6 +1,7 @@
 import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch, Method } from '@stencil/core';
 import { Size } from '../../types';
 import { setupSwipeHandlers, setupDragSort, watchBreakpoint, Breakpoint, animate, debounce } from './tabs-utils';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type TabsPlacement = 'top' | 'bottom' | 'left' | 'right';
 export type TabsType = 'line' | 'card' | 'pills' | 'minimal' | 'gradient' | 'segmented';
@@ -12,11 +13,11 @@ export interface TabMeta {
   closable: boolean;
   icon?: string;
   badge?: string | number;
-  panel: HTMLElement & { 
-    name?: string; 
-    label?: string; 
-    disabled?: boolean; 
-    active?: boolean; 
+  panel: HTMLElement & {
+    name?: string;
+    label?: string;
+    disabled?: boolean;
+    active?: boolean;
     closable?: boolean;
     icon?: string;
     badge?: string | number;
@@ -79,7 +80,7 @@ export class LdesignTabs {
   /** 点击关闭某个面板 */
   @Event() ldesignRemove!: EventEmitter<{ name: string }>;
   /** 拖拽排序 */
-  @Event() ldesignReorder!: EventEmitter<{ items: TabMeta[] }>; 
+  @Event() ldesignReorder!: EventEmitter<{ items: TabMeta[] }>;
 
   @State() currentName?: string;
   @State() items: TabMeta[] = [];
@@ -95,6 +96,7 @@ export class LdesignTabs {
   private slotEl?: HTMLSlotElement;
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
+  private resources = new ResourceManager();
   private shouldCenterOnUpdate = false;
   private centerTries = 0;
   private swipeCleanup?: () => void;
@@ -126,15 +128,15 @@ export class LdesignTabs {
   componentDidLoad() {
     // 监听插槽变化，动态收集
     this.slotEl = this.el.querySelector('slot') as HTMLSlotElement | undefined;
-    this.slotEl?.addEventListener('slotchange', this.onSlotChange);
+    if (this.slotEl) {
+      this.resources.addSafeEventListener(this.slotEl, 'slotchange', this.onSlotChange as EventListener);
+    }
 
     // 监听 DOM 变化（添加/删除面板）
-    this.mutationObserver = new MutationObserver(() => this.collectPanels());
-    this.mutationObserver.observe(this.el, { 
-      childList: true, 
-      subtree: true, 
-      attributes: true, 
-      attributeFilter: ['label', 'name', 'disabled', 'closable', 'icon', 'badge'] 
+    this.mutationObserver = this.resources.observeMutation(() => this.collectPanels(), this.el, {
+      childList: true,
+      subtree: true,
+      attributes: false
     });
 
     // 监听尺寸变化，更新墨水条
@@ -150,8 +152,8 @@ export class LdesignTabs {
         const nav = this.el.querySelector('.ldesign-tabs__nav') as HTMLElement | null;
         if (this.resizeObserver && nav) this.resizeObserver.observe(nav);
       }
-      window.addEventListener('resize', this.updateInkBar as any);
-    } catch {}
+      this.resources.addSafeEventListener(window, 'resize', this.updateInkBar as EventListener);
+    } catch { }
 
     // 设置触摸滑动
     if (this.swipeable) {
@@ -181,7 +183,9 @@ export class LdesignTabs {
 
     // 绑定滚动
     const nav = this.getNavScrollEl();
-    nav?.addEventListener('scroll', this.onNavScroll, { passive: true } as any);
+    if (nav) {
+      this.resources.addSafeEventListener(nav, 'scroll', this.onNavScroll as EventListener, { passive: true });
+    }
     // 初次更新滚动按钮
     this.updateScrollButtons();
   }
@@ -200,34 +204,27 @@ export class LdesignTabs {
   }
 
   disconnectedCallback() {
-    this.slotEl?.removeEventListener('slotchange', this.onSlotChange);
-    this.mutationObserver?.disconnect();
     this.swipeCleanup?.();
     this.dragCleanup?.();
     this.breakpointCleanup?.();
-    this.updateOverflowDebounced?.cancel();
-    try {
-      this.resizeObserver?.disconnect();
-      const nav = this.getNavScrollEl();
-      nav?.removeEventListener('scroll', this.onNavScroll as any);
-      window.removeEventListener('resize', this.updateInkBar as any);
-    } catch {}
+    this.resizeObserver?.disconnect();
+    this.resources.cleanup();
   }
 
   private onSlotChange = () => {
     this.collectPanels();
   };
 
-private getPanels(): (HTMLElement & { name?: string; label?: string; disabled?: boolean; active?: boolean })[] {
+  private getPanels(): (HTMLElement & { name?: string; label?: string; disabled?: boolean; active?: boolean })[] {
     const nodes = Array.from(this.el.querySelectorAll('ldesign-tab-panel'));
     return nodes as any[];
   }
 
-  private ensureIdFor(panel: HTMLElement & { 
-    name?: string; 
-    label?: string; 
-    disabled?: boolean; 
-    active?: boolean; 
+  private ensureIdFor(panel: HTMLElement & {
+    name?: string;
+    label?: string;
+    disabled?: boolean;
+    active?: boolean;
     closable?: boolean;
     icon?: string;
     badge?: string | number;
@@ -343,7 +340,7 @@ private getPanels(): (HTMLElement & { name?: string; label?: string; disabled?: 
         } else {
           it.panel.setAttribute('aria-hidden', 'true');
         }
-      } catch {}
+      } catch { }
     });
   }
 
@@ -550,17 +547,17 @@ private getPanels(): (HTMLElement & { name?: string; label?: string; disabled?: 
 
     const navWidth = nav.clientWidth;
     const tabs = Array.from(nav.querySelectorAll('.ldesign-tabs__tab')) as HTMLElement[];
-    
+
     let totalWidth = 0;
     const overflow: TabMeta[] = [];
-    
+
     tabs.forEach((tab, index) => {
       totalWidth += tab.offsetWidth;
       if (totalWidth > navWidth - 100) { // 留出更多按钮的空间
         overflow.push(this.items[index]);
       }
     });
-    
+
     this.overflowItems = overflow;
   }
 

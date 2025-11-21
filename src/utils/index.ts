@@ -8,6 +8,9 @@ export * from './virtual-scroll';
 // 导出对象池
 export * from './object-pool';
 
+// 导出资源管理器
+export * from './resource-manager';
+
 /**
  * 生成BEM类名
  * @param block 块名

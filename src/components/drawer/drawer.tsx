@@ -1,4 +1,5 @@
 import { Component, Prop, State, Element, Event, EventEmitter, Watch, Method, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 import {
   DrawerPlacement,
   DrawerState,
@@ -235,13 +236,13 @@ export class LdesignDrawer {
 
   /** 性能优化：GPU 加速 */
   @Prop() gpuAcceleration: boolean = true;
-  
+
   /** 性能优化：使用虚拟滚动 */
   @Prop() virtualScroll: boolean = false;
-  
+
   /** 性能优化：懒加载内容 */
   @Prop() lazyLoad: boolean = false;
-  
+
   /** 性能优化：使用 CSS contain */
   @Prop() cssContain: boolean = true;
 
@@ -297,6 +298,7 @@ export class LdesignDrawer {
   private swipeStartPos: { x: number; y: number } = { x: 0, y: 0 };
   private swipeStartTime: number = 0;
   private animationFrameId?: number;
+  private resources = new ResourceManager();
   private resizeObserver?: ResizeObserver;
   private touchVelocity: number = 0; // 触摸速度
   private lastTouchTime: number = 0;
@@ -315,31 +317,31 @@ export class LdesignDrawer {
   componentWillLoad() {
     this.drawerId = generateId('ldesign-drawer');
     this.currentSize = parseSize(this.size, this.placement);
-    
+
     // 检查用户是否明确指定了 swipeTriggerArea
     const hasUserSpecifiedTriggerArea = this.el.hasAttribute('swipe-trigger-area');
-    
+
     // 检测移动设备
     this.isMobileDevice = this.detectMobileDevice();
-    
+
     // 移动设备默认调整
     if (this.isMobileDevice) {
       this.adjustForMobile(hasUserSpecifiedTriggerArea);
     }
-    
+
     // 初始化全屏状态
     this.isFullscreen = this.fullscreen;
-    
+
     // 处理字符串 "false" 的情况（HTML 属性传递）
     // 在 HTML 中 visible="false" 会被当作字符串，需要转换为布尔值
     if (this.visible === 'false' as any || this.visible === false || !this.visible) {
       this.visible = false;
       this.currentState = 'closed';
     }
-    
+
     // 性能模式检测
     this.performanceMode = this.shouldUsePerformanceMode();
-    
+
   }
 
   componentDidLoad() {
@@ -358,30 +360,23 @@ export class LdesignDrawer {
 
     // 设置 resize observer
     this.setupResizeObserver();
-    
+
     // 设置性能优化监听器
     this.setupPerformanceOptimizations();
-    
+
     // 监听设备方向变化
     this.setupOrientationListener();
-    
+
     // 设置视口变化监听
     this.setupViewportListener();
-    
+
     // 关键修复：使用原生事件监听器绑定触摸事件
     // Shadow DOM 模式下 JSX 的事件绑定可能不可靠
     this.setupTouchListeners();
-    
+
   }
 
   disconnectedCallback() {
-    // 移除触摸事件监听器
-    if (this.drawerRef) {
-      this.drawerRef.removeEventListener('touchstart', this.handleSwipeStart as any);
-      this.drawerRef.removeEventListener('touchmove', this.handleSwipeMove as any);
-      this.drawerRef.removeEventListener('touchend', this.handleSwipeEnd as any);
-    }
-    
     this.cleanup();
   }
 
@@ -525,7 +520,7 @@ export class LdesignDrawer {
 
   private async handleOpen() {
     this.drawerBeforeOpen.emit();
-    
+
     // 保存当前焦点元素
     if (this.restoreFocus) {
       this.previousFocusedElement = document.activeElement as HTMLElement;
@@ -553,10 +548,10 @@ export class LdesignDrawer {
         });
       });
     });
-    
+
     // 第 3 步：现在触发动画
     this.isAnimating = true; // 这会触发重新渲染，加上 drawer-visible 类
-    
+
     // 第 4 步：等待动画完成
     if (this.animation) {
       // 移动端使用实际设置的动画时长，不强制缩短
@@ -576,7 +571,7 @@ export class LdesignDrawer {
 
   private async handleClose(reason: CloseReason) {
     this.drawerBeforeClose.emit({ reason });
-    
+
     // 移除 isAnimating 以触发关闭动画
     this.isAnimating = false;
     this.currentState = 'closing';
@@ -655,10 +650,10 @@ export class LdesignDrawer {
     this.resizeStartPos = coords;
     this.resizeStartSize = this.getCurrentSizeInPixels();
 
-    document.addEventListener('mousemove', this.handleResizeMove);
-    document.addEventListener('mouseup', this.handleResizeEnd);
-    document.addEventListener('touchmove', this.handleResizeMove);
-    document.addEventListener('touchend', this.handleResizeEnd);
+    this.resources.addSafeEventListener(document, 'mousemove', this.handleResizeMove as EventListener);
+    this.resources.addSafeEventListener(document, 'mouseup', this.handleResizeEnd as EventListener);
+    this.resources.addSafeEventListener(document, 'touchmove', this.handleResizeMove as EventListener);
+    this.resources.addSafeEventListener(document, 'touchend', this.handleResizeEnd as EventListener);
 
     this.el.classList.add('drawer-resizing');
   };
@@ -716,10 +711,7 @@ export class LdesignDrawer {
 
     this.isResizing = false;
 
-    document.removeEventListener('mousemove', this.handleResizeMove);
-    document.removeEventListener('mouseup', this.handleResizeEnd);
-    document.removeEventListener('touchmove', this.handleResizeMove);
-    document.removeEventListener('touchend', this.handleResizeEnd);
+    // cleanup会自动移除所有事件监听器
 
     this.el.classList.remove('drawer-resizing');
     this.emitResizeEvent();
@@ -729,39 +721,39 @@ export class LdesignDrawer {
 
   private handleSwipeStart = (event: TouchEvent | MouseEvent) => {
     // 更详细的调试日志
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     if (!this.swipeToClose) {
-      
+
       return;
     }
 
     // 检查触发区域
     const target = event.target as HTMLElement;
-    
-    
+
+
     const isTriggerArea = this.isSwipeTriggerArea(target, event);
-    
-    
-    
+
+
+
     if (!isTriggerArea) {
-      
+
       return;
     }
-    
-    
+
+
 
     const coords = getEventCoordinates(event);
     this.swipeStartPos = coords;
     this.swipeStartTime = Date.now();
     this.isSwiping = true;
-    
+
     // 移动设备优化
     if (this.isMobileDevice && event instanceof TouchEvent) {
       this.touchStartX = coords.x;
@@ -770,7 +762,7 @@ export class LdesignDrawer {
       this.lastTouchY = coords.y;
       this.lastTouchTime = Date.now();
       this.touchVelocity = 0;
-      
+
       // 防止默认滚动行为
       if (this.shouldPreventScroll(target)) {
         event.preventDefault();
@@ -783,24 +775,24 @@ export class LdesignDrawer {
 
     const coords = getEventCoordinates(event);
     let delta = 0;
-    
-    
-    
+
+
+
     // 计算触摸速度（移动设备）
     if (this.isMobileDevice && event instanceof TouchEvent) {
       const currentTime = Date.now();
       const timeDelta = currentTime - this.lastTouchTime;
-      
+
       if (timeDelta > 0) {
         const xVelocity = (coords.x - this.lastTouchX) / timeDelta;
         const yVelocity = (coords.y - this.lastTouchY) / timeDelta;
-        
+
         // 根据方向计算速度
         this.touchVelocity = this.placement === 'left' || this.placement === 'right'
           ? Math.abs(xVelocity)
           : Math.abs(yVelocity);
       }
-      
+
       this.lastTouchX = coords.x;
       this.lastTouchY = coords.y;
       this.lastTouchTime = currentTime;
@@ -827,7 +819,7 @@ export class LdesignDrawer {
 
     const currentSize = this.getCurrentSizeInPixels();
     this.swipeProgress = Math.abs(delta) / currentSize;
-    
+
     // 使用 RAF 优化渲染（性能模式）
     if (this.performanceMode) {
       if (this.rafId) cancelAnimationFrame(this.rafId);
@@ -840,27 +832,25 @@ export class LdesignDrawer {
   };
 
   private handleSwipeEnd = () => {
-    
-    
     if (!this.isSwiping) return;
 
     const duration = Date.now() - this.swipeStartTime;
     const distance = this.swipeProgress * this.getCurrentSizeInPixels();
-    
+
     // 使用触摸速度优化关闭判断（移动设备）
     let velocity = calculateVelocity(0, distance, duration);
     if (this.isMobileDevice && this.touchVelocity > 0) {
       velocity = Math.max(velocity, this.touchVelocity * 1000); // 转换为像素/秒
     }
-    
+
     // 移动设备降低阈值，更容易触发关闭
     const threshold = this.isMobileDevice ? this.swipeThreshold * 0.8 : this.swipeThreshold;
-    
+
     if (shouldTriggerSwipeClose(this.swipeProgress, velocity, threshold)) {
-      
+
       this.close('swipe');
     } else {
-      
+
       // 弹性回弹动画
       this.animateSwipeBack();
     }
@@ -871,23 +861,23 @@ export class LdesignDrawer {
   };
 
   private isSwipeTriggerArea(target: HTMLElement, event?: TouchEvent | MouseEvent): boolean {
-    
-    
+
+
     if (this.swipeTriggerArea === 'anywhere') {
-      
+
       return true;
     }
 
     if (this.swipeTriggerArea === 'handle') {
-      const isHandle = target.classList.contains('drawer-swipe-handle') || 
-                       target.closest('.drawer-swipe-handle') !== null;
-      
+      const isHandle = target.classList.contains('drawer-swipe-handle') ||
+        target.closest('.drawer-swipe-handle') !== null;
+
       return isHandle;
     }
 
     if (this.swipeTriggerArea === 'header') {
       const isHeader = target.closest('.drawer-header') !== null;
-      
+
       return isHeader;
     }
 
@@ -899,10 +889,10 @@ export class LdesignDrawer {
       // - 顶部抽屉：底边缘（向上滑动关闭）
       // - 底部抽屉：顶边缘（向下滑动关闭）
       if (!event || !this.drawerRef) {
-        
+
         return false;
       }
-      
+
       const rect = this.drawerRef.getBoundingClientRect();
       const coords = getEventCoordinates(event);
       let isEdge = false;
@@ -930,124 +920,117 @@ export class LdesignDrawer {
           isEdge = distance < 20;
           break;
       }
-      
-      
-      
+
+
+
       return isEdge;
     }
 
-    
+
     return false;
   }
 
   // ==================== 移动设备支持方法 ====================
-  
+
   private detectMobileDevice(): boolean {
     const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
     const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const isSmallScreen = window.innerWidth <= 768;
-    
+
     return isMobile || (isTouchDevice && isSmallScreen);
   }
-  
+
   private adjustForMobile(hasUserSpecifiedTriggerArea: boolean = false) {
     // 移动设备默认调整
     if (!this.swipeToClose) {
       this.swipeToClose = true; // 默认启用滑动关闭
     }
-    
+
     // 只有在用户没有明确指定触发区域时，才修改为 anywhere
     // 如果用户明确设置了 swipe-trigger-area="edge"，就保持用户的选择
     if (!hasUserSpecifiedTriggerArea && this.swipeTriggerArea === 'edge') {
       this.swipeTriggerArea = 'anywhere';
-      
+
     } else if (hasUserSpecifiedTriggerArea) {
-      
+
     }
-    
+
     // 调整默认尺寸
     if (this.size === 'md' || this.size === 400) {
       this.size = this.placement === 'bottom' || this.placement === 'top' ? '60%' : '85%';
     }
-    
+
     // 移动设备不修改动画时长，使用用户设置或默认值
     // 这样可以保证动画流畅性
-    
+
     // 默认启用 GPU 加速
     this.gpuAcceleration = true;
   }
-  
+
   private shouldUsePerformanceMode(): boolean {
     // 检测是否需要启用性能模式
     const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
-    const isSlowConnection = (navigator as any).connection && 
-      ((navigator as any).connection.effectiveType === '2g' || 
-       (navigator as any).connection.effectiveType === 'slow-2g');
-    
+    const isSlowConnection = (navigator as any).connection &&
+      ((navigator as any).connection.effectiveType === '2g' ||
+        (navigator as any).connection.effectiveType === 'slow-2g');
+
     return this.isMobileDevice || isLowEndDevice || isSlowConnection;
   }
-  
+
   // 关键修复：使用原生事件监听器绑定触摸事件
   private setupTouchListeners() {
-    
-    
-    
-    
+
+
+
+
     if (!this.drawerRef) {
       console.error('[Drawer Setup] drawerRef not found!');
       return;
     }
-    
-    // 移除之前可能绑定的监听器
-    this.drawerRef.removeEventListener('touchstart', this.handleSwipeStart as any);
-    this.drawerRef.removeEventListener('touchmove', this.handleSwipeMove as any);
-    this.drawerRef.removeEventListener('touchend', this.handleSwipeEnd as any);
-    
+
     // 添加触摸事件监听器
-    this.drawerRef.addEventListener('touchstart', this.handleSwipeStart as any, { passive: false });
-    this.drawerRef.addEventListener('touchmove', this.handleSwipeMove as any, { passive: false });
-    this.drawerRef.addEventListener('touchend', this.handleSwipeEnd as any, { passive: true });
-    
-    
+    this.resources.addSafeEventListener(this.drawerRef, 'touchstart', this.handleSwipeStart as EventListener, { passive: false });
+    this.resources.addSafeEventListener(this.drawerRef, 'touchmove', this.handleSwipeMove as EventListener, { passive: false });
+    this.resources.addSafeEventListener(this.drawerRef, 'touchend', this.handleSwipeEnd as EventListener, { passive: true });
   }
-  
+
   private shouldPreventScroll(target: HTMLElement): boolean {
     // 判断是否应该阻止滚动
     const isScrollable = target.scrollHeight > target.clientHeight ||
-                        target.scrollWidth > target.clientWidth;
-    
+      target.scrollWidth > target.clientWidth;
+
     return !isScrollable && this.swipeTriggerArea === 'anywhere';
   }
-  
+
   private animateSwipeBack() {
     // 弹性回弹动画
     const duration = 200;
     const startTime = Date.now();
     const startProgress = this.swipeProgress;
-    
+
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = elapsed / duration;
-      
+
       if (progress >= 1) {
         this.swipeProgress = 0;
         return;
       }
-      
+
       // 使用缓动函数
       const easeOut = 1 - Math.pow(1 - progress, 3);
       this.swipeProgress = startProgress * (1 - easeOut);
-      
+
       requestAnimationFrame(animate);
     };
-    
+
     requestAnimationFrame(animate);
   }
-  
+
   private setupOrientationListener() {
     if (!this.isMobileDevice) return;
-    
+
     const handleOrientationChange = debounce(() => {
       // 重新计算尺寸
       const newSize = parseSize(this.size, this.placement);
@@ -1056,23 +1039,21 @@ export class LdesignDrawer {
         this.emitResizeEvent();
       }
     }, 300);
-    
-    window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('resize', handleOrientationChange);
+
+    this.resources.addSafeEventListener(window, 'orientationchange', handleOrientationChange as EventListener);
+    this.resources.addSafeEventListener(window, 'resize', handleOrientationChange as EventListener);
   }
-  
+
   private setupViewportListener() {
     if (!this.isMobileDevice) return;
-    
+
     // 监听虚拟键盘等导致的视口变化
     const visualViewport = (window as any).visualViewport;
     if (visualViewport) {
-      visualViewport.addEventListener('resize', () => {
-        this.handleViewportResize();
-      });
+      this.resources.addSafeEventListener(visualViewport, 'resize', this.handleViewportResize as any);
     }
   }
-  
+
   private handleViewportResize = debounce(() => {
     if (this.placement === 'bottom' && this.visible) {
       // 底部抽屉需要适应虚拟键盘
@@ -1085,34 +1066,34 @@ export class LdesignDrawer {
       }
     }
   }, 100);
-  
+
   // ==================== 性能优化方法 ====================
-  
+
   private setupPerformanceOptimizations() {
     // 设置 Intersection Observer 进行懒加载
     if (this.lazyLoad && 'IntersectionObserver' in window) {
       this.setupIntersectionObserver();
     }
-    
+
     // 设置 Mutation Observer 监听内容变化
     if ('MutationObserver' in window) {
       this.setupMutationObserver();
     }
-    
+
     // 优化滚动性能
     this.optimizeScrollPerformance();
-    
+
     // 设置节流的事件处理器
     this.setupThrottledHandlers();
   }
-  
+
   private setupIntersectionObserver() {
     const options = {
       root: null,
       rootMargin: '50px',
       threshold: 0.01
     };
-    
+
     this.intersectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && !this.contentLoaded) {
@@ -1120,73 +1101,73 @@ export class LdesignDrawer {
         }
       });
     }, options);
-    
+
     if (this.contentRef) {
       this.intersectionObserver.observe(this.contentRef);
     }
   }
-  
+
   private setupMutationObserver() {
     const options = {
       childList: true,
       subtree: true,
       characterData: true
     };
-    
+
     this.mutationObserver = new MutationObserver(
       debounce(() => {
         this.handleContentMutation();
       }, 100)
     );
-    
+
     if (this.contentRef) {
       this.mutationObserver.observe(this.contentRef, options);
     }
   }
-  
+
   private handleContentMutation() {
     // 内容变化时重新计算布局
     if (this.visible && this.currentState === 'open') {
       this.emitResizeEvent();
     }
   }
-  
+
   private loadContent() {
     // 懒加载内容
     this.contentLoaded = true;
-    
+
     // 触发内容加载事件
     const event = new CustomEvent('drawerContentLoad', {
       detail: { drawerId: this.drawerId }
     });
     this.el.dispatchEvent(event);
   }
-  
+
   private optimizeScrollPerformance() {
     if (!this.contentRef) return;
-    
+
     // 添加滚动优化样式
     if (this.performanceMode) {
       // 使用setAttribute来设置webkit前缀属性
       this.contentRef.style.setProperty('-webkit-overflow-scrolling', 'touch');
       (this.contentRef.style as any)['-webkit-overflow-scrolling'] = 'touch';
     }
-    
+
     // 监听滚动事件（节流）
     this.throttledScroll = throttle(() => {
       this.handleScroll();
     }, 100);
-    
-    this.contentRef.addEventListener('scroll', this.throttledScroll, { passive: true });
+
+    this.resources.addSafeEventListener(this.contentRef, 'scroll', this.throttledScroll as EventListener, { passive: true });
   }
-  
+
   private handleScroll() {
     if (!this.contentRef) return;
-    
+
     const scrollTop = this.contentRef.scrollTop;
     const scrollHeight = this.contentRef.scrollHeight;
     const clientHeight = this.contentRef.clientHeight;
-    
+
     // 触发滚动事件
     const event = new CustomEvent('drawerScroll', {
       detail: {
@@ -1198,14 +1179,14 @@ export class LdesignDrawer {
     });
     this.el.dispatchEvent(event);
   }
-  
+
   private setupThrottledHandlers() {
     // 创建节流版本的处理器
     this.throttledResize = throttle(() => {
       this.emitResizeEvent();
     }, 100);
   }
-  
+
   // ==================== 辅助方法 ====================
 
   private getCurrentSizeInPixels(): number {
@@ -1260,11 +1241,11 @@ export class LdesignDrawer {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
-    
+
     if (this.intersectionObserver) {
       this.intersectionObserver.disconnect();
     }
-    
+
     if (this.mutationObserver) {
       this.mutationObserver.disconnect();
     }
@@ -1272,7 +1253,7 @@ export class LdesignDrawer {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
-    
+
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
     }
@@ -1282,64 +1263,65 @@ export class LdesignDrawer {
     document.removeEventListener('mouseup', this.handleResizeEnd);
     document.removeEventListener('touchmove', this.handleResizeMove);
     document.removeEventListener('touchend', this.handleResizeEnd);
-    
+
     // 清理移动设备监听器
     if (this.isMobileDevice) {
       window.removeEventListener('orientationchange', this.handleViewportResize);
       window.removeEventListener('resize', this.handleViewportResize);
     }
-    
+
+    this.resources.cleanup();
   }
 
   private getDrawerStyle() {
     const style: { [key: string]: string } = {};
-    
+
     style['z-index'] = this.zIndex.toString();
 
     // 设置尺寸
-      if (this.placement === 'left' || this.placement === 'right') {
-        style['width'] = this.currentSize;
-        
-        // 全屏模式特殊处理
-        if (this.isFullscreen) {
-          style['width'] = '100vw';
-          style['height'] = '100vh';
-          style['max-width'] = '100vw';
-          style['max-height'] = '100vh';
-          // 确保左右抽屉在全屏时铺满整个视口
-          style['left'] = '0';
-          style['right'] = '0';
-          style['top'] = '0';
-          style['bottom'] = '0';
-        } else {
-          // 非全屏模式：移动端关键修复
-          // 确保内联样式也包含 max-width 约束，防止宽度超出视口
-          if (this.isMobileDevice) {
-            style['max-width'] = '100vw';
-          }
-        }
+    if (this.placement === 'left' || this.placement === 'right') {
+      style['width'] = this.currentSize;
+
+      // 全屏模式特殊处理
+      if (this.isFullscreen) {
+        style['width'] = '100vw';
+        style['height'] = '100vh';
+        style['max-width'] = '100vw';
+        style['max-height'] = '100vh';
+        // 确保左右抽屉在全屏时铺满整个视口
+        style['left'] = '0';
+        style['right'] = '0';
+        style['top'] = '0';
+        style['bottom'] = '0';
       } else {
-        style['height'] = this.currentSize;
-        
-        // 全屏模式特殊处理
-        if (this.isFullscreen) {
-          style['width'] = '100vw';
-          style['height'] = '100vh';
+        // 非全屏模式：移动端关键修复
+        // 确保内联样式也包含 max-width 约束，防止宽度超出视口
+        if (this.isMobileDevice) {
           style['max-width'] = '100vw';
-          style['max-height'] = '100vh';
-          // 确保上下抽屉在全屏时铺满整个视口
-          style['left'] = '0';
-          style['right'] = '0';
-          style['top'] = '0';
-          style['bottom'] = '0';
-        } else {
-          // 非全屏模式：移动端关键修复
-          // 确保内联样式也包含 max-height 约束
-          if (this.isMobileDevice) {
-            style['max-height'] = '100vh';
-          }
         }
       }
+    } else {
+      style['height'] = this.currentSize;
+
+      // 全屏模式特殊处理
+      if (this.isFullscreen) {
+        style['width'] = '100vw';
+        style['height'] = '100vh';
+        style['max-width'] = '100vw';
+        style['max-height'] = '100vh';
+        // 确保上下抽屉在全屏时铺满整个视口
+        style['left'] = '0';
+        style['right'] = '0';
+        style['top'] = '0';
+        style['bottom'] = '0';
+      } else {
+        // 非全屏模式：移动端关键修复
+        // 确保内联样式也包含 max-height 约束
+        if (this.isMobileDevice) {
+          style['max-height'] = '100vh';
+        }
+      }
+    }
 
     // 圆角
     if (this.rounded) {
@@ -1368,11 +1350,11 @@ export class LdesignDrawer {
     if (this.gpuAcceleration) {
       style['will-change'] = 'transform';
       style['backface-visibility'] = 'hidden'; // 避免不必要的重绘
-      
+
       // 注意：不在这里设置 transform，避免覆盖动画的 transform
       // GPU 加速由 CSS 的 translateX/Y/Z 自动触发
     }
-    
+
     // CSS containment 优化
     if (this.cssContain) {
       style['contain'] = 'layout style paint';
@@ -1397,7 +1379,7 @@ export class LdesignDrawer {
     if ((this.currentState === 'opening' && this.isAnimating) || this.currentState === 'open') {
       classes.push('drawer-visible');
     }
-    
+
     if (this.currentState) classes.push(`drawer-${this.currentState}`);
     if (this.placement) classes.push(`drawer-${this.placement}`);
     if (this.theme) classes.push(`drawer-theme-${this.theme}`);
@@ -1479,8 +1461,8 @@ export class LdesignDrawer {
       <div class={`drawer-header ${this.headerBorder ? 'drawer-header-border' : ''} ${this.headerSticky ? 'drawer-header-sticky' : ''}`}>
         <div class="drawer-header-content">
           {this.showBack && (
-            <button 
-              class="drawer-back-btn" 
+            <button
+              class="drawer-back-btn"
               onClick={this.handleBackClick}
               onTouchEnd={(e) => {
                 e.preventDefault();
@@ -1525,8 +1507,8 @@ export class LdesignDrawer {
             )}
 
             {this.minimizable && (
-              <button 
-                class="drawer-action-btn" 
+              <button
+                class="drawer-action-btn"
                 onClick={() => this.minimize()}
                 onTouchEnd={(e) => {
                   e.preventDefault();
@@ -1541,8 +1523,8 @@ export class LdesignDrawer {
             )}
 
             {this.closable && (
-              <button 
-                class="drawer-close-btn" 
+              <button
+                class="drawer-close-btn"
                 onClick={this.handleCloseClick}
                 onTouchEnd={(e) => {
                   e.preventDefault();
@@ -1573,7 +1555,7 @@ export class LdesignDrawer {
       <div
         ref={(el) => (this.contentRef = el!)}
         class="drawer-content"
-        style={{ 
+        style={{
           padding: paddingStyle,
           ...(this.virtualScroll && { overflowAnchor: 'none' }) // 虚拟滚动优化
         }}

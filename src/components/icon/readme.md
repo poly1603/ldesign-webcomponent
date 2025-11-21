@@ -110,6 +110,7 @@ Type: `Promise<string[]>`
  - [ldesign-alert](../alert)
  - [ldesign-avatar](../avatar)
  - [ldesign-backtop](../backtop)
+ - [ldesign-breadcrumb-item](../breadcrumb)
  - [ldesign-button](../button)
  - [ldesign-calendar](../calendar)
  - [ldesign-cascader](../cascader)
@@ -122,6 +123,7 @@ Type: `Promise<string[]>`
  - [ldesign-image-viewer](../image-viewer)
  - [ldesign-input](../input)
  - [ldesign-input-number](../input-number)
+ - [ldesign-layout-sider](../layout)
  - [ldesign-mention](../mention)
  - [ldesign-menu](../menu)
  - [ldesign-message](../message)
@@ -130,12 +132,19 @@ Type: `Promise<string[]>`
  - [ldesign-popconfirm](../popconfirm)
  - [ldesign-progress](../progress)
  - [ldesign-rate](../rate)
+ - [ldesign-result](../result)
  - [ldesign-select](../select)
+ - [ldesign-spin](../spin)
+ - [ldesign-step-item](../steps)
  - [ldesign-switch](../switch)
+ - [ldesign-table](../table)
  - [ldesign-tag](../tag)
  - [ldesign-time-picker](../time-picker)
+ - [ldesign-timeline-item](../timeline)
+ - [ldesign-tour](../tour)
  - [ldesign-transfer](../transfer)
  - [ldesign-tree](../tree)
+ - [ldesign-upload](../upload)
 
 ### Graph
 ```mermaid
@@ -143,6 +152,7 @@ graph TD;
   ldesign-alert --> ldesign-icon
   ldesign-avatar --> ldesign-icon
   ldesign-backtop --> ldesign-icon
+  ldesign-breadcrumb-item --> ldesign-icon
   ldesign-button --> ldesign-icon
   ldesign-calendar --> ldesign-icon
   ldesign-cascader --> ldesign-icon
@@ -155,6 +165,7 @@ graph TD;
   ldesign-image-viewer --> ldesign-icon
   ldesign-input --> ldesign-icon
   ldesign-input-number --> ldesign-icon
+  ldesign-layout-sider --> ldesign-icon
   ldesign-mention --> ldesign-icon
   ldesign-menu --> ldesign-icon
   ldesign-message --> ldesign-icon
@@ -163,12 +174,19 @@ graph TD;
   ldesign-popconfirm --> ldesign-icon
   ldesign-progress --> ldesign-icon
   ldesign-rate --> ldesign-icon
+  ldesign-result --> ldesign-icon
   ldesign-select --> ldesign-icon
+  ldesign-spin --> ldesign-icon
+  ldesign-step-item --> ldesign-icon
   ldesign-switch --> ldesign-icon
+  ldesign-table --> ldesign-icon
   ldesign-tag --> ldesign-icon
   ldesign-time-picker --> ldesign-icon
+  ldesign-timeline-item --> ldesign-icon
+  ldesign-tour --> ldesign-icon
   ldesign-transfer --> ldesign-icon
   ldesign-tree --> ldesign-icon
+  ldesign-upload --> ldesign-icon
   style ldesign-icon fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

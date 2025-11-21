@@ -1,5 +1,6 @@
 import { Component, Prop, Event, EventEmitter, h, Host, Element, State, Watch } from '@stencil/core';
 import { Placement } from '@floating-ui/dom';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type PopconfirmPlacement = Placement;
 export type PopconfirmTrigger = 'click' | 'hover' | 'manual' | 'focus' | 'contextmenu';
@@ -17,7 +18,12 @@ export type PopconfirmIcon = 'info' | 'success' | 'warning' | 'error' | 'questio
 })
 export class LdesignPopconfirm {
   @Element() el!: HTMLElement;
-  
+  private resources = new ResourceManager();
+
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
+
   /** 确认标题（支持 slot=title 覆盖） */
   @Prop() popconfirmTitle: string = '确定要执行该操作吗？';
 
@@ -57,25 +63,25 @@ export class LdesignPopconfirm {
 
   /** 图标类型/名称 */
   @Prop() icon: PopconfirmIcon = 'question';
-  
+
   /** 是否显示图标 */
   @Prop() showIcon: boolean = true;
-  
+
   /** 动画类型（继承自 popup） */
   @Prop() animation: 'fade' | 'scale' | 'slide' = 'scale';
-  
+
   /** 尺寸（影响内容区域大小） */
   @Prop() size: 'small' | 'medium' | 'large' = 'medium';
-  
+
   /** 是否显示加载状态 */
   @Prop() loading: boolean = false;
-  
+
   /** 确认按钮加载状态 */
   @Prop() confirmLoading: boolean = false;
-  
+
   /** 自动关闭延迟（毫秒），0 表示不自动关闭 */
   @Prop() autoCloseDelay: number = 0;
-  
+
   /** 与触发元素的距离 */
   @Prop() offsetDistance: number = 8;
 
@@ -87,7 +93,7 @@ export class LdesignPopconfirm {
 
   /** 事件：对外转发可见性变化 */
   @Event() ldesignVisibleChange!: EventEmitter<boolean>;
-  
+
   /** 内部状态：确认按钮处理中 */
   @State() isConfirming: boolean = false;
 
@@ -103,17 +109,17 @@ export class LdesignPopconfirm {
 
   private onConfirm = async () => {
     if (this.confirmLoading || this.isConfirming) return;
-    
+
     // 触发确认事件
     this.ldesignConfirm.emit();
-    
+
     // 如果需要显示确认加载状态
     if (this.confirmLoading) {
       this.isConfirming = true;
       // 等待外部处理完成（需要外部手动关闭）
     } else if (this.trigger !== 'manual') {
       // 非受控模式下自动关闭
-      setTimeout(() => this.hideInnerPopup(), 100);
+      this.resources.addSafeTimeout(() => this.hideInnerPopup(), 100);
     }
   };
 
@@ -137,14 +143,14 @@ export class LdesignPopconfirm {
       this.isConfirming = false;
     }
   };
-  
+
   @Watch('visible')
   watchVisible(newVal: boolean) {
     if (!newVal) {
       this.isConfirming = false;
     }
   }
-  
+
   // 获取图标配置
   private getIconConfig() {
     const iconMap = {
@@ -154,11 +160,11 @@ export class LdesignPopconfirm {
       'error': { name: 'x-circle', color: 'var(--ldesign-error-color, #ef4444)' },
       'question': { name: 'help-circle', color: 'var(--ldesign-warning-color, #f59e0b)' }
     };
-    
+
     if (iconMap[this.icon]) {
       return iconMap[this.icon];
     }
-    
+
     // 自定义图标名称
     return { name: this.icon, color: 'var(--ldesign-warning-color, #f59e0b)' };
   }
@@ -169,14 +175,14 @@ export class LdesignPopconfirm {
     // manual 模式下才把 visible 传给内部 popup，否则让 popup 自主控制
     const visibleProp = this.trigger === 'manual' ? { visible: this.visible } : {};
     const iconConfig = this.getIconConfig();
-    
+
     // 根据尺寸设置弹层类名
     const popupClass = `ldesign-popconfirm--${this.size}`;
 
     return (
-      <Host class={{ 
+      <Host class={{
         'ldesign-popconfirm': true,
-        [`ldesign-popconfirm--${this.size}`]: true 
+        [`ldesign-popconfirm--${this.size}`]: true
       }}>
         <ldesign-popup
           placement={this.placement}
@@ -217,17 +223,17 @@ export class LdesignPopconfirm {
                 </div>
               )}
               <div class="ldesign-popconfirm__actions">
-                <ldesign-button 
-                  size="small" 
-                  type={this.cancelType} 
+                <ldesign-button
+                  size="small"
+                  type={this.cancelType}
                   onClick={this.onCancel}
                   disabled={this.isConfirming}
                 >
                   {this.cancelText}
                 </ldesign-button>
-                <ldesign-button 
-                  size="small" 
-                  type={this.okType} 
+                <ldesign-button
+                  size="small"
+                  type={this.okType}
                   onClick={this.onConfirm}
                   loading={this.isConfirming}
                 >

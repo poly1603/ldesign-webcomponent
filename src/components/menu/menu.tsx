@@ -1,4 +1,5 @@
-import { Component, Prop, State, Element, Event, EventEmitter, Watch, h, Host } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type VerticalExpand = 'inline' | 'flyout' | 'mixed';
 export type SubmenuTrigger = 'hover' | 'click';
@@ -81,7 +82,8 @@ export class LdesignMenu {
   private submenuRefs: Map<string, HTMLUListElement> = new Map();
   private didInitHeights = false;
   @State() flyoutOpenMap: { [key: string]: boolean } = {};
-  private flyoutTimers: Map<string, number> = new Map();
+  private flyoutTimers = new Map<string, number>();
+  private resources = new ResourceManager();
   private flyChildrenRefs: Map<string, HTMLUListElement> = new Map();
   private downChildrenRefs: Map<string, HTMLUListElement> = new Map();
 
@@ -140,26 +142,26 @@ export class LdesignMenu {
 
   componentDidLoad() {
     // 在 click 触发模式下，支持点击空白处或按 ESC 关闭所有面板
-    document.addEventListener('click', this.onDocumentClick, true);
-    document.addEventListener('keydown', this.onKeydown, true);
+    this.resources.addSafeEventListener(document, 'click', this.onDocumentClick as EventListener, { capture: true });
+    this.resources.addSafeEventListener(document, 'keydown', this.onKeydown as EventListener, { capture: true });
 
     // 监听尺寸变化以进行横向溢出计算
     this.resizeObserver = new ResizeObserver(() => this.scheduleCalcOverflow());
     if (this.el) this.resizeObserver.observe(this.el);
-    window.addEventListener('resize', this.handleWindowResize, { passive: true });
+    this.resources.addSafeEventListener(window, 'resize', this.handleWindowResize as EventListener, { passive: true });
 
     // 初次渲染后计算一次
     this.scheduleCalcOverflow();
   }
 
   disconnectedCallback() {
-    document.removeEventListener('click', this.onDocumentClick, true);
-    document.removeEventListener('keydown', this.onKeydown, true);
-    window.removeEventListener('resize', this.handleWindowResize as any);
     if (this.resizeObserver) {
-      try { this.resizeObserver.disconnect(); } catch {}
+      try { this.resizeObserver.disconnect(); } catch { }
       this.resizeObserver = undefined;
     }
+    this.flyoutTimers.forEach(v => clearTimeout(v));
+    this.flyoutTimers.clear();
+    this.resources.cleanup();
   }
 
   private parseItems(val: string | MenuItem[]): MenuItem[] {
@@ -302,11 +304,10 @@ export class LdesignMenu {
     });
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       el.style.height = 'auto';
       el.style.overflow = '';
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
   }
 
   private animateClose(key: string) {
@@ -320,12 +321,11 @@ export class LdesignMenu {
     });
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      el.removeEventListener('transitionend', onEnd);
       el.style.display = 'block';
       el.style.overflow = 'hidden';
       // 保持高度为 0，收起状态
     };
-    el.addEventListener('transitionend', onEnd);
+    this.resources.addSafeEventListener(el, 'transitionend', onEnd as EventListener);
   }
 
   // 根据选中项，计算并展开其所有祖先（仅对 inline/mixed 的内嵌容器产生视觉效果）
@@ -395,7 +395,7 @@ export class LdesignMenu {
   }
   private scheduleCloseFly(key: string) {
     clearTimeout(this.flyoutTimers.get(key));
-    const t = window.setTimeout(() => this.setFlyoutOpen(key, false), 150);
+    const t = this.resources.addSafeTimeout(() => this.setFlyoutOpen(key, false), 150) as any;
     this.flyoutTimers.set(key, t);
   }
 
@@ -406,7 +406,7 @@ export class LdesignMenu {
   }
   private scheduleCloseDown(key: string) {
     clearTimeout(this.flyoutTimers.get(key));
-    const t = window.setTimeout(() => this.setFlyoutOpen(key, false), 150);
+    const t = this.resources.addSafeTimeout(() => this.setFlyoutOpen(key, false), 150) as any;
     this.flyoutTimers.set(key, t);
   }
 
@@ -726,11 +726,11 @@ export class LdesignMenu {
     return (
       <li class={{ 'ldesign-menu__node': true, 'ldesign-menu__node--fly': true, 'ldesign-menu__node--fly-open': open }} role="none" data-key={item.key} ref={level === 1 ? this.registerTopRef(item.key) : (undefined as any)} onMouseEnter={onEnter} onMouseLeave={onLeave}>
         <div class={{
-            'ldesign-menu__item': true,
-            'ldesign-menu__item--submenu': true,
-            'ldesign-menu__item--disabled': !!item.disabled,
-            'ldesign-menu__item--active': isActive,
-          }} role="menuitem" onClick={onClick}>
+          'ldesign-menu__item': true,
+          'ldesign-menu__item--submenu': true,
+          'ldesign-menu__item--disabled': !!item.disabled,
+          'ldesign-menu__item--active': isActive,
+        }} role="menuitem" onClick={onClick}>
           {level === 1 ? this.renderTopIcon(item.icon) : this.renderIcon(item.icon)}
           <span class="ldesign-menu__title">{item.label}</span>
           {this.renderArrow(open)}
@@ -776,11 +776,11 @@ export class LdesignMenu {
     return (
       <li class={{ 'ldesign-menu__node': true, 'ldesign-menu__node--dropdown': true, 'ldesign-menu__node--dropdown-open': open }} role="none" data-key={item.key} ref={level === 1 ? this.registerTopRef(item.key) : (undefined as any)} onMouseEnter={onEnter} onMouseLeave={onLeave}>
         <div class={{
-            'ldesign-menu__item': true,
-            'ldesign-menu__item--submenu': true,
-            'ldesign-menu__item--disabled': !!item.disabled,
-            'ldesign-menu__item--active': isActive,
-          }} role="menuitem" onClick={onClick}>
+          'ldesign-menu__item': true,
+          'ldesign-menu__item--submenu': true,
+          'ldesign-menu__item--disabled': !!item.disabled,
+          'ldesign-menu__item--active': isActive,
+        }} role="menuitem" onClick={onClick}>
           {level === 1 ? this.renderTopIcon(item.icon) : this.renderIcon(item.icon)}
           <span class="ldesign-menu__title">{item.label}</span>
           {this.renderArrow(open, 'down')}
@@ -836,11 +836,11 @@ export class LdesignMenu {
     const style = (this.mode === 'horizontal' || this.useFlyout(level))
       ? ({} as any)
       : (() => {
-          const indentPx = this.indent * (level - 1);
-          const s: any = { ['--level-indent' as any]: `${indentPx}px` };
-          if (indentPx > 0) s.paddingLeft = `${indentPx}px`;
-          return s;
-        })();
+        const indentPx = this.indent * (level - 1);
+        const s: any = { ['--level-indent' as any]: `${indentPx}px` };
+        if (indentPx > 0) s.paddingLeft = `${indentPx}px`;
+        return s;
+      })();
 
     const inner = (
       <div class={classes} style={style as any} role="menuitem" onClick={(e) => this.handleItemClick(item, level, e)}>
@@ -898,47 +898,47 @@ export class LdesignMenu {
         <ul class="ldesign-menu__list" role="menu" ref={this.registerListRef}>
           {this.mode === 'horizontal'
             ? (() => {
-                const overflow = new Set(this.overflowKeys || []);
-                const visible = (this.parsedItems || []).filter(it => !overflow.has(it.key));
-                const hidden = (this.parsedItems || []).filter(it => overflow.has(it.key));
-                return [
-                  ...visible.map(it => this.renderMenuNode(it, 1)),
-                  hidden.length > 0 && (() => {
-                    const path = this.getPathKeys(this.currentKey || '');
-                    const inMoreBySelection = path.length > 0 && this.overflowKeys.includes(path[0]);
-                    const isOpen = !!this.flyoutOpenMap['__more__'];
-                    const isMoreActive = inMoreBySelection || (this.submenuTrigger === 'click' && isOpen);
-                    return (
-                      <li class={{ 'ldesign-menu__node': true, 'ldesign-menu__node--more': true, 'ldesign-menu__node--dropdown': true, 'ldesign-menu__node--dropdown-open': isOpen }} role="none" ref={this.registerMoreRenderRef}
-                          onMouseEnter={() => { if (this.submenuTrigger === 'hover') { this.openTopExclusive('__more__'); this.openDown('__more__'); this.previewFromMore(); } }}
-                          onMouseLeave={() => { if (this.submenuTrigger === 'hover') this.scheduleCloseDown('__more__'); }}>
-                        <div class={{ 'ldesign-menu__item': true, 'ldesign-menu__item--submenu': true, 'ldesign-menu__item--active': isMoreActive }} role="menuitem"
-                          onClick={(e: MouseEvent) => {
-                            if (this.submenuTrigger === 'click') {
-                              e.preventDefault();
-                              const open = !!this.flyoutOpenMap['__more__'];
-                              if (!open) {
-                                this.openTopExclusive('__more__');
-                                this.openDown('__more__');
-                                // 点击展开时，同步沿当前选中路径展开“更多”中的顶层链路
-                                this.previewFromMore();
-                              } else {
-                                this.closeAllPanels();
-                              }
+              const overflow = new Set(this.overflowKeys || []);
+              const visible = (this.parsedItems || []).filter(it => !overflow.has(it.key));
+              const hidden = (this.parsedItems || []).filter(it => overflow.has(it.key));
+              return [
+                ...visible.map(it => this.renderMenuNode(it, 1)),
+                hidden.length > 0 && (() => {
+                  const path = this.getPathKeys(this.currentKey || '');
+                  const inMoreBySelection = path.length > 0 && this.overflowKeys.includes(path[0]);
+                  const isOpen = !!this.flyoutOpenMap['__more__'];
+                  const isMoreActive = inMoreBySelection || (this.submenuTrigger === 'click' && isOpen);
+                  return (
+                    <li class={{ 'ldesign-menu__node': true, 'ldesign-menu__node--more': true, 'ldesign-menu__node--dropdown': true, 'ldesign-menu__node--dropdown-open': isOpen }} role="none" ref={this.registerMoreRenderRef}
+                      onMouseEnter={() => { if (this.submenuTrigger === 'hover') { this.openTopExclusive('__more__'); this.openDown('__more__'); this.previewFromMore(); } }}
+                      onMouseLeave={() => { if (this.submenuTrigger === 'hover') this.scheduleCloseDown('__more__'); }}>
+                      <div class={{ 'ldesign-menu__item': true, 'ldesign-menu__item--submenu': true, 'ldesign-menu__item--active': isMoreActive }} role="menuitem"
+                        onClick={(e: MouseEvent) => {
+                          if (this.submenuTrigger === 'click') {
+                            e.preventDefault();
+                            const open = !!this.flyoutOpenMap['__more__'];
+                            if (!open) {
+                              this.openTopExclusive('__more__');
+                              this.openDown('__more__');
+                              // 点击展开时，同步沿当前选中路径展开“更多”中的顶层链路
+                              this.previewFromMore();
+                            } else {
+                              this.closeAllPanels();
                             }
-                          }}>
-                          <span class="ldesign-menu__icon ldesign-menu__icon--default" aria-hidden="true"></span>
-                          <span class="ldesign-menu__title">{this.moreLabel}</span>
-                          {this.renderArrow(!!this.flyoutOpenMap['__more__'], 'down')}
-                        </div>
-                        <ul class="ldesign-menu__down-children" role="menu" ref={this.registerDownChildrenRef('__more__')}>
-                          {hidden.map(it => this.renderMenuNode(it, 2))}
-                        </ul>
-                      </li>
-                    );
-                  })()
-                ];
-              })()
+                          }
+                        }}>
+                        <span class="ldesign-menu__icon ldesign-menu__icon--default" aria-hidden="true"></span>
+                        <span class="ldesign-menu__title">{this.moreLabel}</span>
+                        {this.renderArrow(!!this.flyoutOpenMap['__more__'], 'down')}
+                      </div>
+                      <ul class="ldesign-menu__down-children" role="menu" ref={this.registerDownChildrenRef('__more__')}>
+                        {hidden.map(it => this.renderMenuNode(it, 2))}
+                      </ul>
+                    </li>
+                  );
+                })()
+              ];
+            })()
             : this.parsedItems.map(it => this.renderMenuNode(it, 1))}
         </ul>
         {/* 隐藏测量层：渲染所有顶层条目的克隆，用于稳定测量宽度 */}

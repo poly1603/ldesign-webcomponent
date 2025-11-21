@@ -1,4 +1,5 @@
 import { Component, Prop, State, Watch, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Statistic 统计数值组件
@@ -68,6 +69,7 @@ export class LdesignStatistic {
   private animationFrame?: number;
   private startTime?: number;
   private startValue: number = 0;
+  private resources = new ResourceManager();
 
   componentDidLoad(): void {
     if (this.animated) {
@@ -87,9 +89,7 @@ export class LdesignStatistic {
   }
 
   disconnectedCallback(): void {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
-    }
+    this.resources.cleanup();
   }
 
   /**
@@ -98,6 +98,7 @@ export class LdesignStatistic {
   private animateValue(from: number, to: number): void {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = undefined;
     }
 
     this.startValue = from;
@@ -114,13 +115,14 @@ export class LdesignStatistic {
       this.displayValue = this.startValue + (to - this.startValue) * easeProgress;
 
       if (progress < 1) {
-        this.animationFrame = requestAnimationFrame(animate);
+        this.animationFrame = this.resources.addSafeRAF(animate);
       } else {
         this.displayValue = to;
+        this.animationFrame = undefined;
       }
     };
 
-    this.animationFrame = requestAnimationFrame(animate);
+    this.animationFrame = this.resources.addSafeRAF(animate);
   }
 
   /**

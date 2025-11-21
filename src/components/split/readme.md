@@ -37,7 +37,7 @@ Split 面板分割
 | Event                  | Description | Type                                                                     |
 | ---------------------- | ----------- | ------------------------------------------------------------------------ |
 | `ldesignSplit`         |             | `CustomEvent<{ value: number; direction: "horizontal" \| "vertical"; }>` |
-| `ldesignSplitCollapse` | 折叠切换事件      | `CustomEvent<{ side: "none" \| "start" \| "end"; }>`                     |
+| `ldesignSplitCollapse` | 折叠切换事件      | `CustomEvent<{ side: "start" \| "end" \| "none"; }>`                     |
 | `ldesignSplitEnd`      |             | `CustomEvent<{ value: number; direction: "horizontal" \| "vertical"; }>` |
 | `ldesignSplitStart`    | 拖拽事件        | `CustomEvent<{ value: number; direction: "horizontal" \| "vertical"; }>` |
 

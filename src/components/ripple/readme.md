@@ -34,7 +34,7 @@ Ripple 水波纹效果
 | `multiLayer`      | `multi-layer`       | 是否启用多层波纹               | `boolean`                                                   | `false`                          |
 | `opacity`         | `opacity`           | 波纹不透明度                 | `number`                                                    | `0.24`                           |
 | `radius`          | `radius`            | 半径：auto 或固定像素          | `"auto" \| number`                                          | `'auto'`                         |
-| `size`            | `size`              | 波纹大小模式                 | `"extra-large" \| "large" \| "medium" \| "small"`           | `'medium'`                       |
+| `rippleSize`      | `ripple-size`       | 波纹大小模式                 | `"extra-large" \| "large" \| "medium" \| "small"`           | `'medium'`                       |
 | `sound`           | `sound`             | 是否启用声音反馈               | `boolean`                                                   | `false`                          |
 | `soundVolume`     | `sound-volume`      | 声音音量 (0-1)             | `number`                                                    | `0.1`                            |
 | `throttle`        | `throttle`          | 最小触发间隔 (ms)            | `number`                                                    | `0`                              |

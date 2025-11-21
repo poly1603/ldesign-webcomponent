@@ -1,4 +1,6 @@
-import { Component, Prop, State, Element, Event, EventEmitter, Watch, h, Host } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, h, Host, Element, Method } from '@stencil/core';
+import type { Placement } from '@floating-ui/dom';
+import { ResourceManager } from '../../utils/resource-manager';
 import { computePosition, flip, shift, offset, arrow, autoUpdate, Placement, VirtualElement } from '@floating-ui/dom';
 
 // Public types
@@ -79,9 +81,7 @@ export class LdesignPopup {
   private uid = `ldp_${Math.random().toString(36).slice(2)}`;
   private teleported = false;
   private teleportContainer?: HTMLElement;
-  private cleanup?: () => void;
-  private removeDocumentClick?: () => void;
-  private removeDocumentKeydown?: () => void;
+  private resources = new ResourceManager();
   private showTimer?: number;
   private hideTimer?: number;
   private contentHoverBound = false;
@@ -115,12 +115,10 @@ export class LdesignPopup {
   }
 
   disconnectedCallback() {
-    this.cleanup?.();
-    this.clearTimers();
-    this.clearAutoCloseTimer();
     this.unbindTriggerEvents();
     this.unbindDocumentEvents();
-    this.removeFromContainerIfNeeded();
+    this.unbindContentHover();
+    this.resources.cleanup();
   }
 
   componentDidRender() {
@@ -137,42 +135,34 @@ export class LdesignPopup {
     if (!this.triggerElement) return;
     switch (this.trigger) {
       case 'hover':
-        this.triggerElement.addEventListener('mouseenter', this.onMouseEnter);
-        this.triggerElement.addEventListener('mouseleave', this.onMouseLeave);
+        this.resources.addSafeEventListener(this.triggerElement, 'mouseenter', this.onMouseEnter as EventListener);
+        this.resources.addSafeEventListener(this.triggerElement, 'mouseleave', this.onMouseLeave as EventListener);
         break;
       case 'click':
-        this.triggerElement.addEventListener('click', this.onClick);
+        this.resources.addSafeEventListener(this.triggerElement, 'click', this.onClick as EventListener);
         if (this.closeOnOutside) this.bindDocumentClick();
         break;
       case 'contextmenu':
-        this.triggerElement.addEventListener('contextmenu', this.onContextMenu);
+        this.resources.addSafeEventListener(this.triggerElement, 'contextmenu', this.onContextMenu as EventListener);
         if (this.closeOnOutside) this.bindDocumentClick();
         break;
       case 'focus':
-        this.triggerElement.addEventListener('focusin', this.onFocus);
-        this.triggerElement.addEventListener('focusout', this.onBlur);
+        this.resources.addSafeEventListener(this.triggerElement, 'focusin', this.onFocus as EventListener);
+        this.resources.addSafeEventListener(this.triggerElement, 'focusout', this.onBlur as EventListener);
         break;
     }
   }
   private unbindTriggerEvents() {
-    if (!this.triggerElement) return;
-    this.triggerElement.removeEventListener('mouseenter', this.onMouseEnter);
-    this.triggerElement.removeEventListener('mouseleave', this.onMouseLeave);
-    this.triggerElement.removeEventListener('click', this.onClick);
-    this.triggerElement.removeEventListener('contextmenu', this.onContextMenu);
-    this.triggerElement.removeEventListener('focusin', this.onFocus);
-    this.triggerElement.removeEventListener('focusout', this.onBlur);
+    // cleanup会自动移除所有事件
   }
 
   private bindDocumentClick() {
     const handler = this.onDocumentClick;
-    document.addEventListener('click', handler, true);
-    this.removeDocumentClick = () => document.removeEventListener('click', handler, true);
+    this.resources.addSafeEventListener(document, 'click', handler as EventListener, { capture: true });
   }
   private bindDocumentKeydown() {
     const keyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape' && this.isVisible) this.hide(); };
-    document.addEventListener('keydown', keyHandler);
-    this.removeDocumentKeydown = () => document.removeEventListener('keydown', keyHandler);
+    this.resources.addSafeEventListener(document, 'keydown', keyHandler as EventListener);
   }
   private unbindDocumentEvents() { this.removeDocumentClick?.(); this.removeDocumentClick = undefined; this.removeDocumentKeydown?.(); this.removeDocumentKeydown = undefined; }
 
@@ -223,7 +213,7 @@ export class LdesignPopup {
       }
       this.clearTimers();
       const delay = this.hideDelay > 0 ? this.hideDelay : 200;
-      this.hideTimer = window.setTimeout(() => this.setVisible(false), delay);
+      this.hideTimer = this.resources.addSafeTimeout(() => this.setVisible(false), delay) as any;
       return;
     }
     this.hide();
@@ -289,7 +279,7 @@ export class LdesignPopup {
     const base = this.toNumber(this.offsetDistance, 8);
     const offsetValue = base + (this.arrow ? 4 : 0);
 
-    const middleware = [ offset(offsetValue), flip({ boundary } as any), shift({ padding: 8, boundary, mainAxis: false, crossAxis: true } as any) ];
+    const middleware = [offset(offsetValue), flip({ boundary } as any), shift({ padding: 8, boundary, mainAxis: false, crossAxis: true } as any)];
     if (this.arrow && this.arrowElement) middleware.push(arrow({ element: this.arrowElement }));
 
     const reference = this.getReferenceTarget();
@@ -310,7 +300,7 @@ export class LdesignPopup {
 
     this.positioned = true;
     this.cleanup?.();
-    this.cleanup = autoUpdate(reference as any, this.popupElement, () => { if (this.isVisible) this.updatePositionOnly(); }, { ancestorScroll: !this.lockOnScroll, ancestorResize: true, elementResize: true });
+    this.cleanup = this.resources.addSafeAutoUpdate(reference as any, this.popupElement, () => { if (this.isVisible) this.updatePositionOnly(); }, { ancestorScroll: !this.lockOnScroll, ancestorResize: true, elementResize: true });
   }
 
   // ── Positioning（update only） ────────────────────────────────
@@ -329,7 +319,7 @@ export class LdesignPopup {
     const base = this.toNumber(this.offsetDistance, 8);
     const offsetValue = base + (this.arrow ? 4 : 0);
 
-    const middleware = [ offset(offsetValue), flip({ boundary } as any), shift({ padding: 8, boundary, mainAxis: false, crossAxis: true } as any) ];
+    const middleware = [offset(offsetValue), flip({ boundary } as any), shift({ padding: 8, boundary, mainAxis: false, crossAxis: true } as any)];
     if (this.arrow && this.arrowElement) middleware.push(arrow({ element: this.arrowElement }));
 
     const reference = this.getReferenceTarget();
@@ -358,7 +348,7 @@ export class LdesignPopup {
       if (!this.popupElement || !this.triggerElement) return;
       const tr = this.triggerElement.getBoundingClientRect();
       const pp = this.popupElement.getBoundingClientRect();
-      const base = resolvedPlacement.split('-')[0] as 'top'|'bottom'|'left'|'right';
+      const base = resolvedPlacement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right';
       let mainGap = 0;
       if (base === 'top') mainGap = tr.top - pp.bottom;
       if (base === 'bottom') mainGap = pp.top - tr.bottom;
@@ -374,7 +364,7 @@ export class LdesignPopup {
       }
       // eslint-disable-next-line no-console
       console.log('Popup debug:', { placement: resolvedPlacement, mainAxisGap: Number(mainGap.toFixed(2)), arrowTipGap: tipGap != null ? Number(tipGap.toFixed(2)) : null, arrow: !!this.arrow });
-    } catch {}
+    } catch { }
   }
 
   // ── Visibility ─────────────────────────────────────────────────
@@ -387,7 +377,7 @@ export class LdesignPopup {
       this.popupElement = this.getPopupEl() || this.el.querySelector('.ldesign-popup__content');
       // @ts-ignore
       void this.popupElement?.getBoundingClientRect();
-    } catch {}
+    } catch { }
     await this.nextFrame();
     this.motion = 'open';
   }
@@ -404,7 +394,7 @@ export class LdesignPopup {
       this.setupAutoClose();
       this.ldesignVisibleChange.emit(true);
     };
-    if (delay) this.showTimer = window.setTimeout(run, delay); else run();
+    if (delay) this.showTimer = this.resources.addSafeTimeout(run, delay) as any; else run();
   }
   hide() {
     if (!this.isVisible) return; this.clearTimers();
@@ -421,13 +411,13 @@ export class LdesignPopup {
     const run = () => {
       if (this.motionEnabled && this.motionDuration > 0) {
         this.motion = 'closing';
-        window.setTimeout(finalize, this.motionDuration);
+        this.resources.addSafeTimeout(finalize, this.motionDuration);
       } else {
         finalize();
       }
     };
     const delay = this.hideDelay > 0 ? this.hideDelay : 0;
-    if (delay) this.hideTimer = window.setTimeout(run, delay); else run();
+    if (delay) this.hideTimer = this.resources.addSafeTimeout(run, delay) as any; else run();
   }
   toggle() { this.isVisible ? this.hide() : this.show(); }
 
@@ -444,7 +434,7 @@ export class LdesignPopup {
       if (!this.isVisible) return;
       if (this.motionEnabled && this.motionDuration > 0) {
         this.motion = 'closing';
-        window.setTimeout(() => {
+        this.resources.addSafeTimeout(() => {
           this.isVisible = false; this.visible = false;
           this.motion = 'closed';
           this.cleanup?.();
@@ -467,14 +457,14 @@ export class LdesignPopup {
   }
 
   private clearTimers() { if (this.showTimer) { clearTimeout(this.showTimer); this.showTimer = undefined; } if (this.hideTimer) { clearTimeout(this.hideTimer); this.hideTimer = undefined; } }
-  
+
   private setupAutoClose() {
     if (this.autoCloseDelay > 0) {
       this.clearAutoCloseTimer();
-      this.autoCloseTimer = window.setTimeout(() => this.hide(), this.autoCloseDelay);
+      this.autoCloseTimer = this.resources.addSafeTimeout(() => this.hide(), this.autoCloseDelay) as any;
     }
   }
-  
+
   private clearAutoCloseTimer() {
     if (this.autoCloseTimer) {
       clearTimeout(this.autoCloseTimer);
@@ -487,14 +477,13 @@ export class LdesignPopup {
     if (this.trigger !== 'hover' || !this.interactive || this.contentHoverBound) return;
     this.popupElement = this.getPopupEl() || this.el.querySelector('.ldesign-popup__content');
     if (!this.popupElement) return;
-    this.popupElement.addEventListener('mouseenter', this.onMouseEnter);
-    this.popupElement.addEventListener('mouseleave', this.onMouseLeave);
+    this.resources.addSafeEventListener(this.popupElement, 'mouseenter', this.onMouseEnter as EventListener);
+    this.resources.addSafeEventListener(this.popupElement, 'mouseleave', this.onMouseLeave as EventListener);
     this.contentHoverBound = true;
   }
   private unbindContentHover() {
     if (!this.contentHoverBound || !this.popupElement) return;
-    this.popupElement.removeEventListener('mouseenter', this.onMouseEnter);
-    this.popupElement.removeEventListener('mouseleave', this.onMouseLeave);
+    // cleanup会自动移除
     this.contentHoverBound = false;
   }
 
@@ -503,7 +492,7 @@ export class LdesignPopup {
     const style: any = { position: this.getStrategy(), visibility: this.positioned ? 'visible' : 'hidden' };
     const w = this.toPx(this.width); if (w) style.width = w;
     const mw = this.toPx(this.maxWidth); if (mw) style.maxWidth = mw;
-    
+
     // 预设尺寸
     if (this.size === 'small') {
       style.minWidth = '80px';
@@ -512,12 +501,12 @@ export class LdesignPopup {
       style.minWidth = '200px';
       style.maxWidth = '480px';
     }
-    
+
     style['--ldp-motion'] = this.motionEnabled ? `${this.motionDuration}ms` : '0ms';
     style['--ldp-motion-distance'] = `${this.motionDistance}px`;
     return style;
   }
-  
+
   private getPopupClasses() {
     const classes = ['ldesign-popup__content'];
     if (this.popupClass) classes.push(this.popupClass);
@@ -539,7 +528,7 @@ export class LdesignPopup {
                 {this.closable && (
                   <button class="ldesign-popup__close" onClick={this.onCloseClick} aria-label="关闭">
                     <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
                     </svg>
                   </button>
                 )}

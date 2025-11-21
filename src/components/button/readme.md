@@ -171,6 +171,7 @@ Button 按钮组件
  - [ldesign-modal](../modal)
  - [ldesign-popconfirm](../popconfirm)
  - [ldesign-time-picker](../time-picker)
+ - [ldesign-tour](../tour)
  - [ldesign-transfer](../transfer)
 
 ### Depends on
@@ -187,6 +188,7 @@ graph TD;
   ldesign-modal --> ldesign-button
   ldesign-popconfirm --> ldesign-button
   ldesign-time-picker --> ldesign-button
+  ldesign-tour --> ldesign-button
   ldesign-transfer --> ldesign-button
   style ldesign-button fill:#f9f,stroke:#333,stroke-width:4px
 ```

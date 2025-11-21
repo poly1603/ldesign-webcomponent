@@ -1,4 +1,5 @@
-import { Component, Prop, State, Event, EventEmitter, Watch, h, Host } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, Method, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 import { Size } from '../../types';
 
 /**
@@ -82,22 +83,22 @@ export class LdesignInput {
    * 输入框行数（仅对 textarea 有效）
    */
   @Prop() rows: number = 2;
-  
+
   /**
    * 输入限制，只允许输入指定字符
    */
   @Prop() allowInput?: RegExp | ((value: string) => boolean);
-  
+
   /**
    * 是否显示输入数量统计
    */
   @Prop() showCount: boolean = false;
-  
+
   /**
    * 是否受控组件
    */
   @Prop() controlled: boolean = false;
-  
+
   /**
    * 输入框的状态
    */
@@ -155,7 +156,7 @@ export class LdesignInput {
       this.adjustTextareaHeight();
     }
   }
-  
+
   /**
    * 监听autosize属性变化
    */
@@ -169,6 +170,10 @@ export class LdesignInput {
   /**
    * 组件加载完成
    */
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
+
   componentDidLoad() {
     // Stencil会自动处理字符串到对象的转换，但有时候HTML属性可能仍为字符串
     const attrValue = this.host?.getAttribute('autosize');
@@ -179,7 +184,7 @@ export class LdesignInput {
         console.warn('Failed to parse autosize attribute:', attrValue);
       }
     }
-    
+
     // 处理allowInput属性 - 当通过属性设置RegExp时需要特殊处理
     const allowInputAttr = this.host?.getAttribute('allow-input');
     if (allowInputAttr && typeof this.allowInput === 'string') {
@@ -194,13 +199,14 @@ export class LdesignInput {
         console.warn('Failed to parse allowInput attribute:', allowInputAttr);
       }
     }
-    
+
     if (this.autosize && this.type === 'textarea') {
-      setTimeout(() => this.adjustTextareaHeight(), 0);
+      this.resources.addSafeTimeout(() => this.adjustTextareaHeight(), 0);
     }
   }
-  
+
   private host?: HTMLElement;
+  private resources = new ResourceManager();
 
   /**
    * 处理输入事件
@@ -397,16 +403,16 @@ export class LdesignInput {
       // 不在这里隐藏，避免闪烁，由CSS负责
 
       // 计算内容高度
-    const style = window.getComputedStyle(textarea);
-    const paddingTop = parseFloat(style.paddingTop) || 0;
-    const paddingBottom = parseFloat(style.paddingBottom) || 0;
-    const borderTopWidth = parseFloat(style.borderTopWidth) || 0;
-    const borderBottomWidth = parseFloat(style.borderBottomWidth) || 0;
-    
-    // 计算一行的高度
-    // 创建一个临时元素来准确测量行高
-    const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = `
+      const style = window.getComputedStyle(textarea);
+      const paddingTop = parseFloat(style.paddingTop) || 0;
+      const paddingBottom = parseFloat(style.paddingBottom) || 0;
+      const borderTopWidth = parseFloat(style.borderTopWidth) || 0;
+      const borderBottomWidth = parseFloat(style.borderBottomWidth) || 0;
+
+      // 计算一行的高度
+      // 创建一个临时元素来准确测量行高
+      const tempDiv = document.createElement('div');
+      tempDiv.style.cssText = `
       position: absolute;
       top: -9999px;
       left: -9999px;
@@ -418,46 +424,46 @@ export class LdesignInput {
       padding: 0;
       border: 0;
     `;
-    tempDiv.textContent = 'M';
-    document.body.appendChild(tempDiv);
-    const actualLineHeight = tempDiv.offsetHeight;
-    document.body.removeChild(tempDiv);
-    
-    let minHeight = actualLineHeight * this.rows + paddingTop + paddingBottom;
-    let maxHeight = Infinity;
-    
-    // 处理autosize配置
-    if (typeof this.autosize === 'object' && this.autosize !== null) {
-      const minRows = this.autosize.minRows || this.rows;
-      const maxRows = this.autosize.maxRows;
-      
-      minHeight = actualLineHeight * minRows + paddingTop + paddingBottom;
-      if (maxRows) {
-        maxHeight = actualLineHeight * maxRows + paddingTop + paddingBottom;
+      tempDiv.textContent = 'M';
+      document.body.appendChild(tempDiv);
+      const actualLineHeight = tempDiv.offsetHeight;
+      document.body.removeChild(tempDiv);
+
+      let minHeight = actualLineHeight * this.rows + paddingTop + paddingBottom;
+      let maxHeight = Infinity;
+
+      // 处理autosize配置
+      if (typeof this.autosize === 'object' && this.autosize !== null) {
+        const minRows = this.autosize.minRows || this.rows;
+        const maxRows = this.autosize.maxRows;
+
+        minHeight = actualLineHeight * minRows + paddingTop + paddingBottom;
+        if (maxRows) {
+          maxHeight = actualLineHeight * maxRows + paddingTop + paddingBottom;
+        }
       }
-    }
-    
-    // 获取内容高度
-    const scrollHeight = textarea.scrollHeight;
-    const contentHeight = scrollHeight - borderTopWidth - borderBottomWidth;
-    
-    // 计算最终高度
-    let newHeight = Math.max(contentHeight, minHeight);
-    if (maxHeight !== Infinity) {
-      newHeight = Math.min(newHeight, maxHeight);
-    }
 
-    // 设置高度
-    textarea.style.height = `${newHeight}px`;
+      // 获取内容高度
+      const scrollHeight = textarea.scrollHeight;
+      const contentHeight = scrollHeight - borderTopWidth - borderBottomWidth;
 
-    // 始终保持overflowY为auto，CSS会处理滚动条的显示
-    // 当内容不超出时，浏览器自动隐藏滚动条
-    textarea.style.overflowY = 'auto';
+      // 计算最终高度
+      let newHeight = Math.max(contentHeight, minHeight);
+      if (maxHeight !== Infinity) {
+        newHeight = Math.min(newHeight, maxHeight);
+      }
 
-    // 调试信息
-    if (typeof this.autosize === 'object' && this.autosize !== null) {
-      
-    }
+      // 设置高度
+      textarea.style.height = `${newHeight}px`;
+
+      // 始终保持overflowY为auto，CSS会处理滚动条的显示
+      // 当内容不超出时，浏览器自动隐藏滚动条
+      textarea.style.overflowY = 'auto';
+
+      // 调试信息
+      if (typeof this.autosize === 'object' && this.autosize !== null) {
+
+      }
     });
   }
 
@@ -499,11 +505,11 @@ export class LdesignInput {
     if (this.isFocused) {
       classes.push('ldesign-input-wrapper--focused');
     }
-    
+
     if (this.status) {
       classes.push(`ldesign-input-wrapper--${this.status}`);
     }
-    
+
     if (this.type === 'textarea') {
       classes.push('ldesign-input-wrapper--textarea');
     }
@@ -533,9 +539,9 @@ export class LdesignInput {
     // 清空按钮（不适用于textarea）
     if (this.clearable && this.value && !this.disabled && !this.readonly && this.type !== 'textarea') {
       icons.push(
-        <span 
+        <span
           key="clear"
-          class="ldesign-input__clear" 
+          class="ldesign-input__clear"
           onClick={this.handleClear}
           onMouseDown={(e) => e.preventDefault()} // 防止失去焦点
         >
@@ -547,9 +553,9 @@ export class LdesignInput {
     // 密码切换按钮
     if (this.showPassword && this.type === 'password' && !this.disabled && !this.readonly) {
       icons.push(
-        <span 
+        <span
           key="password"
-          class="ldesign-input__password" 
+          class="ldesign-input__password"
           onClick={this.togglePasswordVisibility}
           onMouseDown={(e) => e.preventDefault()} // 防止失去焦点
         >
@@ -601,7 +607,7 @@ export class LdesignInput {
         'ldesign-input--textarea',
         this.autosize ? 'ldesign-input--autosize' : ''
       ].filter(Boolean).join(' ');
-      
+
       return (
         <textarea
           {...commonProps}
@@ -626,16 +632,16 @@ export class LdesignInput {
    */
   private renderCount() {
     if (!this.showCount || !this.maxlength) return null;
-    
+
     const currentLength = this.value?.length || 0;
-    
+
     return (
       <span class="ldesign-input__count">
         {currentLength}/{this.maxlength}
       </span>
     );
   }
-  
+
   /**
    * 渲染输入框主体
    */

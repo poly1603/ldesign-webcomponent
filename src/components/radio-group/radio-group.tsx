@@ -1,5 +1,6 @@
 import { Component, Prop, Event, EventEmitter, Watch, h, Host, Element } from '@stencil/core';
 import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * RadioGroup 单选框组组件
@@ -38,6 +39,8 @@ export class LdesignRadioGroup {
    */
   @Prop() name?: string;
 
+  private resources = new ResourceManager();
+
   /**
    * 当绑定值变化时触发的事件
    */
@@ -64,7 +67,7 @@ export class LdesignRadioGroup {
    */
   private setupRadioGroup() {
     const radios = this.el.querySelectorAll('ldesign-radio');
-    
+
     radios.forEach((radio: any, index) => {
       // 设置name属性用于分组
       if (this.name) {
@@ -72,19 +75,19 @@ export class LdesignRadioGroup {
       } else {
         radio.name = `radio-group-${Date.now()}-${index}`;
       }
-      
+
       // 设置尺寸
       if (this.size) {
         radio.size = this.size;
       }
-      
+
       // 设置禁用状态
       if (this.disabled) {
         radio.disabled = true;
       }
-      
+
       // 监听单选框变化事件
-      radio.addEventListener('ldesignChange', this.handleRadioChange);
+      this.resources.addSafeEventListener(radio, 'ldesignChange', this.handleRadioChange as EventListener);
     });
   }
 
@@ -101,7 +104,7 @@ export class LdesignRadioGroup {
    */
   private updateRadioStates() {
     const radios = this.el.querySelectorAll('ldesign-radio');
-    
+
     radios.forEach((radio: any) => {
       radio.checked = radio.value === this.value;
     });
@@ -112,7 +115,7 @@ export class LdesignRadioGroup {
    */
   private handleRadioChange = (event: CustomEvent) => {
     const newValue = event.detail;
-    
+
     if (newValue !== this.value) {
       this.value = newValue;
       this.ldesignChange.emit(newValue);
@@ -122,7 +125,7 @@ export class LdesignRadioGroup {
   /**
    * 处理方向键导航（WAI-ARIA 推荐：方向键切换选项并选中）
    */
-  private handleKeyDown = (event: KeyboardEvent) => {
+  private handleRadioKeyDown = (event: KeyboardEvent) => {
     if (this.disabled) return;
 
     const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'];
@@ -131,7 +134,7 @@ export class LdesignRadioGroup {
     const radios = this.getEnabledRadios();
     if (radios.length === 0) return;
 
-      const active = (event.target as HTMLElement)?.closest('ldesign-radio') as any as HTMLElement | null;
+    const active = (event.target as HTMLElement)?.closest('ldesign-radio') as any as HTMLElement | null;
 
     let currentIndex = radios.findIndex(r => r === active);
     if (currentIndex === -1) {
@@ -178,10 +181,7 @@ export class LdesignRadioGroup {
    * 组件卸载
    */
   disconnectedCallback() {
-    const radios = this.el.querySelectorAll('ldesign-radio');
-    radios.forEach((radio: any) => {
-      radio.removeEventListener('ldesignChange', this.handleRadioChange);
-    });
+    this.resources.cleanup();
   }
 
   render() {
@@ -197,7 +197,7 @@ export class LdesignRadioGroup {
         class={classes}
         role="radiogroup"
         aria-disabled={this.disabled ? 'true' : 'false'}
-        onKeyDown={this.handleKeyDown}
+        onKeyDown={this.handleRadioKeyDown}
       >
         <slot></slot>
       </Host>

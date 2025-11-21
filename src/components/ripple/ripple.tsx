@@ -1,4 +1,5 @@
 import { Component, Prop, Element, h, Host, Watch } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Ripple 水波纹效果
@@ -41,7 +42,7 @@ export class LdesignRipple {
   /** 波纹效果类型 */
   @Prop() variant: 'default' | 'light' | 'strong' | 'pulse' | 'gradient' = 'default';
   /** 波纹大小模式 */
-  @Prop() size: 'small' | 'medium' | 'large' | 'extra-large' = 'medium';
+  @Prop() rippleSize: 'small' | 'medium' | 'large' | 'extra-large' = 'medium';
   /** 是否启用多层波纹 */
   @Prop() multiLayer: boolean = false;
   /** 多层波纹延迟 (ms) */
@@ -81,6 +82,7 @@ export class LdesignRipple {
     large: 1.25,
     'extra-large': 1.5
   };
+  private resources = new ResourceManager();
 
   @Watch('disabled')
   onDisabledChange() {
@@ -130,7 +132,7 @@ export class LdesignRipple {
   }
 
   disconnectedCallback() {
-    this.updateListeners(true);
+    this.resources.cleanup();
     const target = this.targetEl;
     if (target) {
       target.classList.remove('ldesign-ripple__target');
@@ -149,30 +151,29 @@ export class LdesignRipple {
     const target = this.targetEl;
     if (!target) return;
 
-    const add = (type: string, handler: any, opts?: any) => !remove && target.addEventListener(type, handler, opts);
-    const rm = (type: string, handler: any) => remove && target.removeEventListener(type, handler as any);
-
-    // 先全部移除
-    ['pointerdown', 'mousedown', 'click', 'pointerup', 'mouseup', 'pointerleave', 'mouseleave', 'keydown'].forEach(t => rm(t, (this as any)[t + 'Handler'] || this.pointerDownHandler));
+    if (remove) {
+      // BaseComponent 会自动清理所有监听器
+      return;
+    }
 
     if (this.disabled) return;
 
     const down = this.trigger;
     if (down === 'pointerdown') {
-      add('pointerdown', this.pointerDownHandler, { passive: true });
-      add('pointerup', this.pointerUpHandler, { passive: true });
-      add('pointerleave', this.pointerLeaveHandler, { passive: true });
+      this.resources.addSafeEventListener(target, 'pointerdown', this.pointerDownHandler, { passive: true });
+      this.resources.addSafeEventListener(target, 'pointerup', this.pointerUpHandler, { passive: true });
+      this.resources.addSafeEventListener(target, 'pointerleave', this.pointerLeaveHandler, { passive: true });
     } else if (down === 'mousedown') {
-      add('mousedown', this.pointerDownHandler);
-      add('mouseup', this.pointerUpHandler);
-      add('mouseleave', this.pointerLeaveHandler);
+      this.resources.addSafeEventListener(target, 'mousedown', this.pointerDownHandler);
+      this.resources.addSafeEventListener(target, 'mouseup', this.pointerUpHandler);
+      this.resources.addSafeEventListener(target, 'mouseleave', this.pointerLeaveHandler);
     } else {
-      add('click', this.pointerDownHandler);
+      this.resources.addSafeEventListener(target, 'click', this.pointerDownHandler);
     }
 
     // 键盘事件支持
-    if (this.keyboardEnabled && !remove) {
-      add('keydown', this.keyboardHandler);
+    if (this.keyboardEnabled) {
+      this.resources.addSafeEventListener(target, 'keydown', this.keyboardHandler as EventListener);
     }
   }
 
@@ -223,7 +224,7 @@ export class LdesignRipple {
     const createWave = (opacity = this.opacity, delay = 0, isSecondary = false) => {
       const wave = document.createElement('span');
       const classes = ['ldesign-ripple__wave'];
-      
+
       // 添加变体类
       if (this.variant !== 'default') {
         classes.push(`ldesign-ripple__wave--${this.variant}`);
@@ -239,9 +240,9 @@ export class LdesignRipple {
       if (this.glow) {
         classes.push('ldesign-ripple__wave--glow');
       }
-      
+
       wave.className = classes.join(' ');
-      const sizeMultiplier = this.sizeMultiplier[this.size] || 1;
+      const sizeMultiplier = this.sizeMultiplier[this.rippleSize] || 1;
       const size = radius * 2 * sizeMultiplier;
 
       const left = x - (radius * sizeMultiplier);
@@ -254,7 +255,7 @@ export class LdesignRipple {
       wave.style.setProperty('--ld-ripple-color', color);
       wave.style.setProperty('--ld-ripple-opacity', String(opacity));
       wave.style.setProperty('--ld-ripple-glow-intensity', String(this.glowIntensity));
-      
+
       // 根据方向设置不同的动画
       const transformDuration = this.direction === 'both' ? this.duration * 0.7 : this.duration;
       wave.style.transition = `transform ${transformDuration}ms ${this.easing}, opacity ${this.fadeOutDuration}ms ease-out`;
@@ -275,37 +276,39 @@ export class LdesignRipple {
     };
 
     // 创建主波纹
-    const mainWave = createWave(this.opacity, 0, false);
-    
+    const primaryWave = createWave(this.opacity, 0, false);
+
     // 多层波纹效果
     if (this.multiLayer) {
-      setTimeout(() => {
-        createWave(this.opacity * 0.6, 0, true);
+      this.resources.addSafeTimeout(() => {
+        const secondaryWave = createWave(this.opacity * 0.6, 0, true);
+        primaryWave.appendChild(secondaryWave);
       }, this.layerDelay);
-      
+
       if (this.variant === 'pulse') {
-        setTimeout(() => {
-          createWave(this.opacity * 0.3, 0, true);
+        this.resources.addSafeTimeout(() => {
+          const tertiaryWave = createWave(this.opacity * 0.3, 0, true);
+          primaryWave.appendChild(tertiaryWave);
         }, this.layerDelay * 2);
       }
     }
-    
+
     // 双向波纹
     if (this.direction === 'both') {
-      setTimeout(() => {
+      this.resources.addSafeTimeout(() => {
         const inwardWave = createWave(this.opacity * 0.5, 0, true);
         inwardWave.classList.add('ldesign-ripple__wave--inward-secondary');
+        primaryWave.appendChild(inwardWave);
       }, 50);
     }
 
     if (this.trigger === 'click') {
-      setTimeout(() => this.onPointerUp(), 0);
+      this.resources.addSafeTimeout(() => this.onPointerUp(), 0);
     }
   }
 
   private onPointerUp() {
     const waves = Array.from(this.el.querySelectorAll('.ldesign-ripple__wave')) as HTMLElement[];
-    if (!waves.length) return;
     const now = performance.now();
 
     waves.forEach((wave) => {
@@ -314,9 +317,9 @@ export class LdesignRipple {
       // 等待膨胀动画结束后再淡出，保证观感自然
       const delay = Math.max(0, this.duration - (now - activatedAt));
       (wave as any).__fading = true;
-      setTimeout(() => {
+      this.resources.addSafeTimeout(() => {
         wave.classList.add('ldesign-ripple__wave--fadeout');
-        setTimeout(() => {
+        this.resources.addSafeTimeout(() => {
           this.activeWaves.delete(wave);
           wave.remove();
         }, this.fadeOutDuration + 50);
@@ -341,7 +344,7 @@ export class LdesignRipple {
 
   private onKeyboardEvent(event: KeyboardEvent) {
     if (this.disabled || !this.keyboardEnabled) return;
-    
+
     // 仅响应 Enter 和 Space 键
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -349,7 +352,7 @@ export class LdesignRipple {
       const fakeEvent = new Event('click');
       this.centered = true;
       this.onPointerDown(fakeEvent);
-      setTimeout(() => {
+      this.resources.addSafeTimeout(() => {
         this.onPointerUp();
         this.centered = false;
       }, 100);
@@ -358,26 +361,26 @@ export class LdesignRipple {
 
   private playClickSound() {
     if (!this.audioContext) return;
-    
+
     try {
       const oscillator = this.audioContext.createOscillator();
       const gainNode = this.audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(this.audioContext.destination);
-      
+
       // 创建轻柔的点击音效
       oscillator.frequency.value = 800 + Math.random() * 200; // 800-1000Hz
       oscillator.type = 'sine';
-      
+
       gainNode.gain.setValueAtTime(this.soundVolume, this.audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
-      
+
       oscillator.start(this.audioContext.currentTime);
       oscillator.stop(this.audioContext.currentTime + 0.1);
     } catch (error) {
       // 静默处理音频错误
-      
+
     }
   }
 
@@ -387,17 +390,17 @@ export class LdesignRipple {
       'ldesign-ripple': true,
       'ldesign-ripple--unbounded': this.unbounded,
       [`ldesign-ripple--${this.variant}`]: this.variant !== 'default',
-      [`ldesign-ripple--${this.size}`]: this.size !== 'medium',
+      [`ldesign-ripple--${this.rippleSize}`]: this.rippleSize !== 'medium',
       'ldesign-ripple--disabled': this.disabled,
       [this.customClass || '']: !!this.customClass
     };
-    
+
     return (
-      <Host 
-        class={hostClasses} 
+      <Host
+        class={hostClasses}
         aria-hidden="true"
         data-variant={this.variant}
-        data-size={this.size}
+        data-size={this.rippleSize}
       />
     );
   }

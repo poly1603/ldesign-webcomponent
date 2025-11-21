@@ -1,4 +1,5 @@
-import { Component, Prop, State, Element, Event, EventEmitter, Watch, h, Host } from '@stencil/core';
+import { Component, Prop, State, Element, Event, EventEmitter, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * Affix 固钉组件
@@ -57,9 +58,7 @@ export class LdesignAffix {
   private scrollContainer: Window | HTMLElement = window;
   private placeholderEl?: HTMLElement;
   private contentEl?: HTMLElement;
-  private removeScrollListener?: () => void;
-  private removeResizeListener?: () => void;
-  private ticking = false;
+  private resources = new ResourceManager();
 
   // 监听相关属性变化，重新绑定容器和测量
   @Watch('target')
@@ -76,8 +75,8 @@ export class LdesignAffix {
     this.updatePosition();
   }
 
-  disconnectedCallback() {
-    this.unbind();
+  disconnectedCallback(): void {
+    this.resources.cleanup();
   }
 
   private async bind() {
@@ -93,23 +92,16 @@ export class LdesignAffix {
     const onResize = () => this.onResize();
 
     if (this.isWindow(this.scrollContainer)) {
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onResize);
-      this.removeScrollListener = () => window.removeEventListener('scroll', onScroll);
-      this.removeResizeListener = () => window.removeEventListener('resize', onResize);
+      this.resources.addSafeEventListener(window, 'scroll', onScroll as EventListener, { passive: true });
+      this.resources.addSafeEventListener(window, 'resize', onResize as EventListener);
     } else {
-      this.scrollContainer.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onResize);
-      this.removeScrollListener = () => this.scrollContainer instanceof HTMLElement && this.scrollContainer.removeEventListener('scroll', onScroll);
-      this.removeResizeListener = () => window.removeEventListener('resize', onResize);
+      this.resources.addSafeEventListener(this.scrollContainer, 'scroll', onScroll as EventListener, { passive: true });
+      this.resources.addSafeEventListener(window, 'resize', onResize as EventListener);
     }
   }
 
   private unbind() {
-    this.removeScrollListener?.();
-    this.removeScrollListener = undefined;
-    this.removeResizeListener?.();
-    this.removeResizeListener = undefined;
+    // cleanup会自动移除所有事件监听器
   }
 
   private isWindow(c: Window | HTMLElement): c is Window {

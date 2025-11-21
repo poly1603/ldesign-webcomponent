@@ -1,4 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Watch, Method, Element, h, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * ldesign-image-preview
@@ -23,43 +24,43 @@ export class LdesignImagePreview {
   // ── Props ─────────────────────────────────────────────
   /** 当前预览的图片列表 */
   @Prop({ mutable: true }) images: string[] = [];
-  
+
   /** 当前显示的图片索引 */
   @Prop({ mutable: true }) currentIndex: number = 0;
-  
+
   /** 是否显示预览 */
   @Prop({ mutable: true }) visible: boolean = false;
-  
+
   /** 是否显示图片索引 */
   @Prop() showIndex: boolean = true;
-  
+
   /** 是否显示工具栏 */
   @Prop() showToolbar: boolean = true;
-  
+
   /** 是否循环切换 */
   @Prop() loop: boolean = true;
-  
+
   /** 是否在点击遮罩时关闭 */
   @Prop() maskClosable: boolean = true;
-  
+
   /** 是否启用键盘操作 */
   @Prop() keyboard: boolean = true;
-  
+
   /** 初始缩放比例 */
   @Prop() initialScale: number = 1;
-  
+
   /** 最小缩放比例 */
   @Prop() minScale: number = 0.25;
-  
+
   /** 最大缩放比例 */
   @Prop() maxScale: number = 4;
-  
+
   /** 是否启用旋转 */
   @Prop() enableRotate: boolean = true;
-  
+
   /** 是否显示关闭按钮 */
   @Prop() showCloseBtn: boolean = true;
-  
+
   /** 动画过渡时长 (ms) */
   @Prop() transitionDuration: number = 300;
 
@@ -79,6 +80,7 @@ export class LdesignImagePreview {
   private overlayRef?: HTMLElement;
   private contentRef?: HTMLElement;
   private transitionTimer?: number;
+  private resources = new ResourceManager();
 
   // ── Watchers ──────────────────────────────────────────
   @Watch('visible')
@@ -109,17 +111,12 @@ export class LdesignImagePreview {
 
   componentDidLoad() {
     if (this.keyboard) {
-      document.addEventListener('keydown', this.handleKeyDown);
+      this.resources.addSafeEventListener(document, 'keydown', this.handleKeyDown as EventListener);
     }
   }
 
   disconnectedCallback() {
-    if (this.keyboard) {
-      document.removeEventListener('keydown', this.handleKeyDown);
-    }
-    if (this.transitionTimer) {
-      clearTimeout(this.transitionTimer);
-    }
+    this.resources.cleanup();
   }
 
   // ── Public Methods ────────────────────────────────────
@@ -133,7 +130,7 @@ export class LdesignImagePreview {
     } else if (!this.images.includes(this.currentSrc)) {
       this.currentIndex = 0;
     }
-    
+
     if (this.images.length > 0) {
       this.currentSrc = this.images[this.currentIndex];
       this.visible = true;
@@ -148,7 +145,7 @@ export class LdesignImagePreview {
   @Method()
   async prev() {
     if (this.images.length <= 1) return;
-    
+
     if (this.currentIndex > 0) {
       this.currentIndex--;
     } else if (this.loop) {
@@ -159,7 +156,7 @@ export class LdesignImagePreview {
   @Method()
   async next() {
     if (this.images.length <= 1) return;
-    
+
     if (this.currentIndex < this.images.length - 1) {
       this.currentIndex++;
     } else if (this.loop) {
@@ -206,42 +203,42 @@ export class LdesignImagePreview {
   private openPreview() {
     this.isAnimating = true;
     this.hasError = false;
-    
+
     // 禁止背景滚动
     document.body.style.overflow = 'hidden';
-    
+
     // 触发打开事件
     this.ldesignPreviewOpen.emit({
       images: this.images,
       index: this.currentIndex
     });
-    
+
     // 动画结束后
-    this.transitionTimer = window.setTimeout(() => {
+    this.transitionTimer = this.resources.addSafeTimeout(() => {
       this.isAnimating = false;
-    }, this.transitionDuration);
+    }, this.transitionDuration) as any;
   }
 
   private closePreview() {
     this.isAnimating = true;
-    
+
     // 恢复背景滚动
     document.body.style.overflow = '';
-    
+
     // 触发关闭事件
     this.ldesignPreviewClose.emit();
-    
+
     // 动画结束后
-    this.transitionTimer = window.setTimeout(() => {
+    this.transitionTimer = this.resources.addSafeTimeout(() => {
       this.isAnimating = false;
       this.visible = false;
-    }, this.transitionDuration);
+    }, this.transitionDuration) as any;
   }
 
   private resetDraggable() {
     this.hasError = false;
     this.isLoading = true;
-    
+
     if (this.draggableRef) {
       // 重置到初始状态
       this.draggableRef.reset();
@@ -250,7 +247,7 @@ export class LdesignImagePreview {
 
   private handleKeyDown = (e: KeyboardEvent) => {
     if (!this.visible || !this.keyboard) return;
-    
+
     switch (e.key) {
       case 'Escape':
         e.preventDefault();
@@ -308,7 +305,7 @@ export class LdesignImagePreview {
 
     return (
       <Host>
-        <div 
+        <div
           class={{
             'ldesign-image-preview': true,
             'is-visible': this.visible,
@@ -316,14 +313,14 @@ export class LdesignImagePreview {
           }}
         >
           {/* 遮罩层 */}
-          <div 
+          <div
             class="ldesign-image-preview__overlay"
             ref={el => this.overlayRef = el}
             onClick={this.handleMaskClick}
           />
-          
+
           {/* 主内容区 */}
-          <div 
+          <div
             class="ldesign-image-preview__content"
             ref={el => this.contentRef = el}
             onWheel={this.handleWheel}
@@ -337,18 +334,18 @@ export class LdesignImagePreview {
                 type="button"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M6 6l12 12M6 18L18 6"/>
+                  <path d="M6 6l12 12M6 18L18 6" />
                 </svg>
               </button>
             )}
-            
+
             {/* 图片索引 */}
             {this.showIndex && this.images.length > 1 && (
               <div class="ldesign-image-preview__index">
                 {this.currentIndex + 1} / {this.images.length}
               </div>
             )}
-            
+
             {/* 上一张按钮 */}
             {showPrevBtn && (
               <button
@@ -358,11 +355,11 @@ export class LdesignImagePreview {
                 type="button"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M15 18l-6-6 6-6"/>
+                  <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
             )}
-            
+
             {/* 下一张按钮 */}
             {showNextBtn && (
               <button
@@ -372,11 +369,11 @@ export class LdesignImagePreview {
                 type="button"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 18l6-6-6-6"/>
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>
             )}
-            
+
             {/* 图片容器 - 使用 draggable 组件 */}
             <div class="ldesign-image-preview__img-wrapper">
               {this.currentSrc && (
@@ -396,26 +393,26 @@ export class LdesignImagePreview {
                   onError={this.handleImageError}
                 />
               )}
-              
+
               {/* 加载状态 */}
               {this.isLoading && (
                 <div class="ldesign-image-preview__loading">
                   <div class="ldesign-image-preview__spinner" />
                 </div>
               )}
-              
+
               {/* 错误状态 */}
               {this.hasError && (
                 <div class="ldesign-image-preview__error">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4M12 16h.01"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
                   </svg>
                   <div>图片加载失败</div>
                 </div>
               )}
             </div>
-            
+
             {/* 工具栏 */}
             {this.showToolbar && !this.hasError && (
               <div class="ldesign-image-preview__toolbar">
@@ -426,11 +423,11 @@ export class LdesignImagePreview {
                   type="button"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35M8 11h6"/>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35M8 11h6" />
                   </svg>
                 </button>
-                
+
                 <button
                   class="ldesign-image-preview__tool"
                   onClick={() => this.zoomIn()}
@@ -438,11 +435,11 @@ export class LdesignImagePreview {
                   type="button"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35M11 8v6M8 11h6" />
                   </svg>
                 </button>
-                
+
                 <button
                   class="ldesign-image-preview__tool"
                   onClick={() => this.reset()}
@@ -450,11 +447,11 @@ export class LdesignImagePreview {
                   type="button"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 4v6h6M23 20v-6h-6"/>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                    <path d="M1 4v6h6M23 20v-6h-6" />
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
                   </svg>
                 </button>
-                
+
                 {this.enableRotate && [
                   <button
                     class="ldesign-image-preview__tool"
@@ -463,11 +460,11 @@ export class LdesignImagePreview {
                     type="button"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M2.5 12C2.5 6.753 6.753 2.5 12 2.5c3.127 0 5.9 1.51 7.63 3.847l-2.13 2.13"/>
-                      <path d="M19.5 2.5v5h-5"/>
+                      <path d="M2.5 12C2.5 6.753 6.753 2.5 12 2.5c3.127 0 5.9 1.51 7.63 3.847l-2.13 2.13" />
+                      <path d="M19.5 2.5v5h-5" />
                     </svg>
                   </button>,
-                  
+
                   <button
                     class="ldesign-image-preview__tool"
                     onClick={() => this.rotateRight()}
@@ -475,8 +472,8 @@ export class LdesignImagePreview {
                     type="button"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21.5 12C21.5 6.753 17.247 2.5 12 2.5c-3.127 0-5.9 1.51-7.63 3.847l2.13 2.13"/>
-                      <path d="M4.5 2.5v5h5"/>
+                      <path d="M21.5 12C21.5 6.753 17.247 2.5 12 2.5c-3.127 0-5.9 1.51-7.63 3.847l2.13 2.13" />
+                      <path d="M4.5 2.5v5h5" />
                     </svg>
                   </button>
                 ]}

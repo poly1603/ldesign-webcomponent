@@ -1,4 +1,5 @@
-import { Component, Prop, State, Element, Event, EventEmitter, h, Host, Method, Watch, Fragment } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, Method, h, Host, Element, Fragment } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * ldesign-scrollbar 自定义滚动条
@@ -68,7 +69,7 @@ export class LdesignScrollbar {
   @Prop() initialScrollLeft?: number;
 
   /** 滚动事件（代理自内容容器） */
-  @Event() ldesignScroll!: EventEmitter<{ scrollTop: number; scrollLeft: number; clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number }>; 
+  @Event() ldesignScroll!: EventEmitter<{ scrollTop: number; scrollLeft: number; clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number }>;
   /** 触达边缘事件 */
   @Event() ldesignReach!: EventEmitter<{ edge: 'top' | 'bottom' | 'left' | 'right' }>;
   /** 滚动开始/结束 */
@@ -86,6 +87,7 @@ export class LdesignScrollbar {
 
   private ro?: ResizeObserver;
   private contentRO?: ResizeObserver;
+  private resources = new ResourceManager();
   private destroyers: Array<() => void> = [];
   private showTimer?: number;
   private hideTimer?: number;
@@ -120,23 +122,21 @@ export class LdesignScrollbar {
 
     if (this.wrapEl) {
       const onScroll = () => { this.showNow(); this.handleScroll(); };
-      this.wrapEl.addEventListener('scroll', onScroll, { passive: true });
-      this.destroyers.push(() => this.wrapEl?.removeEventListener('scroll', onScroll as any));
+      this.resources.addSafeEventListener(this.wrapEl, 'scroll', onScroll as EventListener, { passive: true });
 
       const onWheel = (e: WheelEvent) => this.handleWheel(e);
-      this.wrapEl.addEventListener('wheel', onWheel, { passive: false });
-      this.destroyers.push(() => this.wrapEl?.removeEventListener('wheel', onWheel as any));
+      this.resources.addSafeEventListener(this.wrapEl, 'wheel', onWheel as EventListener, { passive: false });
 
       const onPointerDown = (e: PointerEvent) => { this.showNow(); this.tryStartPan(e); };
       const onPointerMove = () => this.showNow();
       const onPointerUp = (e: PointerEvent) => { this.stopPan(e); this.hideLater(); };
-      this.wrapEl.addEventListener('pointerdown', onPointerDown); this.wrapEl.addEventListener('pointermove', onPointerMove); this.wrapEl.addEventListener('pointerup', onPointerUp);
-      this.destroyers.push(() => { this.wrapEl?.removeEventListener('pointerdown', onPointerDown); this.wrapEl?.removeEventListener('pointermove', onPointerMove); this.wrapEl?.removeEventListener('pointerup', onPointerUp); });
+      this.resources.addSafeEventListener(this.wrapEl, 'pointerdown', onPointerDown as EventListener);
+      this.resources.addSafeEventListener(this.wrapEl, 'pointermove', onPointerMove as EventListener);
+      this.resources.addSafeEventListener(this.wrapEl, 'pointerup', onPointerUp as EventListener);
 
       if (this.keyboard) {
         const onKey = (e: KeyboardEvent) => this.handleKey(e);
-        this.wrapEl.addEventListener('keydown', onKey);
-        this.destroyers.push(() => this.wrapEl?.removeEventListener('keydown', onKey as any));
+        this.resources.addSafeEventListener(this.wrapEl, 'keydown', onKey as EventListener);
       }
 
       // 初始滚动位置
@@ -152,7 +152,7 @@ export class LdesignScrollbar {
       // 监听 wrap 内第一个元素（slot 内容的容器）
       const first = this.wrapEl?.firstElementChild as HTMLElement | undefined;
       if (first) this.contentRO.observe(first);
-    } catch {}
+    } catch { }
 
     // 注册同步组
     if (this.syncGroup) {
@@ -166,10 +166,7 @@ export class LdesignScrollbar {
   disconnectedCallback() {
     this.ro?.disconnect(); this.ro = undefined;
     this.contentRO?.disconnect(); this.contentRO = undefined;
-    this.destroyers.forEach(fn => { try { fn(); } catch {} });
-    window.removeEventListener('pointermove', this.onWindowPointerMove);
-    window.removeEventListener('pointerup', this.onWindowPointerUp);
-
+    this.destroyers.forEach(fn => { try { fn(); } catch { } });
     if (this.syncGroup) {
       const set = LdesignScrollbar.groups.get(this.syncGroup);
       set?.delete(this);
@@ -186,7 +183,7 @@ export class LdesignScrollbar {
     const schedule = () => {
       window.clearTimeout(this.syncTimer);
       const delay = Math.max(0, this.syncThrottle);
-      this.syncTimer = window.setTimeout(() => { this.lastSyncTime = Date.now(); this.doSyncNow(); }, delay);
+      this.syncTimer = this.resources.addSafeTimeout(() => { this.lastSyncTime = Date.now(); this.doSyncNow(); }, delay) as any;
     };
     if (now - this.lastSyncTime < this.syncThrottle) { schedule(); return; }
     this.lastSyncTime = now; this.doSyncNow();
@@ -215,7 +212,7 @@ export class LdesignScrollbar {
     // scroll start/end 事件
     if (!this.scrolling) { this.scrolling = true; this.ldesignScrollStart?.emit?.(undefined as any); }
     window.clearTimeout(this.scrollEndTimer);
-    this.scrollEndTimer = window.setTimeout(() => { this.scrolling = false; this.ldesignScrollEnd?.emit?.(undefined as any); if (this.snapEnabled) this.doSnapIfNeeded(); }, Math.max(60, this.snapDelay));
+    this.scrollEndTimer = this.resources.addSafeTimeout(() => { this.scrolling = false; this.ldesignScrollEnd?.emit?.(undefined as any); if (this.snapEnabled) this.doSnapIfNeeded(); }, Math.max(60, this.snapDelay)) as any;
 
     this.ldesignScroll.emit({
       scrollTop: wrap.scrollTop,
@@ -330,7 +327,7 @@ export class LdesignScrollbar {
     if (!this.wrapEl) return;
     e.preventDefault();
     this.draggingV = true; this.startY = e.clientY; this.startScrollTop = this.wrapEl.scrollTop;
-    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch { }
     window.addEventListener('pointermove', this.onWindowPointerMove, { passive: false });
     window.addEventListener('pointerup', this.onWindowPointerUp, { passive: false });
   };
@@ -339,7 +336,7 @@ export class LdesignScrollbar {
     if (!this.wrapEl) return;
     e.preventDefault();
     this.draggingH = true; this.startX = e.clientX; this.startScrollLeft = this.wrapEl.scrollLeft;
-    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch { }
     window.addEventListener('pointermove', this.onWindowPointerMove, { passive: false });
     window.addEventListener('pointerup', this.onWindowPointerUp, { passive: false });
   };
@@ -398,7 +395,7 @@ export class LdesignScrollbar {
     w.scrollTo({ left, top, behavior });
   }
   /** 滚动容器内的元素到可视区 */
-  @Method() async scrollIntoViewWithin(target: Element | string, options?: { behavior?: ScrollBehavior; block?: 'start'|'center'|'end'; inline?: 'start'|'center'|'end' }) {
+  @Method() async scrollIntoViewWithin(target: Element | string, options?: { behavior?: ScrollBehavior; block?: 'start' | 'center' | 'end'; inline?: 'start' | 'center' | 'end' }) {
     const w = this.wrapEl; if (!w) return;
     const el = typeof target === 'string' ? (w.querySelector(target) as HTMLElement | null) : (target as HTMLElement | null);
     if (!el || !w.contains(el)) return;
@@ -485,7 +482,7 @@ export class LdesignScrollbar {
     if (this.draggingH || this.draggingV) return;
     window.clearTimeout(this.hideTimer);
     const delay = this.autoHideDelay > 0 ? this.autoHideDelay : 0;
-    this.hideTimer = window.setTimeout(() => (this.showBars = false), delay);
+    this.hideTimer = this.resources.addSafeTimeout(() => (this.showBars = false), delay) as any;
   }
 
   private tryStartPan(e: PointerEvent) {
@@ -497,16 +494,16 @@ export class LdesignScrollbar {
     if (!ok) return;
     e.preventDefault();
     this.isPanning = true; this.panStartX = e.clientX; this.panStartY = e.clientY; this.panStartLeft = this.getLeftNorm(); this.panStartTop = this.wrapEl.scrollTop;
-    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+    try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch { }
     const move = (ev: PointerEvent) => {
       if (!this.isPanning || !this.wrapEl) return;
       const dx = ev.clientX - this.panStartX; const dy = ev.clientY - this.panStartY;
       this.wrapEl.scrollTop = this.panStartTop - dy;
       this.setLeftNorm(this.panStartLeft - dx);
     };
-    const up = (_ev: PointerEvent) => { this.isPanning = false; window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); };
-    window.addEventListener('pointermove', move, true);
-    window.addEventListener('pointerup', up, true);
+    const up = (_ev: PointerEvent) => { this.isPanning = false; };
+    this.resources.addSafeEventListener(window, 'pointermove', move as EventListener, { capture: true });
+    this.resources.addSafeEventListener(window, 'pointerup', up as EventListener, { capture: true });
   }
 
   private stopPan(_e: PointerEvent) { this.isPanning = false; }

@@ -5,14 +5,15 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size, Theme } from "./types";
 import { AlertSize, AlertType, AlertVariant } from "./components/alert/alert";
+import { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size } from "./types";
 import { ButtonColor, ButtonHTMLType, ButtonSize, ButtonVariant } from "./components/button/interface";
 import { CalEvent } from "./components/calendar/calendar";
 import { Breakpoints, CascaderOption, CascaderOverlay, CascaderTrigger } from "./components/cascader/cascader";
 import { Placement } from "@floating-ui/dom";
 import { CloseReason, DrawerButton, DrawerLevel, DrawerPlacement, DrawerState, DrawerTheme, SizePreset, SnapPoint } from "./components/drawer/drawer.types";
 import { DropdownItem, DropdownNode, DropdownPlacement, DropdownTrigger, DropdownVariant } from "./components/dropdown/dropdown";
+import { FormRule } from "./components/form/form";
 import { ImageViewerItem } from "./components/image-viewer/image-viewer";
 import { MenuItem, SubmenuTrigger, VerticalExpand } from "./components/menu/menu";
 import { MessageType } from "./components/message/message";
@@ -23,20 +24,24 @@ import { PopconfirmIcon, PopconfirmPlacement, PopconfirmTrigger } from "./compon
 import { PopupAnimation, PopupPlacement, PopupSize, PopupTrigger } from "./components/popup/popup";
 import { Element } from "@stencil/core";
 import { SelectOption, SelectPlacement, SelectTrigger } from "./components/select/select";
+import { TableColumn, TableSort } from "./components/table/table";
 import { TabMeta, TabsPlacement, TabsType } from "./components/tabs/tabs";
 import { TagData } from "./components/tag-group/tag-group";
 import { Breakpoints as Breakpoints1, TimePickerLocale, TimePickerOverlay, TimePickerSize, TimePickerTrigger, TimePreset } from "./components/time-picker/time-picker";
 import { TooltipAnimation, TooltipPlacement, TooltipSize, TooltipTrigger } from "./components/tooltip/tooltip";
+import { TourStep } from "./components/tour/tour";
 import { TransferItem } from "./components/transfer/transfer";
 import { TreeNode } from "./components/tree/tree";
-export { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size, Theme } from "./types";
+import { UploadFile } from "./components/upload/upload";
 export { AlertSize, AlertType, AlertVariant } from "./components/alert/alert";
+export { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size } from "./types";
 export { ButtonColor, ButtonHTMLType, ButtonSize, ButtonVariant } from "./components/button/interface";
 export { CalEvent } from "./components/calendar/calendar";
 export { Breakpoints, CascaderOption, CascaderOverlay, CascaderTrigger } from "./components/cascader/cascader";
 export { Placement } from "@floating-ui/dom";
 export { CloseReason, DrawerButton, DrawerLevel, DrawerPlacement, DrawerState, DrawerTheme, SizePreset, SnapPoint } from "./components/drawer/drawer.types";
 export { DropdownItem, DropdownNode, DropdownPlacement, DropdownTrigger, DropdownVariant } from "./components/dropdown/dropdown";
+export { FormRule } from "./components/form/form";
 export { ImageViewerItem } from "./components/image-viewer/image-viewer";
 export { MenuItem, SubmenuTrigger, VerticalExpand } from "./components/menu/menu";
 export { MessageType } from "./components/message/message";
@@ -47,51 +52,23 @@ export { PopconfirmIcon, PopconfirmPlacement, PopconfirmTrigger } from "./compon
 export { PopupAnimation, PopupPlacement, PopupSize, PopupTrigger } from "./components/popup/popup";
 export { Element } from "@stencil/core";
 export { SelectOption, SelectPlacement, SelectTrigger } from "./components/select/select";
+export { TableColumn, TableSort } from "./components/table/table";
 export { TabMeta, TabsPlacement, TabsType } from "./components/tabs/tabs";
 export { TagData } from "./components/tag-group/tag-group";
 export { Breakpoints as Breakpoints1, TimePickerLocale, TimePickerOverlay, TimePickerSize, TimePickerTrigger, TimePreset } from "./components/time-picker/time-picker";
 export { TooltipAnimation, TooltipPlacement, TooltipSize, TooltipTrigger } from "./components/tooltip/tooltip";
+export { TourStep } from "./components/tour/tour";
 export { TransferItem } from "./components/transfer/transfer";
 export { TreeNode } from "./components/tree/tree";
+export { UploadFile } from "./components/upload/upload";
 export namespace Components {
-    /**
-     * 组件基类
-     * 提供通用的属性和方法
-     */
-    interface BaseComponent {
-        /**
-          * 组件类名
-         */
-        "class"?: string;
-        /**
-          * 组件ID
-         */
-        "componentId"?: string;
-        /**
-          * 是否禁用
-          * @default false
-         */
-        "disabled": boolean;
-        /**
-          * 组件尺寸
-          * @default 'medium'
-         */
-        "size": Size;
-        /**
-          * 主题
-          * @default 'light'
-         */
-        "theme": Theme;
-    }
     interface LDropdownPanel {
         /**
           * 动画模式：'scale' 展开动画，'slide' 滑动动画
-          * @default 'scale'
          */
         "animationMode": 'scale' | 'slide';
         /**
           * 动画持续时间（毫秒）
-          * @default 300
          */
         "duration": number;
         /**
@@ -100,27 +77,22 @@ export namespace Components {
         "hide": () => Promise<void>;
         /**
           * 遮罩层背景色
-          * @default 'rgba(0, 0, 0, 0.3)'
          */
         "maskBackground": string;
         /**
           * 点击遮罩层是否关闭
-          * @default true
          */
         "maskClosable": boolean;
         /**
           * 面板最大高度
-          * @default '60vh'
          */
         "maxHeight": string;
         /**
           * 面板弹出位置，'top' 或 'bottom'，'auto' 自动判断
-          * @default 'auto'
          */
         "placement": 'top' | 'bottom' | 'auto';
         /**
           * 面板与遮罩边缘的安全距离（像素）
-          * @default 16
          */
         "safeDistance": number;
         /**
@@ -133,7 +105,6 @@ export namespace Components {
         "toggle": () => Promise<void>;
         /**
           * 面板是否可见
-          * @default false
          */
         "visible": boolean;
     }
@@ -145,12 +116,10 @@ export namespace Components {
     interface LdesignAffix {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 距离顶部的偏移量（触发吸顶的阈值）
-          * @default 0
          */
         "offset": number;
         /**
@@ -159,12 +128,10 @@ export namespace Components {
         "target"?: string;
         /**
           * 是否在指定滚动容器内部吸附（使用 position: sticky 策略） 仅当设置了 target 且 target 不是 window 时生效
-          * @default false
          */
         "withinTarget": boolean;
         /**
           * 自定义层级
-          * @default 1000
          */
         "zIndex": number;
     }
@@ -179,22 +146,18 @@ export namespace Components {
         "alertTitle"?: string;
         /**
           * 是否启用动画效果
-          * @default true
          */
         "animated": boolean;
         /**
           * 横幅样式（常用于页面顶部）
-          * @default false
          */
         "banner": boolean;
         /**
           * 自定义边框宽度
-          * @default 1
          */
         "borderWidth": number;
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable": boolean;
         /**
@@ -207,7 +170,6 @@ export namespace Components {
         "color"?: string;
         /**
           * 是否为紧凑模式
-          * @default false
          */
         "compact": boolean;
         /**
@@ -220,59 +182,79 @@ export namespace Components {
         "iconName"?: string;
         /**
           * 启用滚动公告（Marquee）
-          * @default false
          */
         "marquee": boolean;
         /**
           * 方向
-          * @default 'left'
          */
         "marqueeDirection": 'left' | 'right';
         /**
           * 两段内容之间的间距（px）
-          * @default 24
          */
         "marqueeGap": number;
         /**
           * 悬停时是否暂停
-          * @default true
          */
         "marqueePauseOnHover": boolean;
         /**
           * 滚动速度（px/s）
-          * @default 60
          */
         "marqueeSpeed": number;
         /**
           * 是否圆角
-          * @default true
          */
         "rounded": boolean;
         /**
           * 是否带有阴影效果
-          * @default false
          */
         "shadow": boolean;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon": boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": AlertSize;
         /**
           * 警告类型
-          * @default 'info'
          */
         "type": AlertType;
         /**
           * 样式变体
-          * @default 'light'
          */
         "variant": AlertVariant;
+    }
+    /**
+     * Anchor 锚点组件
+     * 用于快速定位到页面内容
+     */
+    interface LdesignAnchor {
+        /**
+          * 固定位置
+         */
+        "affix": boolean;
+        /**
+          * 滚动容器选择器
+         */
+        "container"?: string;
+        /**
+          * 距离窗口顶部偏移量
+         */
+        "offsetTop": number;
+    }
+    /**
+     * AnchorLink 锚点链接
+     */
+    interface LdesignAnchorLink {
+        /**
+          * 链接地址
+         */
+        "href": string;
+        /**
+          * 链接标题
+         */
+        "title": string;
     }
     /**
      * Avatar 头像
@@ -290,7 +272,6 @@ export namespace Components {
         "alt"?: string;
         /**
           * 是否根据宽度自动缩放文字
-          * @default true
          */
         "autosize": boolean;
         /**
@@ -299,22 +280,18 @@ export namespace Components {
         "background"?: string;
         /**
           * 是否显示徽标红点
-          * @default false
          */
         "badge": boolean;
         /**
           * 徽标颜色（红点/气泡背景色）
-          * @default '#ff4d4f'
          */
         "badgeColor": string;
         /**
           * 徽标偏移量
-          * @default [0, 0]
          */
         "badgeOffset": [number, number];
         /**
           * 徽标位置
-          * @default 'top-right'
          */
         "badgePosition": 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         /**
@@ -323,22 +300,18 @@ export namespace Components {
         "badgeValue"?: number | string;
         /**
           * 是否显示边框
-          * @default false
          */
         "border": boolean;
         /**
           * 边框颜色
-          * @default '#e8e8e8'
          */
         "borderColor": string;
         /**
           * 边框宽度
-          * @default 2
          */
         "borderWidth": number;
         /**
           * 是否可点击（会添加悬浮效果）
-          * @default false
          */
         "clickable": boolean;
         /**
@@ -347,12 +320,10 @@ export namespace Components {
         "color"?: string;
         /**
           * 图片填充模式
-          * @default 'cover'
          */
         "fit": 'fill' | 'contain' | 'cover' | 'none' | 'scale-down';
         /**
           * 文字与容器左右间距（px），仅文字头像生效
-          * @default 4
          */
         "gap": number;
         /**
@@ -361,37 +332,30 @@ export namespace Components {
         "icon"?: string;
         /**
           * 是否显示加载态
-          * @default false
          */
         "loading": boolean;
         /**
           * 响应式尺寸（使用 CSS clamp 设置宽高）
-          * @default false
          */
         "responsive": boolean;
         /**
           * clamp 最大像素（responsive 为 true 时生效）
-          * @default 64
          */
         "responsiveMax": number;
         /**
           * clamp 中间项，接受任何 CSS 长度表达式，默认 10vw
-          * @default '10vw'
          */
         "responsiveMid": string;
         /**
           * clamp 最小像素（responsive 为 true 时生效）
-          * @default 28
          */
         "responsiveMin": number;
         /**
           * 形状：圆形或方形
-          * @default 'circle'
          */
         "shape": 'circle' | 'square';
         /**
           * 尺寸：预设 small/middle/medium/large 或自定义像素
-          * @default 'medium'
          */
         "size": 'small' | 'middle' | 'medium' | 'large' | number;
         /**
@@ -428,12 +392,10 @@ export namespace Components {
     interface LdesignAvatarGroup {
         /**
           * 边框颜色（用于实现“描边”效果以区分重叠）
-          * @default '#fff'
          */
         "borderColor": string;
         /**
           * 重叠间距（正值，单位px），默认 8
-          * @default 8
          */
         "gap": number;
         /**
@@ -470,6 +432,37 @@ export namespace Components {
           * @default 200
          */
         "visibilityHeight": number;
+    }
+    /**
+     * Breadcrumb 面包屑组件
+     * 显示当前页面的路径
+     */
+    interface LdesignBreadcrumb {
+        /**
+          * 分隔符
+         */
+        "separator": string;
+        /**
+          * 分隔符图标
+         */
+        "separatorIcon"?: string;
+    }
+    /**
+     * BreadcrumbItem 面包屑项
+     */
+    interface LdesignBreadcrumbItem {
+        /**
+          * 是否禁用
+         */
+        "disabled": boolean;
+        /**
+          * 链接地址
+         */
+        "href"?: string;
+        /**
+          * 图标
+         */
+        "icon"?: string;
     }
     /**
      * Button 按钮组件
@@ -540,12 +533,10 @@ export namespace Components {
         "loadingIcon"?: string;
         /**
           * 是否启用水波纹
-          * @default true
          */
         "ripple": boolean;
         /**
           * 是否居中触发
-          * @default false
          */
         "rippleCentered": boolean;
         /**
@@ -554,37 +545,30 @@ export namespace Components {
         "rippleColor"?: string;
         /**
           * 扩散动画时长
-          * @default 550
          */
         "rippleDuration": number;
         /**
           * 缓动
-          * @default 'cubic-bezier(0.22, 0.61, 0.36, 1)'
          */
         "rippleEasing": string;
         /**
           * 淡出时长
-          * @default 260
          */
         "rippleFadeOutDuration": number;
         /**
           * 最大并发波纹数
-          * @default 6
          */
         "rippleMaxRipples": number;
         /**
           * 波纹不透明度
-          * @default 0.2
          */
         "rippleOpacity": number;
         /**
           * 触发方式
-          * @default 'pointerdown'
          */
         "rippleTrigger": 'pointerdown' | 'mousedown' | 'click';
         /**
           * 是否不裁剪边界
-          * @default false
          */
         "rippleUnbounded": boolean;
         /**
@@ -612,23 +596,13 @@ export namespace Components {
         "variant"?: ButtonVariant;
     }
     interface LdesignCalendar {
-        /**
-          * @default true
-         */
         "allowCrossWeek": boolean;
-        /**
-          * @default true
-         */
         "allowMonthCrossWeek": boolean;
         "defaultValue"?: string;
         "disabledDate"?: (d: Date) => boolean;
-        /**
-          * @default false
-         */
         "draggableEvents": boolean;
         /**
           * 是否启用内置的CRUD功能
-          * @default true
          */
         "enableCrud": boolean;
         /**
@@ -651,74 +625,78 @@ export namespace Components {
           * 事件数据（JS 设置），与 events 二选一，前者用于 attribute，后者用于 property
          */
         "eventsData"?: Array<CalEvent>;
-        /**
-          * @default 1
-         */
         "firstDayOfWeek": 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /**
-          * @default 'YYYY-MM-DD'
-         */
         "format": string;
-        /**
-          * @default 20
-         */
         "hourEnd": number;
         /**
           * 时间轴起止与步长（周/日视图）
-          * @default 8
          */
         "hourStart": number;
         /**
           * 自定义农历格式化（优先级高于内置），返回文本，例如 “初九” 或 “正月初一”
          */
         "lunarFormatter"?: (d: Date) => string;
-        /**
-          * @default 3
-         */
         "maxAllDayRows": number;
         "maxDate"?: string;
         "maxDuration"?: number;
         /**
           * 单元格最多展示的事件条数
-          * @default 3
          */
         "maxEventsPerCell": number;
         "minDate"?: string;
-        /**
-          * @default 15
-         */
         "minDuration": number;
-        /**
-          * @default false
-         */
         "resizableEvents": boolean;
-        /**
-          * @default true
-         */
         "showAllDay": boolean;
         /**
           * 是否显示农历（默认关闭）。若浏览器支持 Intl Chinese Calendar，将自动使用内置格式化
-          * @default false
          */
         "showLunar": boolean;
-        /**
-          * @default false
-         */
         "showWeekNumbers": boolean;
-        /**
-          * @default true
-         */
         "snapToGrid": boolean;
-        /**
-          * @default 30
-         */
         "stepMinutes": number;
         "value"?: string;
         /**
           * 视图：月/周/日/年
-          * @default 'month'
          */
         "view": 'month' | 'week' | 'day' | 'year';
+    }
+    /**
+     * Card 卡片组件
+     * 通用卡片容器
+     */
+    interface LdesignCard {
+        /**
+          * 主体样式
+         */
+        "bodyStyle"?: string;
+        /**
+          * 是否显示边框
+         */
+        "bordered": boolean;
+        /**
+          * 头部样式
+         */
+        "headerStyle"?: string;
+        /**
+          * 是否可悬浮
+         */
+        "hoverable": boolean;
+        /**
+          * 是否加载中
+         */
+        "loading": boolean;
+        /**
+          * 卡片阴影
+         */
+        "shadow": 'never' | 'hover' | 'always';
+        /**
+          * 卡片尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 卡片标题
+         */
+        "title"?: string;
     }
     /**
      * ldesign-cascader
@@ -729,69 +707,33 @@ export namespace Components {
         "breakpoints"?: Breakpoints;
         /**
           * 点击非叶子是否直接触发变更（默认仅叶子触发）
-          * @default false
          */
         "changeOnSelect": boolean;
-        /**
-          * @default false
-         */
         "clearable": boolean;
         /**
           * 选择后是否自动关闭（手动触发模式除外）
-          * @default true
          */
         "closeOnSelect": boolean;
         "defaultValue"?: string[];
-        /**
-          * @default false
-         */
         "disabled": boolean;
-        /**
-          * @default 'bottom'
-         */
         "drawerPlacement": 'left' | 'right' | 'top' | 'bottom';
         "drawerSize"?: number | string;
-        /**
-          * @default '请选择'
-         */
         "drawerTitle"?: string;
         /**
           * 列表最大高度（列会滚动）
-          * @default 280
          */
         "listMaxHeight": number;
-        /**
-          * @default []
-         */
         "options": string | CascaderOption[];
-        /**
-          * @default 'auto'
-         */
         "overlay": CascaderOverlay;
         /**
           * 面板宽度（popup 模式下可用）
          */
         "panelWidth"?: number | string;
-        /**
-          * @default '请选择'
-         */
         "placeholder": string;
-        /**
-          * @default 'bottom-start' as Placement
-         */
         "placement": Placement;
-        /**
-          * @default ' / '
-         */
         "separator": string;
-        /**
-          * @default 'click'
-         */
         "trigger": CascaderTrigger;
         "value"?: string[];
-        /**
-          * @default false
-         */
         "visible": boolean;
     }
     /**
@@ -801,27 +743,22 @@ export namespace Components {
     interface LdesignCheckbox {
         /**
           * 是否显示边框（兼容旧 API）
-          * @default false
          */
         "border": boolean;
         /**
           * 是否为按钮样式（兼容旧 API）
-          * @default false
          */
         "button": boolean;
         /**
           * 是否选中
-          * @default false
          */
         "checked": boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 设置半选状态，只负责样式控制
-          * @default false
          */
         "indeterminate": boolean;
         /**
@@ -840,7 +777,6 @@ export namespace Components {
         "shape": 'square' | 'round';
         /**
           * 多选框的尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -865,17 +801,14 @@ export namespace Components {
     interface LdesignCheckboxGroup {
         /**
           * 组方向
-          * @default 'horizontal'
          */
         "direction": 'horizontal' | 'vertical';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 统一标签位置（可被子项覆盖）
-          * @default 'right'
          */
         "labelPlacement": 'left' | 'right';
         /**
@@ -888,27 +821,22 @@ export namespace Components {
         "min"?: number;
         /**
           * 统一形状（可被子项覆盖）
-          * @default 'square'
          */
         "shape": 'square' | 'round';
         /**
           * 复选框组尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 统一外观主题（可被子项覆盖）
-          * @default 'brand'
          */
         "status": 'brand' | 'success' | 'warning' | 'danger' | 'info';
         /**
           * 绑定值
-          * @default []
          */
         "value": Array<string | number>;
         /**
           * 统一变体（可被子项覆盖）
-          * @default 'default'
          */
         "variant": 'default' | 'outline' | 'filled' | 'button';
     }
@@ -919,70 +847,55 @@ export namespace Components {
     interface LdesignCircleNavigation {
         /**
           * 是否顺时针排布
-          * @default true
          */
         "clockwise": boolean;
         /**
           * 椭圆端点轴：auto 根据宽高选择；x 左右为端点；y 上下为端点
-          * @default 'auto'
          */
         "ellipseAxis": 'auto' | 'x' | 'y';
         /**
           * 椭圆半弧内的间距策略：'arc' 按弧长均分，'angle' 按角度均分（更“均匀”的视觉效果）
-          * @default 'angle'
          */
         "ellipseSpacing": 'arc' | 'angle';
         /**
           * 是否启用拖动旋转
-          * @default true
          */
         "enableDrag": boolean;
         /**
           * 惯性摩擦系数（0-1，越小惯性越大）
-          * @default 0.95
          */
         "friction": number;
         /**
           * 视角正前方的角度（度），默认 90° 即底部为“最近”
-          * @default 90
          */
         "frontAngle": number;
         /**
           * 圆形容器高度（不传则等于 width）
          */
         "height"?: number | string;
-        /**
-          * @default 1.2
-         */
         "maxScale": number;
         /**
           * 透视缩放范围：最小与最大缩放因子
-          * @default 0.8
          */
         "minScale": number;
         /**
           * 最小旋转速度（度/帧，低于此速度停止旋转）
-          * @default 0.1
          */
         "minVelocity": number;
         /**
           * 是否启用惯性/动量效果
-          * @default true
          */
         "momentum": boolean;
         /**
           * 与圆边缘的内边距（px），用于避免项目贴边
-          * @default 8
          */
         "padding": number;
         /**
           * 是否启用透视（近大远小）效果
-          * @default false
          */
         "perspective": boolean;
         /**
           * 3D 透视距离（px，对应 CSS perspective），zDepth>0 时生效
-          * @default 600
          */
         "perspectiveDistance": number;
         /**
@@ -991,47 +904,38 @@ export namespace Components {
         "perspectiveOrigin"?: string;
         /**
           * 旋转灵敏度（度/像素）
-          * @default 0.5
          */
         "rotateSensitivity": number;
         /**
           * 是否显示圆形轨道
-          * @default true
          */
         "showTrack": boolean;
         /**
           * 吸附角度间隔（度）
-          * @default 45
          */
         "snapAngle": number;
         /**
           * 是否启用吸附点
-          * @default false
          */
         "snapPoints": boolean;
         /**
           * 吸附阈值（度，在此范围内会自动吸附）
-          * @default 15
          */
         "snapThreshold": number;
         /**
           * 起始角度（度），默认 -90 表示第一个项在正上方；0 表示第一个项在最右侧
-          * @default -90
          */
         "startAngle": number;
         /**
           * 是否启用触摸手势旋转
-          * @default true
          */
         "touchRotate": boolean;
         /**
           * 圆形容器宽度（数字按 px 处理，亦可传入如 '20rem' / '240px' / '50%'）
-          * @default 240
          */
         "width": number | string;
         /**
           * 3D 透视：Z 轴偏移幅度（px）。>0 则开启 translateZ；与 perspectiveDistance 联动
-          * @default 0
          */
         "zDepth": number;
     }
@@ -1043,7 +947,6 @@ export namespace Components {
     interface LdesignCol {
         /**
           * 占用的列数
-          * @default 1
          */
         "span": number;
     }
@@ -1055,27 +958,22 @@ export namespace Components {
     interface LdesignCollapse {
         /**
           * 手风琴模式：同层级仅允许展开一个
-          * @default false
          */
         "accordion": boolean;
         /**
           * 动画持续时间（毫秒）
-          * @default 200
          */
         "animationDuration": number;
         /**
           * 动画缓动函数
-          * @default 'ease'
          */
         "animationEasing": string;
         /**
           * 边框样式
-          * @default true
          */
         "bordered": boolean;
         /**
           * 卡片模式
-          * @default false
          */
         "cardStyle": boolean;
         /**
@@ -1084,17 +982,14 @@ export namespace Components {
         "collapseAll": () => Promise<void>;
         /**
           * 内容加载方式
-          * @default 'sync'
          */
         "contentLoading": 'sync' | 'async' | 'lazy';
         /**
           * 默认展开的面板标识列表（非受控）
-          * @default []
          */
         "defaultValue": string[];
         /**
           * 整体禁用（子面板不可交互）
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -1103,7 +998,6 @@ export namespace Components {
         "expandAll": () => Promise<void>;
         /**
           * 展开图标位置
-          * @default 'left'
          */
         "expandIconPlacement": 'left' | 'right';
         /**
@@ -1112,17 +1006,14 @@ export namespace Components {
         "getOpenPanels": () => Promise<string[]>;
         /**
           * 幽灵（无背景，仅分隔线）
-          * @default false
          */
         "ghost": boolean;
         /**
           * 是否高亮搜索结果
-          * @default true
          */
         "highlightSearch": boolean;
         /**
           * 是否可通过键盘导航
-          * @default true
          */
         "keyboardNavigation": boolean;
         /**
@@ -1131,47 +1022,38 @@ export namespace Components {
         "loadContent"?: (name: string) => Promise<string>;
         /**
           * 折叠模式：普通、紧凑、分离、卡片
-          * @default 'default'
          */
         "mode": 'default' | 'compact' | 'separated' | 'card';
         /**
           * 嵌套缩进（像素）
-          * @default 20
          */
         "nestingIndent": number;
         /**
           * 圆角样式
-          * @default 'medium'
          */
         "rounded": 'none' | 'small' | 'medium' | 'large';
         /**
           * 搜索过滤关键词
-          * @default ''
          */
         "searchKeyword": string;
         /**
           * 是否显示阴影
-          * @default false
          */
         "shadow": boolean;
         /**
           * 是否显示展开图标
-          * @default true
          */
         "showExpandIcon": boolean;
         /**
           * 尺寸变体
-          * @default 'medium'
          */
         "size": 'small' | 'medium' | 'large';
         /**
           * 是否可拖拽排序
-          * @default false
          */
         "sortable": boolean;
         /**
           * 主题颜色
-          * @default 'default'
          */
         "theme": 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
         /**
@@ -1189,27 +1071,22 @@ export namespace Components {
     interface LdesignCollapsePanel {
         /**
           * 激活状态（由父级控制）
-          * @default false
          */
         "active": boolean;
         /**
           * 动画延迟
-          * @default 0
          */
         "animationDelay": number;
         /**
           * 动画持续时间（毫秒）
-          * @default 200
          */
         "animationDuration": number;
         /**
           * 动画缓动函数
-          * @default 'ease'
          */
         "animationEasing": string;
         /**
           * 动画曲线预设
-          * @default 'default'
          */
         "animationPreset": 'default' | 'spring' | 'bounce' | 'smooth' | 'sharp';
         /**
@@ -1218,12 +1095,10 @@ export namespace Components {
         "collapsedIcon"?: string;
         /**
           * 内容动画类型
-          * @default 'fade'
          */
         "contentAnimation": 'none' | 'fade' | 'slide' | 'scale' | 'slide-fade';
         /**
           * 内容淡入延迟
-          * @default 100
          */
         "contentFadeDelay": number;
         /**
@@ -1232,12 +1107,10 @@ export namespace Components {
         "contentPadding"?: string;
         /**
           * 收起后是否销毁内容（优先级高于 lazy）
-          * @default false
          */
         "destroyOnClose": boolean;
         /**
           * 禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -1246,12 +1119,10 @@ export namespace Components {
         "emptyText"?: string;
         /**
           * 展开图标名称（默认 chevron-right）
-          * @default 'chevron-right'
          */
         "expandIcon": string;
         /**
           * 图标位置（由父级传入，也可单独覆盖）
-          * @default 'left'
          */
         "expandIconPlacement": 'left' | 'right';
         /**
@@ -1272,17 +1143,14 @@ export namespace Components {
         "headerBackground"?: string;
         /**
           * 图标旋转角度
-          * @default 90
          */
         "iconRotation": number;
         /**
           * 首次激活才渲染内容（懒渲染）
-          * @default false
          */
         "lazy": boolean;
         /**
           * 是否加载中
-          * @default false
          */
         "loading": boolean;
         /**
@@ -1291,37 +1159,30 @@ export namespace Components {
         "name"?: string;
         /**
           * 嵌套层级
-          * @default 0
          */
         "nestingLevel": number;
         /**
           * 是否反向旋转图标
-          * @default false
          */
         "reverseIconRotation": boolean;
         /**
           * 是否显示分隔线
-          * @default true
          */
         "showDivider": boolean;
         /**
           * 是否显示展开图标
-          * @default true
          */
         "showExpandIcon": boolean;
         /**
           * 尺寸变体
-          * @default 'medium'
          */
         "size": 'small' | 'medium' | 'large';
         /**
           * 是否可排序（由父级传入）
-          * @default false
          */
         "sortable": boolean;
         /**
           * 主题颜色
-          * @default 'default'
          */
         "theme": 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
     }
@@ -1333,67 +1194,54 @@ export namespace Components {
     interface LdesignColorInput {
         /**
           * 是否可清空
-          * @default true
          */
         "clearable": boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 显示/输出格式
-          * @default 'hex'
          */
         "format": 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 选择后是否自动关闭弹层
-          * @default true
          */
         "hideOnSelect": boolean;
         /**
           * 输入占位符
-          * @default ''
          */
         "placeholder": string;
         /**
           * 弹出位置
-          * @default 'bottom-start'
          */
         "placement": 'top'|'top-start'|'top-end'|'bottom'|'bottom-start'|'bottom-end'|'left'|'left-start'|'left-end'|'right'|'right-start'|'right-end';
         /**
           * 预设颜色
-          * @default []
          */
         "presets": string[];
         /**
           * 最近颜色最大条数
-          * @default 12
          */
         "recentMax": number;
         /**
           * 是否显示透明度
-          * @default true
          */
         "showAlpha": boolean;
         /**
           * 是否显示最近使用
-          * @default true
          */
         "showHistory": boolean;
         /**
           * 是否显示系统预设
-          * @default true
          */
         "showPreset": boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 当前颜色字符串（与 ColorPicker 格式一致）
-          * @default '#1677ff'
          */
         "value": string;
     }
@@ -1403,94 +1251,55 @@ export namespace Components {
      * - 支持 HEX/RGB/HSL/HSV 输入与预设/历史颜色
      */
     interface LdesignColorPicker {
-        /**
-          * @default '取消'
-         */
         "cancelText": string;
         /**
           * 自定义按钮文案
-          * @default '确定'
          */
         "confirmText": string;
         /**
           * 使用具名插槽自定义触发器（slot="trigger"）；为 true 时不渲染默认触发器
-          * @default false
          */
         "customTrigger": boolean;
-        /**
-          * @default false
-         */
         "disabled": boolean;
-        /**
-          * @default 'hex'
-         */
         "format": 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 渐变类型：'linear' | 'radial' | 'both'（传递给面板）
-          * @default 'both'
          */
         "gradientTypes": 'linear' | 'radial' | 'both';
         /**
           * 选择后是否自动关闭弹层
-          * @default true
          */
         "hideOnSelect": boolean;
         /**
           * 渐变色标之间的最小间距（百分比，避免重叠），默认 1（透传给面板）
-          * @default 1
          */
         "minStopGap": number;
         /**
           * 面板模式：'solid' | 'gradient' | 'both'
-          * @default 'both'
          */
         "modes": 'solid' | 'gradient' | 'both';
         /**
           * 弹出位置
-          * @default 'bottom-start'
          */
         "placement": 'top'|'top-start'|'top-end'|'bottom'|'bottom-start'|'bottom-end'|'left'|'left-start'|'left-end'|'right'|'right-start'|'right-end';
         /**
           * 设置弹层宽度（数字或 CSS 长度），panel 将铺满此宽度
          */
         "popupWidth"?: number | string;
-        /**
-          * @default []
-         */
         "presets": string[];
-        /**
-          * @default 12
-         */
         "recentMax": number;
         /**
           * 是否显示“确定/取消”操作区（默认 false）
-          * @default false
          */
         "showActions": boolean;
-        /**
-          * @default true
-         */
         "showAlpha": boolean;
-        /**
-          * @default true
-         */
         "showHistory": boolean;
-        /**
-          * @default true
-         */
         "showPreset": boolean;
-        /**
-          * @default 'medium'
-         */
         "size": Size;
         /**
           * 透传面板 UI 模式
-          * @default 'pro'
          */
         "ui": 'simple' | 'pro';
-        /**
-          * @default '#1677ff'
-         */
         "value": string;
     }
     /**
@@ -1501,77 +1310,62 @@ export namespace Components {
     interface LdesignColorPickerPanel {
         /**
           * 是否禁用（禁用交互）
-          * @default false
          */
         "disabled": boolean;
         /**
           * 默认显示格式
-          * @default 'hex'
          */
         "format": 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 渐变类型：线性/径向/两者（仅在 activeMode=gradient 时生效）
-          * @default 'both'
          */
         "gradientTypes": 'linear' | 'radial' | 'both';
         /**
           * 渐变色标之间的最小间距（百分比，避免重叠），默认 1
-          * @default 1
          */
         "minStopGap": number;
         /**
           * 面板模式：单色 | 渐变 | 两者
-          * @default 'both'
          */
         "modes": 'solid' | 'gradient' | 'both';
         /**
           * 预设颜色
-          * @default [     '#ff4d4f', '#ff7a45', '#ffa940', '#ffc53d', '#ffec3d', '#bae637', '#73d13d', '#36cfc9', '#40a9ff', '#597ef7', '#9254de', '#f759ab',     '#d4380d', '#d46b08', '#d48806', '#ad8b00', '#5b8c00', '#08979c', '#096dd9', '#1d39c4', '#531dab', '#c41d7f', '#8c8c8c', '#595959',   ]
          */
         "presets": string[];
         /**
           * 最近使用最多条数
-          * @default 12
          */
         "recentMax": number;
         /**
           * 是否显示透明度
-          * @default true
          */
         "showAlpha": boolean;
         /**
           * 是否在渐变面板中显示“线性/径向”切换按钮（默认不显示）
-          * @default false
          */
         "showGradientTypeTabs": boolean;
         /**
           * 是否显示最近使用（无数据时自动隐藏）
-          * @default true
          */
         "showHistory": boolean;
         /**
           * 是否显示系统预设
-          * @default true
          */
         "showPreset": boolean;
         /**
           * 在渐变-径向模式下，于右侧显示径向面板（中心拖拽与参数）
-          * @default false
          */
         "showRadialSidebar": boolean;
         /**
           * 尺寸（影响整体间距）
-          * @default 'medium'
          */
         "size": Size;
         /**
           * UI 模式：simple 为精简界面，仅保留必要控件；pro 为完整界面
-          * @default 'pro'
          */
         "ui": 'simple' | 'pro';
         /**
           * 当前颜色（默认 hex），支持 #RRGGBB/#RRGGBBAA、rgb/rgba、hsl/hsla、hsv
-          * @default '#3498db'
          */
         "value": string;
     }
@@ -1582,7 +1376,6 @@ export namespace Components {
     interface LdesignCountdown {
         /**
           * 是否在初始化时自动开始
-          * @default true
          */
         "autoStart": boolean;
         /**
@@ -1591,7 +1384,6 @@ export namespace Components {
         "circleSize"?: number;
         /**
           * 环形进度的描边宽度
-          * @default 4
          */
         "circleStroke": number;
         /**
@@ -1600,7 +1392,6 @@ export namespace Components {
         "endTime"?: number | string | Date;
         /**
           * 显示格式，支持 DD、HH、mm、ss、SSS 令牌组合
-          * @default 'HH:mm:ss'
          */
         "format": string;
         /**
@@ -1609,7 +1400,6 @@ export namespace Components {
         "label"?: string;
         /**
           * 是否以更高频率更新毫秒（约 50ms 一次）。为 false 时每秒更新一次
-          * @default false
          */
         "millisecond": boolean;
         /**
@@ -1618,12 +1408,10 @@ export namespace Components {
         "pause": () => Promise<void>;
         /**
           * 是否暂停（受控）
-          * @default false
          */
         "paused": boolean;
         /**
           * 进度展示采用已消耗还是剩余（用于 progress-* 样式）
-          * @default 'elapsed'
          */
         "progressAs": 'elapsed' | 'remaining';
         /**
@@ -1632,12 +1420,10 @@ export namespace Components {
         "reset": () => Promise<void>;
         /**
           * 是否在分段/翻牌样式中显示单位（天/时/分/秒/毫秒）
-          * @default false
          */
         "showUnit": boolean;
         /**
           * 尺寸（对齐其他组件的 size 体系）
-          * @default 'middle'
          */
         "size": Size;
         /**
@@ -1650,44 +1436,82 @@ export namespace Components {
         "value"?: number;
         /**
           * 展现形式：文本、分段、翻牌、进度条、环形进度
-          * @default 'text'
          */
         "variant": 'text' | 'segment' | 'flip' | 'progress-line' | 'progress-circle';
     }
     interface LdesignDatePicker {
-        /**
-          * @default true
-         */
         "clearable": boolean;
         "defaultValue"?: string;
-        /**
-          * @default false
-         */
         "disabled": boolean;
         "disabledDate"?: (d: Date) => boolean;
-        /**
-          * @default 1
-         */
         "firstDayOfWeek": 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /**
-          * @default 'YYYY-MM-DD'
-         */
         "format": string;
         "maxDate"?: string;
         "minDate"?: string;
-        /**
-          * @default 'date'
-         */
         "mode": 'date' | 'week' | 'month' | 'quarter' | 'year';
-        /**
-          * @default '请选择日期'
-         */
         "placeholder": string;
-        /**
-          * @default false
-         */
         "showWeekNumbers": boolean;
         "value"?: string;
+    }
+    /**
+     * Descriptions 描述列表组件
+     */
+    interface LdesignDescriptions {
+        /**
+          * 是否显示边框
+         */
+        "bordered": boolean;
+        /**
+          * 列数
+         */
+        "column": number;
+        /**
+          * 布局方式
+         */
+        "layout": 'horizontal' | 'vertical';
+        /**
+          * 尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 标题
+         */
+        "title"?: string;
+    }
+    /**
+     * DescriptionsItem 描述项
+     */
+    interface LdesignDescriptionsItem {
+        /**
+          * 标签
+         */
+        "label": string;
+        /**
+          * 跨列数
+         */
+        "span": number;
+    }
+    /**
+     * Divider 分割线组件
+     * 用于分隔不同内容区域
+     */
+    interface LdesignDivider {
+        /**
+          * 是否虚线
+         */
+        "dashed": boolean;
+        /**
+          * 分割线方向
+         */
+        "direction": 'horizontal' | 'vertical';
+        /**
+          * 文字内容
+         */
+        "text"?: string;
+        /**
+          * 文字位置
+         */
+        "textPosition": 'left' | 'center' | 'right';
     }
     /**
      * ldesign-draggable
@@ -1705,47 +1529,36 @@ export namespace Components {
     interface LdesignDraggable {
         /**
           * 是否允许双击/双指双击缩放
-          * @default true
          */
         "allowDoubleTap": boolean;
         "alt"?: string;
         /**
           * 边界弹性系数
-          * @default 0.15
          */
         "boundsElasticity": number;
-        /**
-          * @default 'top-right'
-         */
         "controlsPosition": 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         /**
           * 是否禁用右键菜单（避免干扰拖拽）
-          * @default true
          */
         "disableContextMenu": boolean;
         /**
           * 双击切换到的缩放倍数
-          * @default 2
          */
         "doubleTapZoom": number;
         /**
           * 是否启用网格吸附
-          * @default false
          */
         "enableGrid": boolean;
         /**
           * 是否启用撤销/重做
-          * @default false
          */
         "enableHistory": boolean;
         /**
           * 是否启用动量滚动
-          * @default true
          */
         "enableMomentum": boolean;
         /**
           * 是否允许旋转（移动端双指）
-          * @default true
          */
         "enableRotate": boolean;
         "fitContain": () => Promise<void>;
@@ -1755,58 +1568,38 @@ export namespace Components {
         "goToPresetView": (index: number) => Promise<void>;
         /**
           * 网格大小（像素）
-          * @default 20
          */
         "gridSize": number;
-        /**
-          * @default 0
-         */
         "initialOffsetX": number;
-        /**
-          * @default 0
-         */
         "initialOffsetY": number;
-        /**
-          * @default 0
-         */
         "initialRotate": number;
         /**
           * 初始状态
-          * @default 1
          */
         "initialScale": number;
         /**
           * 按住 Shift 时的平移步长倍率
-          * @default 3
          */
         "keyPanFastMultiplier": number;
         /**
           * 方向键平移基础步长（像素）
-          * @default 40
          */
         "keyPanStep": number;
         /**
           * 是否启用键盘交互（方向键平移、+/- 缩放、R 旋转、0 重置）
-          * @default true
          */
         "keyboard": boolean;
         /**
           * 历史记录最大数量
-          * @default 20
          */
         "maxHistory": number;
-        /**
-          * @default 4
-         */
         "maxScale": number;
         /**
           * 最小/最大缩放
-          * @default 0.25
          */
         "minScale": number;
         /**
           * 缩略图导航位置
-          * @default 'bottom-right'
          */
         "minimapPosition": 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         "panBy": (dx: number, dy: number, clamp?: boolean) => Promise<void>;
@@ -1820,38 +1613,29 @@ export namespace Components {
         "rotateBy": (deltaDeg: number) => Promise<void>;
         /**
           * 旋转吸附角度（度）。大于 0 时在捏合旋转接近该步进的倍数会吸附
-          * @default 0
          */
         "rotateSnapDeg": number;
         /**
           * 旋转吸附阈值（度），仅当与最近倍数的差值不超过该阈值时生效
-          * @default 3
          */
         "rotateSnapEpsilon": number;
         "setOffsets": (x: number, y: number) => Promise<void>;
         "setRotate": (deg: number) => Promise<void>;
-        /**
-          * @default false
-         */
         "showControls": boolean;
         /**
           * 是否显示缩放/旋转指示器
-          * @default false
          */
         "showIndicators": boolean;
         /**
           * 是否启用缩略图导航
-          * @default false
          */
         "showMinimap": boolean;
         /**
           * 是否显示性能监控
-          * @default false
          */
         "showPerformance": boolean;
         /**
           * 是否启用平滑边界
-          * @default true
          */
         "smoothBounds": boolean;
         /**
@@ -1864,24 +1648,20 @@ export namespace Components {
         "undo": () => Promise<void>;
         /**
           * 允许使用滚轮进行平移（当未触发缩放时）
-          * @default true
          */
         "wheelPan": boolean;
         /**
           * PC 滚轮缩放
-          * @default true
          */
         "wheelZoom": boolean;
         /**
           * 是否需要按住 Ctrl/⌘ 才进行滚轮缩放；否则滚轮优先缩放
-          * @default false
          */
         "wheelZoomRequiresCtrl": boolean;
         "zoomIn": (step?: number) => Promise<void>;
         "zoomOut": (step?: number) => Promise<void>;
         /**
           * 缩放步进（滚轮/按钮）
-          * @default 0.1
          */
         "zoomStep": number;
         "zoomTo": (scale: number, clientX?: number, clientY?: number) => Promise<void>;
@@ -1889,22 +1669,18 @@ export namespace Components {
     interface LdesignDrawer {
         /**
           * 是否启用动画
-          * @default true
          */
         "animation": boolean;
         /**
           * 动画持续时间（毫秒）
-          * @default 300
          */
         "animationDuration": number;
         /**
           * 动画缓动函数
-          * @default 'ease-in-out'
          */
         "animationEasing": string;
         /**
           * 动画类型
-          * @default 'slide'
          */
         "animationType": string;
         /**
@@ -1913,17 +1689,14 @@ export namespace Components {
         "ariaLabelText"?: string;
         /**
           * 自动聚焦
-          * @default true
          */
         "autoFocus": boolean;
         /**
           * 圆角大小
-          * @default '8px'
          */
         "borderRadius": string;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable": boolean;
         /**
@@ -1932,7 +1705,6 @@ export namespace Components {
         "close": (reason?: CloseReason) => Promise<void>;
         /**
           * 按 ESC 关闭
-          * @default true
          */
         "closeOnEsc": boolean;
         /**
@@ -1941,17 +1713,14 @@ export namespace Components {
         "container"?: string | HTMLElement;
         /**
           * 性能优化：使用 CSS contain
-          * @default true
          */
         "cssContain": boolean;
         /**
           * 自定义类名
-          * @default ''
          */
         "customClass": string;
         /**
           * 关闭时销毁
-          * @default false
          */
         "destroyOnClose": boolean;
         /**
@@ -1960,32 +1729,26 @@ export namespace Components {
         "drawerTitle"?: string;
         /**
           * 焦点捕获
-          * @default true
          */
         "focusTrap": boolean;
         /**
           * 底部按钮对齐方式
-          * @default 'right'
          */
         "footerAlign": 'left' | 'center' | 'right' | 'space-between';
         /**
           * 是否显示底部边框
-          * @default true
          */
         "footerBorder": boolean;
         /**
           * 底部按钮配置
-          * @default []
          */
         "footerButtons": DrawerButton[];
         /**
           * 是否全屏
-          * @default false
          */
         "fullscreen": boolean;
         /**
           * 是否可全屏切换
-          * @default false
          */
         "fullscreenable": boolean;
         /**
@@ -1998,17 +1761,14 @@ export namespace Components {
         "getState": () => Promise<DrawerState>;
         /**
           * 性能优化：GPU 加速
-          * @default true
          */
         "gpuAcceleration": boolean;
         /**
           * 是否显示头部边框
-          * @default true
          */
         "headerBorder": boolean;
         /**
           * 头部是否吸顶
-          * @default false
          */
         "headerSticky": boolean;
         /**
@@ -2021,52 +1781,42 @@ export namespace Components {
         "icon"?: string;
         /**
           * 性能优化：懒加载内容
-          * @default false
          */
         "lazyLoad": boolean;
         /**
           * 抽屉层级
-          * @default 'normal'
          */
         "level": DrawerLevel;
         /**
           * 是否显示加载状态
-          * @default false
          */
         "loading": boolean;
         /**
           * 加载文本
-          * @default '加载中...'
          */
         "loadingText": string;
         /**
           * 是否锁定页面滚动
-          * @default true
          */
         "lockScroll": boolean;
         /**
           * 是否显示遮罩
-          * @default true
          */
         "mask": boolean;
         /**
           * 遮罩样式类名
-          * @default ''
          */
         "maskClass": string;
         /**
           * 点击遮罩是否关闭
-          * @default true
          */
         "maskClosable": boolean;
         /**
           * 最大尺寸
-          * @default '90%'
          */
         "maxSize": number | string;
         /**
           * 是否可最大化
-          * @default false
          */
         "maximizable": boolean;
         /**
@@ -2075,12 +1825,10 @@ export namespace Components {
         "maximize": () => Promise<void>;
         /**
           * 最小尺寸
-          * @default 200
          */
         "minSize": number | string;
         /**
           * 是否可最小化
-          * @default false
          */
         "minimizable": boolean;
         /**
@@ -2093,17 +1841,14 @@ export namespace Components {
         "open": () => Promise<void>;
         /**
           * 内容内边距
-          * @default true
          */
         "padding": string | boolean;
         /**
           * 抽屉位置
-          * @default 'right'
          */
         "placement": DrawerPlacement;
         /**
           * 是否可调整大小
-          * @default false
          */
         "resizable": boolean;
         /**
@@ -2116,17 +1861,14 @@ export namespace Components {
         "restore": () => Promise<void>;
         /**
           * 恢复焦点
-          * @default true
          */
         "restoreFocus": boolean;
         /**
           * 是否启用圆角
-          * @default true
          */
         "rounded": boolean;
         /**
           * 是否显示返回按钮
-          * @default false
          */
         "showBack": boolean;
         /**
@@ -2135,22 +1877,18 @@ export namespace Components {
         "showLoading": (text?: string) => Promise<void>;
         /**
           * 是否显示尺寸提示
-          * @default true
          */
         "showSizeHint": boolean;
         /**
           * 抽屉大小
-          * @default 'md'
          */
         "size": number | string | SizePreset;
         /**
           * 吸附点
-          * @default []
          */
         "snapPoints": SnapPoint[];
         /**
           * 吸附阈值
-          * @default 30
          */
         "snapThreshold": number;
         /**
@@ -2163,22 +1901,18 @@ export namespace Components {
         "subtitle"?: string;
         /**
           * 滑动阈值（0-1）
-          * @default 0.3
          */
         "swipeThreshold": number;
         /**
           * 是否启用滑动关闭
-          * @default false
          */
         "swipeToClose": boolean;
         /**
           * 滑动触发区域
-          * @default 'edge'
          */
         "swipeTriggerArea": 'anywhere' | 'handle' | 'header' | 'edge';
         /**
           * 主题
-          * @default 'light'
          */
         "theme": DrawerTheme;
         /**
@@ -2187,22 +1921,18 @@ export namespace Components {
         "toggle": () => Promise<void>;
         /**
           * 性能优化：使用 transform
-          * @default true
          */
         "useTransform": boolean;
         /**
           * 性能优化：使用虚拟滚动
-          * @default false
          */
         "virtualScroll": boolean;
         /**
           * 是否显示抽屉
-          * @default false
          */
         "visible": boolean;
         /**
           * z-index 层级
-          * @default 1000
          */
         "zIndex": number;
     }
@@ -2213,22 +1943,18 @@ export namespace Components {
     interface LdesignDropdown {
         /**
           * 移动端选中态颜色（文本与对勾）
-          * @default '#F53F3F'
          */
         "activeColor": string;
         /**
           * 浮层挂载位置：默认 body，避免在文档容器中被裁剪
-          * @default 'body'
          */
         "appendTo": 'self' | 'body' | 'closest-popup';
         /**
           * 是否显示箭头（默认不显示）
-          * @default false
          */
         "arrow": boolean;
         /**
           * 点击选项后是否自动关闭
-          * @default true
          */
         "closeOnSelect": boolean;
         /**
@@ -2237,57 +1963,46 @@ export namespace Components {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 菜单宽度是否跟随触发器宽度（默认否）
-          * @default false
          */
         "fitTriggerWidth": boolean;
         /**
           * 下拉节点（数组或 JSON 字符串）
-          * @default []
          */
         "items": string | DropdownNode[];
         /**
           * 列表最大高度（px）
-          * @default 240
          */
         "maxHeight": number;
         /**
           * 触发器文本（默认触发器显示的固定文案，不随选择变化）
-          * @default '请选择'
          */
         "placeholder": string;
         /**
           * 出现位置
-          * @default 'bottom-start'
          */
         "placement": DropdownPlacement;
         /**
           * 是否将选中项同步到默认触发器文本（默认不同步）
-          * @default false
          */
         "reflectSelectionOnTrigger": boolean;
         /**
           * 是否在菜单项上展示选中样式（PC，默认不展示）
-          * @default false
          */
         "showSelected": boolean;
         /**
           * 子菜单的触发方式（hover/click），默认 hover，仅 PC 生效
-          * @default 'hover'
          */
         "submenuTrigger": 'hover' | 'click';
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme": 'light' | 'dark';
         /**
           * 触发方式（PC）
-          * @default 'click'
          */
         "trigger": DropdownTrigger;
         /**
@@ -2296,12 +2011,10 @@ export namespace Components {
         "value"?: string;
         /**
           * 自适应：'auto' | 'pc' | 'mobile'
-          * @default 'auto'
          */
         "variant": DropdownVariant;
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
-          * @default false
          */
         "visible": boolean;
         /**
@@ -2322,24 +2035,20 @@ export namespace Components {
         "actionClass"?: string;
         /**
           * 行为控制：auto（默认）| inline（强制同行右置）| newline（强制换行右对齐）
-          * @default 'auto'
          */
         "actionPlacement": 'auto' | 'inline' | 'newline';
         "actionStyle"?: any;
         /**
           * 自动折叠延迟（毫秒，0为不自动折叠）
-          * @default 0
          */
         "autoCollapseDelay": number;
         "collapseIcon"?: string;
         /**
           * 展开态允许 ESC 收起
-          * @default false
          */
         "collapseOnEscape": boolean;
         /**
           * 收起按钮文案（展开态）
-          * @default '收起'
          */
         "collapseText": string;
         /**
@@ -2348,17 +2057,14 @@ export namespace Components {
         "content"?: string;
         /**
           * 是否默认展开
-          * @default false
          */
         "defaultExpanded": boolean;
         /**
           * 双击文本切换展开/收起
-          * @default false
          */
         "doubleClickToggle": boolean;
         /**
           * 按钮悬浮效果增强
-          * @default true
          */
         "enhancedHover": boolean;
         /**
@@ -2367,7 +2073,6 @@ export namespace Components {
         "expandIcon"?: string;
         /**
           * 展开按钮文案（折叠态）
-          * @default '更多'
          */
         "expandText": string;
         /**
@@ -2380,17 +2085,14 @@ export namespace Components {
         "fadeColors"?: string;
         /**
           * 渐变遮罩宽度（如 40% 或 120）
-          * @default '40%'
          */
         "fadeWidth": number | string;
         /**
           * 同行放置时，文本与"收起"的间距（像素）
-          * @default 8
          */
         "inlineGap": number;
         /**
           * 折叠时显示的行数
-          * @default 3
          */
         "lines": number;
         /**
@@ -2399,40 +2101,126 @@ export namespace Components {
         "linesMap"?: { sm?: number; md?: number; lg?: number; xl?: number };
         /**
           * 收起时滚动到组件顶部
-          * @default false
          */
         "scrollIntoViewOnCollapse": boolean;
         /**
           * 展开时滚动到组件顶部
-          * @default false
          */
         "scrollIntoViewOnExpand": boolean;
         /**
           * 折叠态是否显示渐变遮罩
-          * @default true
          */
         "showFade": boolean;
         /**
           * Tooltip 最大宽度
-          * @default 320
          */
         "tooltipMaxWidth": number;
         /**
           * 折叠且溢出时，悬浮显示全文
-          * @default false
          */
         "tooltipOnCollapsed": boolean;
         /**
           * Tooltip 位置
-          * @default 'top'
          */
         "tooltipPlacement": string;
         /**
           * 展开/收起高度变化动画时长（ms）
-          * @default 200
          */
         "transitionDuration": number;
         "update": () => Promise<void>;
+    }
+    /**
+     * Empty 空状态组件
+     * 用于展示空数据状态
+     */
+    interface LdesignEmpty {
+        /**
+          * 空状态描述文字
+         */
+        "description": string;
+        /**
+          * 图片地址
+         */
+        "image"?: string;
+        /**
+          * 图片大小
+         */
+        "imageSize": 'small' | 'medium' | 'large';
+        /**
+          * 预设图片类型
+         */
+        "imageType": 'default' | 'simple' | 'search';
+    }
+    /**
+     * Form 表单组件
+     * 统一管理表单验证和数据
+     */
+    interface LdesignForm {
+        /**
+          * 是否禁用
+         */
+        "disabled": boolean;
+        /**
+          * 获取表单值
+         */
+        "getFieldsValue": () => Promise<Record<string, any>>;
+        /**
+          * 标签位置
+         */
+        "labelAlign": 'left' | 'right';
+        /**
+          * 标签宽度
+         */
+        "labelWidth"?: string | number;
+        /**
+          * 表单布局
+         */
+        "layout": 'horizontal' | 'vertical' | 'inline';
+        /**
+          * 注册表单项
+         */
+        "registerField": (name: string, value: any, rules?: FormRule[]) => Promise<void>;
+        /**
+          * 重置表单
+         */
+        "reset": () => Promise<void>;
+        /**
+          * 更新字段值
+         */
+        "setFieldValue": (name: string, value: any) => Promise<void>;
+        /**
+          * 表单尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 验证表单
+         */
+        "validate": () => Promise<{ valid: boolean; errors: Record<string, string>; }>;
+    }
+    /**
+     * FormItem 表单项
+     */
+    interface LdesignFormItem {
+        /**
+          * 错误提示
+         */
+        "error"?: string;
+        /**
+          * 帮助文本
+         */
+        "help"?: string;
+        /**
+          * 字段标签
+         */
+        "label"?: string;
+        /**
+          * 字段名称
+         */
+        "name": string;
+        /**
+          * 是否必填
+         */
+        "required": boolean;
     }
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -2450,7 +2238,6 @@ export namespace Components {
         "defaultRows"?: number;
         /**
           * 是否使用密集填充（尽量填补空位）；显式定位下仅作类名标识
-          * @default false
          */
         "dense": boolean;
         /**
@@ -2459,12 +2246,10 @@ export namespace Components {
         "gap"?: number | string;
         /**
           * 每列的最小宽度，用于自适应计算列数；数字为 px；默认 240
-          * @default 240
          */
         "minColWidth": number | string;
         /**
           * 展开按钮所在列宽（span）
-          * @default 8
          */
         "toggleSpan": number;
         /**
@@ -2484,7 +2269,6 @@ export namespace Components {
     interface LdesignGridItem {
         /**
           * 占用的列数
-          * @default 1
          */
         "span": number;
     }
@@ -2495,7 +2279,6 @@ export namespace Components {
     interface LdesignIcon {
         /**
           * 动画类型
-          * @default 'none'
          */
         "animation"?: 'spin' | 'pulse' | 'bounce' | 'flash' | 'shake' | 'none';
         /**
@@ -2508,7 +2291,6 @@ export namespace Components {
         "customSvg"?: string;
         /**
           * 是否为装饰性图标（无语义）
-          * @default false
          */
         "decorative": boolean;
         /**
@@ -2517,7 +2299,6 @@ export namespace Components {
         "flip"?: 'horizontal' | 'vertical' | 'both';
         /**
           * 是否使用渐变色
-          * @default false
          */
         "gradient": boolean;
         /**
@@ -2526,7 +2307,6 @@ export namespace Components {
         "gradientColors"?: string | string[];
         /**
           * 渐变方向
-          * @default 'horizontal'
          */
         "gradientDirection": 'horizontal' | 'vertical' | 'diagonal';
         /**
@@ -2551,17 +2331,14 @@ export namespace Components {
         "searchIcons": (keyword: string) => Promise<string[]>;
         /**
           * 图标尺寸
-          * @default 'medium'
          */
         "size": Size | number;
         /**
           * 是否旋转（兼容旧版）
-          * @default false
          */
         "spin": boolean;
         /**
           * 描边宽度
-          * @default 2
          */
         "strokeWidth": number;
     }
@@ -2584,7 +2361,6 @@ export namespace Components {
         "blurhash"?: string;
         /**
           * 启用图片对比模式
-          * @default false
          */
         "comparison": boolean;
         /**
@@ -2597,17 +2373,14 @@ export namespace Components {
         "crossorigin"?: 'anonymous' | 'use-credentials';
         /**
           * HTMLImageElement.decoding
-          * @default 'auto'
          */
         "decoding": 'async' | 'sync' | 'auto';
         /**
           * 是否禁用（影响交互，如预览）
-          * @default false
          */
         "disabled": boolean;
         /**
           * 预览工具栏显示下载按钮
-          * @default true
          */
         "downloadable": boolean;
         /**
@@ -2616,27 +2389,22 @@ export namespace Components {
         "fallback"?: string;
         /**
           * 图片加载优先级
-          * @default 'auto'
          */
         "fetchpriority"?: 'high' | 'low' | 'auto';
         /**
           * 图片滤镜效果
-          * @default 'none'
          */
         "filter"?: 'grayscale' | 'sepia' | 'blur' | 'brightness' | 'contrast' | 'none';
         /**
           * object-fit
-          * @default 'cover'
          */
         "fit": 'fill' | 'contain' | 'cover' | 'none' | 'scale-down';
         /**
           * 预览工具栏显示全屏按钮
-          * @default true
          */
         "fullscreenable": boolean;
         /**
           * GIF 默认静止，点击播放。建议同时提供 gifPreviewSrc（第一帧快照）与 ratio 避免CLS
-          * @default false
          */
         "gifPlayOnClick": boolean;
         /**
@@ -2649,7 +2417,6 @@ export namespace Components {
         "height"?: number | string;
         /**
           * 是否允许拖拽原图（仅影响 img 的原生 draggable 属性，预览层可拖拽不受此限制）
-          * @default false
          */
         "imgDraggable": boolean;
         /**
@@ -2658,17 +2425,14 @@ export namespace Components {
         "imgTitle"?: string;
         /**
           * IntersectionObserver rootMargin（预加载阈值）
-          * @default '200px'
          */
         "intersectionRootMargin": string;
         /**
           * 是否懒加载（首屏建议关闭）
-          * @default true
          */
         "lazy": boolean;
         /**
           * 最大重试次数
-          * @default 3
          */
         "maxRetries": number;
         /**
@@ -2677,32 +2441,26 @@ export namespace Components {
         "placeholder"?: string;
         /**
           * 占位背景颜色（无自定义占位图时显示）
-          * @default '#f5f5f5'
          */
         "placeholderColor": string;
         /**
           * object-position
-          * @default 'center center'
          */
         "position": string;
         /**
           * 点击开启预览
-          * @default false
          */
         "preview": boolean;
         /**
           * 预览遮罩主题
-          * @default 'dark'
          */
         "previewBackdrop": 'dark' | 'light';
         /**
           * 当前图片在预览组中的索引
-          * @default 0
          */
         "previewCurrentIndex": number;
         /**
           * 预览图片组（用于gallery模式）
-          * @default []
          */
         "previewImages": string[];
         /**
@@ -2723,37 +2481,30 @@ export namespace Components {
         "referrerPolicy"?: string;
         /**
           * 显示重试按钮
-          * @default true
          */
         "retryable": boolean;
         /**
           * 预览工具栏显示旋转按钮
-          * @default true
          */
         "rotatable": boolean;
         /**
           * 形状：square（默认）| rounded | circle
-          * @default 'square'
          */
         "shape": 'square' | 'rounded' | 'circle';
         /**
           * 是否展示错误占位层
-          * @default true
          */
         "showError": boolean;
         /**
           * 显示图片信息（尺寸、大小等）
-          * @default false
          */
         "showInfo": boolean;
         /**
           * 是否展示加载中骨架（当无自定义占位图时）
-          * @default true
          */
         "showLoading": boolean;
         /**
           * 显示加载进度条
-          * @default false
          */
         "showProgress": boolean;
         /**
@@ -2774,7 +2525,6 @@ export namespace Components {
         "srcset"?: string;
         /**
           * 使用外部预览组件（用于多图gallery模式）
-          * @default false
          */
         "useExternalPreview": boolean;
         /**
@@ -2783,7 +2533,6 @@ export namespace Components {
         "watermark"?: string;
         /**
           * 水印位置
-          * @default 'bottom-right'
          */
         "watermarkPosition": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
         /**
@@ -2792,7 +2541,6 @@ export namespace Components {
         "width"?: number | string;
         /**
           * 预览是否可缩放
-          * @default true
          */
         "zoomable": boolean;
     }
@@ -2805,12 +2553,10 @@ export namespace Components {
     interface LdesignImageGroup {
         /**
           * 列数
-          * @default 3
          */
         "columns": number;
         /**
           * 间距（px）
-          * @default 8
          */
         "gap": number;
         /**
@@ -2831,48 +2577,39 @@ export namespace Components {
     interface LdesignImagePreview {
         /**
           * 当前显示的图片索引
-          * @default 0
          */
         "currentIndex": number;
         /**
           * 是否启用旋转
-          * @default true
          */
         "enableRotate": boolean;
         "hide": () => Promise<void>;
         /**
           * 当前预览的图片列表
-          * @default []
          */
         "images": string[];
         /**
           * 初始缩放比例
-          * @default 1
          */
         "initialScale": number;
         /**
           * 是否启用键盘操作
-          * @default true
          */
         "keyboard": boolean;
         /**
           * 是否循环切换
-          * @default true
          */
         "loop": boolean;
         /**
           * 是否在点击遮罩时关闭
-          * @default true
          */
         "maskClosable": boolean;
         /**
           * 最大缩放比例
-          * @default 4
          */
         "maxScale": number;
         /**
           * 最小缩放比例
-          * @default 0.25
          */
         "minScale": number;
         "next": () => Promise<void>;
@@ -2883,27 +2620,22 @@ export namespace Components {
         "show": (images?: string | string[], index?: number) => Promise<void>;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "showCloseBtn": boolean;
         /**
           * 是否显示图片索引
-          * @default true
          */
         "showIndex": boolean;
         /**
           * 是否显示工具栏
-          * @default true
          */
         "showToolbar": boolean;
         /**
           * 动画过渡时长 (ms)
-          * @default 300
          */
         "transitionDuration": number;
         /**
           * 是否显示预览
-          * @default false
          */
         "visible": boolean;
         "zoomIn": (step?: number) => Promise<void>;
@@ -2919,17 +2651,14 @@ export namespace Components {
     interface LdesignImageViewer {
         /**
           * 主题：暗色/亮色遮罩
-          * @default 'dark'
          */
         "backdrop": 'dark' | 'light';
         /**
           * 标题与描述的对齐方式：left 左对齐；center 居中；right 右对齐
-          * @default 'center'
          */
         "captionAlign": 'left' | 'center' | 'right';
         /**
           * 标题与描述的显示位置：bottom 底部（工具栏上方）；top 顶部（缩略图下方）
-          * @default 'bottom'
          */
         "captionPosition": 'bottom' | 'top';
         /**
@@ -2946,31 +2675,23 @@ export namespace Components {
         "images": string | Array<ImageViewerItem | string>;
         /**
           * 是否启用键盘快捷键
-          * @default true
          */
         "keyboard": boolean;
         /**
           * 是否循环播放
-          * @default true
          */
         "loop": boolean;
         /**
           * 点击遮罩是否可关闭
-          * @default true
          */
         "maskClosable": boolean;
-        /**
-          * @default 4
-         */
         "maxScale": number;
         /**
           * 最小/最大缩放
-          * @default 0.25
          */
         "minScale": number;
         /**
           * 打开/关闭动画效果：fade 淡入淡出；zoom 缩放；slide-up 上滑；slide-down 下滑；none 无动画
-          * @default 'fade-zoom'
          */
         "openAnimation": 'fade' | 'zoom' | 'fade-zoom' | 'slide-up' | 'slide-down' | 'none';
         /**
@@ -2979,7 +2700,6 @@ export namespace Components {
         "openDuration"?: number;
         /**
           * 小窗拖拽方式：title 标题栏拖拽；anywhere 全面板可拖拽
-          * @default 'title'
          */
         "panelDraggable": 'title' | 'anywhere';
         "panelHeight"?: number | string;
@@ -2989,37 +2709,30 @@ export namespace Components {
         "panelWidth"?: number | string;
         /**
           * 是否显示标题与描述
-          * @default true
          */
         "showCaption": boolean;
         /**
           * 是否展示顶部缩略图
-          * @default true
          */
         "showThumbnails": boolean;
         /**
           * 初始索引
-          * @default 0
          */
         "startIndex": number;
         /**
           * 图片切换过渡类型
-          * @default 'fade-zoom'
          */
         "transition": 'fade' | 'fade-zoom';
         /**
           * 过渡时长（ms）
-          * @default 240
          */
         "transitionDuration": number;
         /**
           * 过渡缓动函数
-          * @default 'cubic-bezier(0.22, 0.61, 0.36, 1)'
          */
         "transitionEasing": string;
         /**
           * 查看窗口模式：overlay 全屏；modal 小窗
-          * @default 'overlay'
          */
         "viewerMode": 'overlay' | 'modal' | 'embedded';
         /**
@@ -3028,22 +2741,18 @@ export namespace Components {
         "viewerTitle"?: string;
         /**
           * 是否显示
-          * @default false
          */
         "visible": boolean;
         /**
           * 是否启用滚轮缩放
-          * @default true
          */
         "wheelZoom": boolean;
         /**
           * z-index
-          * @default 1000
          */
         "zIndex": number;
         /**
           * 缩放步进
-          * @default 0.1
          */
         "zoomStep": number;
     }
@@ -3058,22 +2767,18 @@ export namespace Components {
         "allowInput"?: RegExp | ((value: string) => boolean);
         /**
           * 自适应内容高度（仅对 textarea 有效）
-          * @default false
          */
         "autosize": boolean | { minRows?: number; maxRows?: number };
         /**
           * 是否可清空
-          * @default false
          */
         "clearable": boolean;
         /**
           * 是否受控组件
-          * @default false
          */
         "controlled": boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -3094,27 +2799,22 @@ export namespace Components {
         "prefixIcon"?: string;
         /**
           * 是否只读
-          * @default false
          */
         "readonly": boolean;
         /**
           * 输入框行数（仅对 textarea 有效）
-          * @default 2
          */
         "rows": number;
         /**
           * 是否显示输入数量统计
-          * @default false
          */
         "showCount": boolean;
         /**
           * 是否显示切换密码图标
-          * @default false
          */
         "showPassword": boolean;
         /**
           * 输入框尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -3127,12 +2827,10 @@ export namespace Components {
         "suffixIcon"?: string;
         /**
           * 输入框类型
-          * @default 'text'
          */
         "type": 'text' | 'password' | 'textarea' | 'number' | 'email' | 'url' | 'tel';
         /**
           * 输入框的值
-          * @default ''
          */
         "value": string;
     }
@@ -3144,7 +2842,6 @@ export namespace Components {
     interface LdesignInputNumber {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -3153,7 +2850,6 @@ export namespace Components {
         "formatter"?: (value: number | null) => string;
         /**
           * 是否启用键盘增减（方向键/页键）
-          * @default true
          */
         "keyboard": boolean;
         /**
@@ -3166,7 +2862,6 @@ export namespace Components {
         "min"?: number;
         /**
           * 是否允许鼠标滚轮调整
-          * @default false
          */
         "mouseWheel": boolean;
         /**
@@ -3183,12 +2878,10 @@ export namespace Components {
         "precision"?: number;
         /**
           * 是否只读（可选，禁用输入但可复制）
-          * @default false
          */
         "readonly": boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -3197,14 +2890,65 @@ export namespace Components {
         "status"?: 'error' | 'warning' | 'success';
         /**
           * 步长（增减用，不强制对齐输入）
-          * @default 1
          */
         "step": number;
         /**
           * 当前值（受控，支持双向）
-          * @default 0
          */
         "value": number | null;
+    }
+    /**
+     * Layout 布局容器
+     */
+    interface LdesignLayout {
+        /**
+          * 布局方向
+         */
+        "direction": 'horizontal' | 'vertical';
+    }
+    /**
+     * Layout Content
+     */
+    interface LdesignLayoutContent {
+    }
+    /**
+     * Layout Footer
+     */
+    interface LdesignLayoutFooter {
+        /**
+          * 高度
+         */
+        "height": string;
+    }
+    /**
+     * Layout Header
+     */
+    interface LdesignLayoutHeader {
+        /**
+          * 高度
+         */
+        "height": string;
+    }
+    /**
+     * Layout Sider
+     */
+    interface LdesignLayoutSider {
+        /**
+          * 是否已折叠
+         */
+        "collapsed": boolean;
+        /**
+          * 折叠后的宽度
+         */
+        "collapsedWidth": string;
+        /**
+          * 是否可折叠
+         */
+        "collapsible": boolean;
+        /**
+          * 宽度
+         */
+        "width": string;
     }
     /**
      * Loading 加载组件
@@ -3213,27 +2957,22 @@ export namespace Components {
     interface LdesignLoading {
         /**
           * 全屏模式（覆盖整个视口）
-          * @default false
          */
         "fullscreen": boolean;
         /**
           * 全屏时是否锁定页面滚动
-          * @default true
          */
         "lockScroll": boolean;
         /**
           * 全屏时是否显示遮罩背景
-          * @default true
          */
         "mask": boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 是否处于加载中
-          * @default true
          */
         "spinning": boolean;
         /**
@@ -3242,12 +2981,10 @@ export namespace Components {
         "tip"?: string;
         /**
           * 加载指示类型
-          * @default 'spinner'
          */
         "type": 'spinner' | 'dots';
         /**
           * 垂直布局（图标在上、文字在下）
-          * @default false
          */
         "vertical": boolean;
         /**
@@ -3263,22 +3000,18 @@ export namespace Components {
     interface LdesignMention {
         /**
           * 浮层挂载到：self|body|closest-popup（透传给 popup）
-          * @default 'body'
          */
         "appendTo": 'self' | 'body' | 'closest-popup';
         /**
           * 自动聚焦
-          * @default false
          */
         "autofocus": boolean;
         /**
           * token 是否默认可关闭
-          * @default true
          */
         "closable": boolean;
         /**
           * 受控模式（为 true 时不在内部修改 value）
-          * @default false
          */
         "controlled": boolean;
         /**
@@ -3287,7 +3020,6 @@ export namespace Components {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -3296,12 +3028,10 @@ export namespace Components {
         "filterOption"?: (input: string, option: MentionItem) => boolean;
         /**
           * 加载中（用于异步搜索）
-          * @default false
          */
         "loading": boolean;
         /**
           * 列表最大高度
-          * @default 240
          */
         "maxHeight": number;
         /**
@@ -3314,12 +3044,10 @@ export namespace Components {
         "model"?: string | MentionSegment[];
         /**
           * 是否多行模式。多行模式下允许回车换行，并可按 rows/maxRows 控制显示高度
-          * @default false
          */
         "multiline": boolean;
         /**
           * 候选项（数组或 JSON 字符串）
-          * @default []
          */
         "options": string | MentionItem[];
         /**
@@ -3329,7 +3057,6 @@ export namespace Components {
         "parseOnInit"?: boolean;
         /**
           * 解析策略：label（直接转换）/options（仅命中候选时转换）
-          * @default 'label'
          */
         "parseStrategy": 'label' | 'options';
         /**
@@ -3338,33 +3065,27 @@ export namespace Components {
         "placeholder"?: string;
         /**
           * 是否只读
-          * @default false
          */
         "readonly": boolean;
         /**
           * 是否允许用户手动拖拽调整高度（vertical）
-          * @default true
          */
         "resizable": boolean;
         /**
           * 初始可见行数（用于计算最小高度）
-          * @default 3
          */
         "rows": number;
         "setOptions": (options: MentionItem[]) => Promise<void>;
         /**
           * 尺寸（影响样式）
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 默认 token 外观
-          * @default 'primary'
          */
         "tokenType": 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
         /**
           * 触发字符（如 @ 或 #），兼容旧属性
-          * @default '@'
          */
         "trigger": string;
         /**
@@ -3378,12 +3099,10 @@ export namespace Components {
         /**
           * 当前值（受控，文本值，包含渲染后的
           * @name 文本）
-          * @default ''
          */
         "value": string;
         /**
           * 事件/受控值格式（默认 model）
-          * @default 'model'
          */
         "valueFormat": 'model' | 'segments' | 'text';
         /**
@@ -3394,17 +3113,14 @@ export namespace Components {
     interface LdesignMenu {
         /**
           * 手风琴模式：同层级只允许展开一个
-          * @default false
          */
         "accordion": boolean;
         /**
           * 折叠模式：仅显示一级图标，悬停右侧弹出；无子级时显示 tooltip（仅纵向）
-          * @default false
          */
         "collapse": boolean;
         /**
           * 默认打开的子菜单 key 列表（非受控）
-          * @default []
          */
         "defaultOpenKeys": string[];
         /**
@@ -3413,22 +3129,18 @@ export namespace Components {
         "defaultValue"?: string;
         /**
           * 子级缩进（px）
-          * @default 16
          */
         "indent": number;
         /**
           * 菜单数据（可传入 JSON 字符串或对象数组）
-          * @default []
          */
         "items": string | MenuItem[];
         /**
           * 展示模式：vertical（纵向）| horizontal（横向）
-          * @default 'vertical'
          */
         "mode": 'vertical' | 'horizontal';
         /**
           * 横向模式下 “更多” 文案
-          * @default '更多'
          */
         "moreLabel": string;
         /**
@@ -3437,17 +3149,14 @@ export namespace Components {
         "openKeys"?: string[];
         /**
           * 顶层（一级）是否强制显示图标占位（保证对齐）。若条目没有 icon，将渲染一个占位。
-          * @default true
          */
         "requireTopIcon": boolean;
         /**
           * 弹出子菜单的触发方式（仅在 flyout/mixed 生效；横向模式同样适用）
-          * @default 'hover'
          */
         "submenuTrigger": SubmenuTrigger;
         /**
           * 纵向模式：顶层互斥展开（无论 inline 或 flyout），默认开启
-          * @default true
          */
         "topLevelExclusive": boolean;
         /**
@@ -3456,7 +3165,6 @@ export namespace Components {
         "value"?: string;
         /**
           * 垂直模式展开方式：inline（内嵌）、flyout（右侧弹出）、mixed（一级内嵌，其余弹出）
-          * @default 'inline'
          */
         "verticalExpand": VerticalExpand;
     }
@@ -3474,7 +3182,6 @@ export namespace Components {
     interface LdesignMessage {
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable": boolean;
         /**
@@ -3487,12 +3194,10 @@ export namespace Components {
         "customClass"?: string;
         /**
           * 自动关闭的时长（毫秒）；设为 0 则不自动关闭
-          * @default 3000
          */
         "duration": number;
         /**
           * 是否支持HTML内容
-          * @default false
          */
         "html": boolean;
         /**
@@ -3509,22 +3214,18 @@ export namespace Components {
         "messageTitle"?: string;
         /**
           * 消息内容
-          * @default true
          */
         "pauseOnHover": boolean;
         /**
           * 出现位置
-          * @default 'top'
          */
         "placement": 'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right' | 'center';
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon": boolean;
         /**
           * 提示类型
-          * @default 'info'
          */
         "type": MessageType;
     }
@@ -3535,22 +3236,18 @@ export namespace Components {
         "animEase"?: string;
         /**
           * 动画效果类型
-          * @default 'zoom'
          */
         "animation": ModalAnimation;
         /**
           * 新增：是否显示动画效果
-          * @default true
          */
         "animationEnabled": boolean;
         /**
           * 新增：自动检测系统深色模式
-          * @default true
          */
         "autoDetectDarkMode": boolean;
         /**
           * 软键盘（移动端）避让
-          * @default true
          */
         "avoidKeyboard": boolean;
         /**
@@ -3563,12 +3260,10 @@ export namespace Components {
         "beforeStepChange"?: (from: number, to: number) => boolean | Promise<boolean>;
         /**
           * 新增：模糊程度
-          * @default 10
          */
         "blurAmount": number;
         /**
           * 新增：模糊背景
-          * @default false
          */
         "blurBackground": boolean;
         /**
@@ -3576,22 +3271,14 @@ export namespace Components {
          */
         "bodyPadding"?: string | number;
         "breakpoints"?: { xs: number; sm: number; md: number; lg: number };
-        /**
-          * @default '取消'
-         */
         "cancelText": string;
-        /**
-          * @default 'secondary'
-         */
         "cancelType": ButtonType;
         /**
           * 是否居中显示
-          * @default false
          */
         "centered": boolean;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable": boolean;
         /**
@@ -3600,17 +3287,14 @@ export namespace Components {
         "close": () => Promise<void>;
         /**
           * 新增：是否显示关闭动画
-          * @default true
          */
         "closeAnimation": boolean;
         /**
           * 图标可配置
-          * @default 'close'
          */
         "closeIcon": string;
         /**
           * 当前步骤（0-based，可受控）
-          * @default 0
          */
         "currentStep": number;
         /**
@@ -3629,22 +3313,18 @@ export namespace Components {
         "customClass"?: string;
         /**
           * 新增：深色模式
-          * @default false
          */
         "darkMode": boolean;
         /**
           * 新增：是否允许双击标题栏最大化
-          * @default true
          */
         "dblclickMaximize": boolean;
         /**
           * 是否销毁子元素
-          * @default false
          */
         "destroyOnClose": boolean;
         /**
           * 新增：是否禁用过渡效果
-          * @default false
          */
         "disableTransition": boolean;
         /**
@@ -3653,7 +3333,6 @@ export namespace Components {
         "drawerCloseThreshold"?: number | string;
         /**
           * Drawer 边缘滑动关闭
-          * @default true
          */
         "drawerSwipeToClose": boolean;
         /**
@@ -3663,27 +3342,22 @@ export namespace Components {
         "ease"?: string;
         /**
           * 边缘感应宽度（px）
-          * @default 24
          */
         "edgeSwipeWidth": number;
         /**
           * 新增：是否启用手势操作
-          * @default true
          */
         "enableGestures": boolean;
         /**
           * 新增：是否支持画中画模式
-          * @default false
          */
         "enablePictureInPicture": boolean;
         /**
           * 新增：底部按钮对齐
-          * @default 'right'
          */
         "footerAlign": 'left' | 'center' | 'right' | 'space-between';
         /**
           * 新增：是否默认满屏
-          * @default false
          */
         "fullscreen": boolean;
         /**
@@ -3705,48 +3379,38 @@ export namespace Components {
         "initialFocus"?: string;
         /**
           * 是否可拖拽
-          * @default false
          */
         "isDraggable": boolean;
         /**
           * 按ESC键是否关闭
-          * @default true
          */
         "keyboard": boolean;
         /**
           * 新增：是否展示加载状态
-          * @default false
          */
         "loading": boolean;
         /**
           * 新增：加载文字
-          * @default '加载中...'
          */
         "loadingText": string;
         /**
           * 是否显示遮罩层
-          * @default true
          */
         "mask": boolean;
         /**
           * 点击遮罩层是否关闭
-          * @default true
          */
         "maskClosable": boolean;
         "maxHeight"?: number;
         "maxWidth"?: number;
         /**
           * 是否可最大化
-          * @default false
          */
         "maximizable": boolean;
         /**
           * 最大化模态框
          */
         "maximize": () => Promise<void>;
-        /**
-          * @default 'maximize'
-         */
         "maximizeIcon": string;
         "minHeight"?: number;
         /**
@@ -3757,47 +3421,33 @@ export namespace Components {
           * 模态框标题
          */
         "modalTitle"?: string;
-        /**
-          * @default false
-         */
         "okDisabled": boolean;
         /**
           * OK 按钮状态
-          * @default false
          */
         "okLoading": boolean;
         /**
           * 底部按钮文案和类型控制（仅在未自定义 footer 时生效）
-          * @default '确定'
          */
         "okText": string;
-        /**
-          * @default 'primary'
-         */
         "okType": ButtonType;
         /**
           * 屏幕边缘滑动打开抽屉（需 destroyOnClose=false 以便组件常驻）
-          * @default false
          */
         "openOnEdgeSwipe": boolean;
         "preOk"?: () => boolean | Promise<boolean>;
         /**
           * 新增：当前进度（0-100）
-          * @default 0
          */
         "progress": number;
         /**
           * 是否可调整大小
-          * @default false
          */
         "resizable": boolean;
         /**
           * 恢复模态框
          */
         "restore": () => Promise<void>;
-        /**
-          * @default 'restore'
-         */
         "restoreIcon": string;
         /**
           * 显示模态框
@@ -3805,42 +3455,34 @@ export namespace Components {
         "show": () => Promise<void>;
         /**
           * 新增：是否显示取消按钮
-          * @default true
          */
         "showCancelButton": boolean;
         /**
           * 新增：是否显示底部分割线
-          * @default true
          */
         "showFooterDivider": boolean;
         /**
           * 新增：是否显示满屏按钮
-          * @default false
          */
         "showFullscreenButton": boolean;
         /**
           * 新增：是否显示头部分割线
-          * @default true
          */
         "showHeaderDivider": boolean;
         /**
           * 新增：是否显示确认按钮
-          * @default true
          */
         "showOkButton": boolean;
         /**
           * 新增：是否显示进度指示器
-          * @default false
          */
         "showProgress": boolean;
         /**
           * 新增：是否显示阴影
-          * @default true
          */
         "showShadow": boolean;
         /**
           * 模态框尺寸
-          * @default 'medium'
          */
         "size": ModalSize;
         /**
@@ -3849,7 +3491,6 @@ export namespace Components {
         "steps"?: string[];
         /**
           * 新增：主题
-          * @default 'light'
          */
         "theme": ModalTheme;
         /**
@@ -3862,12 +3503,10 @@ export namespace Components {
         "top"?: number | string;
         /**
           * 焦点与可访问性
-          * @default true
          */
         "trapFocus": boolean;
         /**
           * 变体：抽屉/底部弹层等
-          * @default 'modal'
          */
         "variant": ModalVariant;
         /**
@@ -3876,12 +3515,10 @@ export namespace Components {
         "variantAt"?: Partial<Record<'xs'|'sm'|'md'|'lg', ModalVariant>>;
         /**
           * 新增：支持虚拟化滚动
-          * @default false
          */
         "virtualScroll": boolean;
         /**
           * 是否显示模态框
-          * @default false
          */
         "visible": boolean;
         /**
@@ -3890,12 +3527,10 @@ export namespace Components {
         "width"?: number | string;
         /**
           * 向导模式
-          * @default false
          */
         "wizard": boolean;
         /**
           * z-index
-          * @default 1000
          */
         "zIndex": number;
     }
@@ -3906,7 +3541,6 @@ export namespace Components {
     interface LdesignNotification {
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable": boolean;
         /**
@@ -3919,7 +3553,6 @@ export namespace Components {
         "description"?: string;
         /**
           * 自动关闭的时长（毫秒）；设为 0 则不自动关闭
-          * @default 4500
          */
         "duration": number;
         /**
@@ -3928,22 +3561,18 @@ export namespace Components {
         "notificationTitle"?: string;
         /**
           * 悬浮时是否暂停计时
-          * @default true
          */
         "pauseOnHover": boolean;
         /**
           * 出现位置
-          * @default 'top-right'
          */
         "placement": NotificationPlacement;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon": boolean;
         /**
           * 通知类型
-          * @default 'info'
          */
         "type": NotificationType;
     }
@@ -3954,7 +3583,6 @@ export namespace Components {
     interface LdesignPagination {
         /**
           * 页码省略边界数（两端保留）
-          * @default 1
          */
         "boundaryCount": number;
         /**
@@ -3963,22 +3591,18 @@ export namespace Components {
         "current"?: number;
         /**
           * 默认当前页（非受控）
-          * @default 1
          */
         "defaultCurrent": number;
         /**
           * 默认每页条数（非受控）
-          * @default 10
          */
         "defaultPageSize": number;
         /**
           * 组件禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 仅一页时是否隐藏
-          * @default false
          */
         "hideOnSinglePage": boolean;
         /**
@@ -3987,67 +3611,54 @@ export namespace Components {
         "pageSize"?: number;
         /**
           * 页大小选项（可传数组或逗号分隔字符串）
-          * @default [10, 20, 50, 100]
          */
         "pageSizeOptions": number[] | string;
         /**
           * 下拉展示文案模板，仅在 dropdown 模式下生效，支持 {size}
-          * @default '{size} 条/页'
          */
         "pageSizeText": string;
         /**
           * 页信息文案模板，支持 {current}、{pageCount}
-          * @default '{current}/{pageCount} 页'
          */
         "pageText": string;
         /**
           * 是否显示首页/末页
-          * @default false
          */
         "showFirstLast": boolean;
         /**
           * 是否显示快速跳转输入框
-          * @default false
          */
         "showQuickJumper": boolean;
         /**
           * 是否显示每页条数切换器
-          * @default false
          */
         "showSizeChanger": boolean;
         /**
           * 是否显示总数文案
-          * @default false
          */
         "showTotal": boolean;
         /**
           * 当前页两侧展示的邻接页数
-          * @default 1
          */
         "siblingCount": number;
         /**
           * 简洁模式（仅上一页/下一页 + 页码输入）
-          * @default false
          */
         "simple": boolean;
         /**
           * 组件尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 切换器类型：native 原生下拉；dropdown 使用组件弹层
-          * @default 'dropdown'
          */
         "sizeChangerType": 'native' | 'dropdown';
         /**
           * 总条目数
-          * @default 0
          */
         "total": number;
         /**
           * 总数文案模板，支持 {total}、{rangeStart}、{rangeEnd}
-          * @default '共 {total} 条'
          */
         "totalText": string;
     }
@@ -4071,12 +3682,10 @@ export namespace Components {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 手势拖拽跟随比例（0-1），1 表示 1:1 跟手，越小阻力越大，默认 1
-          * @default 1
          */
         "dragFollow": number;
         /**
@@ -4085,27 +3694,22 @@ export namespace Components {
         "dragSmoothing"?: number;
         /**
           * 是否启用 3D 效果
-          * @default false
          */
         "enable3d": boolean;
         /**
           * 惯性摩擦 0-1（越小减速越快）
-          * @default 0.92
          */
         "friction": number;
         /**
           * 是否启用触觉反馈（需要浏览器支持 Vibration API）
-          * @default true
          */
         "hapticFeedback": boolean;
         /**
           * 触觉反馈强度（毫秒）
-          * @default 5
          */
         "hapticIntensity": number;
         /**
           * 搜索时是否高亮匹配文本
-          * @default true
          */
         "highlightMatch": boolean;
         /**
@@ -4114,7 +3718,6 @@ export namespace Components {
         "itemHeight"?: number;
         /**
           * 键盘快捷定位是否启用（输入字母快速定位）
-          * @default true
          */
         "keyboardQuickJump": boolean;
         /**
@@ -4127,12 +3730,10 @@ export namespace Components {
         "maxOverscrollRatio"?: number;
         /**
           * 是否启用惯性
-          * @default true
          */
         "momentum": boolean;
         /**
           * 选项列表（数组或 JSON 字符串）
-          * @default []
          */
         "options": string | PickerOption[];
         /**
@@ -4141,7 +3742,6 @@ export namespace Components {
         "panelHeight"?: number;
         /**
           * 边界阻力系数 0-1（越小阻力越大）
-          * @default 0.3
          */
         "resistance": number;
         /**
@@ -4152,32 +3752,26 @@ export namespace Components {
         "scrollToValue": (value: string, opts?: { trigger?: "program" | "click" | "scroll" | "wheel" | "keyboard" | "touch"; animate?: boolean; silent?: boolean; }) => Promise<void>;
         /**
           * 搜索防抖延迟（毫秒）
-          * @default 300
          */
         "searchDebounce": number;
         /**
           * 是否在搜索时大小写不敏感
-          * @default true
          */
         "searchIgnoreCase": boolean;
         /**
           * 搜索框占位符
-          * @default '搜索选项...'
          */
         "searchPlaceholder": string;
         /**
           * 是否显示搜索框
-          * @default false
          */
         "searchable": boolean;
         /**
           * 是否显示渐变遮罩
-          * @default true
          */
         "showMask": boolean;
         /**
           * 尺寸，影响每行高度
-          * @default 'medium'
          */
         "size": 'small' | 'medium' | 'large';
         /**
@@ -4190,7 +3784,6 @@ export namespace Components {
         "snapDurationWheel"?: number;
         /**
           * 是否启用音效
-          * @default false
          */
         "soundEffects": boolean;
         /**
@@ -4199,7 +3792,6 @@ export namespace Components {
         "soundUrl"?: string;
         /**
           * 音效音量 (0-1)
-          * @default 0.3
          */
         "soundVolume": number;
         /**
@@ -4208,12 +3800,10 @@ export namespace Components {
         "springBackDuration"?: number;
         /**
           * 边界回弹模式：'bounce' 弹簧回弹（默认） | 'ease' 缓慢恢复
-          * @default 'bounce'
          */
         "springBackMode": 'bounce' | 'ease';
         /**
           * 主题模式
-          * @default 'light'
          */
         "theme": 'light' | 'dark' | 'auto';
         /**
@@ -4222,7 +3812,6 @@ export namespace Components {
         "value"?: string;
         /**
           * 可视条目数（未显式 panelHeight 时生效，建议奇数：3/5/7）
-          * @default 5
          */
         "visibleItems": number;
         /**
@@ -4238,109 +3827,84 @@ export namespace Components {
     interface LdesignPopconfirm {
         /**
           * 动画类型（继承自 popup）
-          * @default 'scale'
          */
         "animation": 'fade' | 'scale' | 'slide';
         /**
           * 箭头（默认显示），透传给 Popup
-          * @default true
          */
         "arrow": boolean;
         /**
           * 自动关闭延迟（毫秒），0 表示不自动关闭
-          * @default 0
          */
         "autoCloseDelay": number;
-        /**
-          * @default '取消'
-         */
         "cancelText": string;
         /**
           * 取消按钮类型（默认使用次要/描边样式）
-          * @default 'outline'
          */
         "cancelType": 'primary' | 'secondary' | 'outline' | 'text' | 'danger';
         /**
           * 点击外部是否关闭（仅点击触发较常用）
-          * @default true
          */
         "closeOnOutside": boolean;
         /**
           * 确认按钮加载状态
-          * @default false
          */
         "confirmLoading": boolean;
         /**
           * 辅助说明（可选，支持默认 slot 覆盖）
          */
         "description"?: string;
-        /**
-          * @default 0
-         */
         "hideDelay": number;
         /**
           * 图标类型/名称
-          * @default 'question'
          */
         "icon": PopconfirmIcon;
         /**
           * 是否显示加载状态
-          * @default false
          */
         "loading": boolean;
         /**
           * 与触发元素的距离
-          * @default 8
          */
         "offsetDistance": number;
         /**
           * 确认/取消按钮文本
-          * @default '确定'
          */
         "okText": string;
         /**
           * 确认按钮类型（影响颜色）
-          * @default 'primary'
          */
         "okType": 'primary' | 'secondary' | 'outline' | 'text' | 'danger';
         /**
           * 出现位置（透传给 Popup）
-          * @default 'top'
          */
         "placement": PopconfirmPlacement;
         /**
           * 确认标题（支持 slot=title 覆盖）
-          * @default '确定要执行该操作吗？'
          */
         "popconfirmTitle": string;
         /**
           * 延迟显示/隐藏（毫秒），透传给 Popup
-          * @default 0
          */
         "showDelay": number;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon": boolean;
         /**
           * 尺寸（影响内容区域大小）
-          * @default 'medium'
          */
         "size": 'small' | 'medium' | 'large';
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme": 'light' | 'dark';
         /**
           * 触发方式（默认点击）
-          * @default 'click'
          */
         "trigger": PopconfirmTrigger;
         /**
           * 外部受控可见性（仅在 trigger='manual' 时生效）
-          * @default false
          */
         "visible": boolean;
     }
@@ -4357,118 +3921,62 @@ export namespace Components {
     interface LdesignPopup {
         /**
           * 动画类型
-          * @default 'scale'
          */
         "animation": PopupAnimation;
-        /**
-          * @default 'self'
-         */
         "appendTo": 'self' | 'body' | 'closest-popup';
-        /**
-          * @default true
-         */
         "arrow": boolean;
         /**
           * 自动关闭延迟（ms），0表示不自动关闭
-          * @default 0
          */
         "autoCloseDelay": number;
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable": boolean;
-        /**
-          * @default true
-         */
         "closeOnEsc": boolean;
-        /**
-          * @default true
-         */
         "closeOnOutside": boolean;
         "content"?: string;
-        /**
-          * @default false
-         */
         "debug": boolean;
-        /**
-          * @default false
-         */
         "disabled": boolean;
-        /**
-          * @default 0
-         */
         "hideDelay": number;
-        /**
-          * @default true
-         */
         "interactive": boolean;
         /**
           * 加载状态
-          * @default false
          */
         "loading": boolean;
-        /**
-          * @default false
-         */
         "lockOnScroll": boolean;
         "maxWidth"?: number | string;
         /**
           * 动画位移距离（px），用于"朝触发器靠近"的起始位移
-          * @default 10
          */
         "motionDistance": number;
         /**
           * 动画时长（ms）
-          * @default 200
          */
         "motionDuration": number;
         /**
           * 是否开启动画（基于 data-placement 的定向靠近/离开）
-          * @default true
          */
         "motionEnabled": boolean;
         /**
           * 与触发元素的距离：参见组件注释中的语义说明
-          * @default 8
          */
         "offsetDistance": number | string;
-        /**
-          * @default 'bottom'
-         */
         "placement": PopupPlacement;
         /**
           * 自定义弹层类名
          */
         "popupClass"?: string;
-        /**
-          * @default 'dialog'
-         */
         "popupRole": string;
         "popupTitle"?: string;
-        /**
-          * @default 0
-         */
         "showDelay": number;
         /**
           * 预设尺寸
          */
         "size"?: PopupSize;
-        /**
-          * @default 'auto'
-         */
         "strategy": 'auto' | 'fixed' | 'absolute';
-        /**
-          * @default 'light'
-         */
         "theme": 'light' | 'dark';
-        /**
-          * @default 'hover'
-         */
         "trigger": PopupTrigger;
-        /**
-          * @default false
-         */
         "visible": boolean;
         "width"?: number | string;
     }
@@ -4479,12 +3987,10 @@ export namespace Components {
     interface LdesignProgress {
         /**
           * 启用百分比过渡动�?
-          * @default false
          */
         "animated": boolean;
         /**
           * 圆形分段之间的间隔角度（度数�?
-          * @default 2
          */
         "circleStepGapDegree": number;
         /**
@@ -4493,17 +3999,14 @@ export namespace Components {
         "circleSteps"?: number;
         /**
           * 仪表盘变体（仅dashboard类型）：standard | bottom | left | right | fan
-          * @default 'standard'
          */
         "dashboardVariant": 'standard' | 'bottom' | 'left' | 'right' | 'fan';
         /**
           * 3D效果（仅line类型�?
-          * @default false
          */
         "effect3d": boolean;
         /**
           * 文本格式化，使用 {percent} 占位符，例如�?{percent} / 100"
-          * @default '{percent}%'
          */
         "format": string;
         /**
@@ -4512,17 +4015,14 @@ export namespace Components {
         "gapDegree"?: number;
         /**
           * 缺口位置（top/right/bottom/left，仅 circle/dashboard�?
-          * @default 'top'
          */
         "gapPosition": 'top' | 'right' | 'bottom' | 'left';
         /**
           * 发光效果
-          * @default false
          */
         "glow": boolean;
         /**
           * 渐变方向：horizontal | vertical | diagonal
-          * @default 'horizontal'
          */
         "gradientDirection": 'horizontal' | 'vertical' | 'diagonal';
         /**
@@ -4536,12 +4036,10 @@ export namespace Components {
         "gradientTo"?: string;
         /**
           * 不确定状态（显示循环动画，忽�?percent�?
-          * @default false
          */
         "indeterminate": boolean;
         /**
           * 线形文本位置
-          * @default 'right'
          */
         "infoPosition": 'right' | 'left' | 'inside' | 'bottom';
         /**
@@ -4554,37 +4052,30 @@ export namespace Components {
         "markers"?: Array<{position: number; color?: string; label?: string}>;
         /**
           * 百分�?0-100
-          * @default 0
          */
         "percent": number;
         /**
           * 脉冲动画
-          * @default false
          */
         "pulse": boolean;
         /**
           * 半圆位置（type=semicircle），top 表示显示上半圆，bottom 表示下半�?
-          * @default 'top'
          */
         "semiPosition": 'top' | 'bottom';
         /**
           * 进度条阴�?
-          * @default false
          */
         "shadow": boolean;
         /**
           * 是否显示信息文本（line：默认右侧；circle/dashboard：内部）
-          * @default true
          */
         "showInfo": boolean;
         /**
           * 组件尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 状态：normal | active | success | exception
-          * @default 'normal'
          */
         "status": 'normal' | 'active' | 'success' | 'exception';
         /**
@@ -4593,17 +4084,14 @@ export namespace Components {
         "steps"?: number;
         /**
           * 步骤间隙 px（仅 steps�?
-          * @default 2
          */
         "stepsGap": number;
         /**
           * 步骤条的块圆�?
-          * @default 100
          */
         "stepsRadius": number;
         /**
           * 条纹动画（active 状态下默认开启）
-          * @default true
          */
         "striped": boolean;
         /**
@@ -4612,7 +4100,6 @@ export namespace Components {
         "strokeColor"?: string;
         /**
           * 端点样式：round | square | butt（仅 circle 有效，line 以圆角呈�?round�?
-          * @default 'round'
          */
         "strokeLinecap": 'round' | 'square' | 'butt';
         /**
@@ -4621,7 +4108,6 @@ export namespace Components {
         "strokeWidth"?: number;
         /**
           * 成功颜色
-          * @default 'var(--ldesign-success-color, #42bd42)'
          */
         "successColor"?: string;
         /**
@@ -4630,7 +4116,6 @@ export namespace Components {
         "successPercent"?: number;
         /**
           * 视觉主题：default | neon | gradient3d | candy | water | glass | metallic
-          * @default 'default'
          */
         "theme": 'default' | 'neon' | 'gradient3d' | 'candy' | 'water' | 'glass' | 'metallic';
         /**
@@ -4639,17 +4124,14 @@ export namespace Components {
         "trailColor"?: string;
         /**
           * 类型：line（默认）| circle | dashboard | steps | semicircle
-          * @default 'line'
          */
         "type": 'line' | 'circle' | 'dashboard' | 'steps' | 'semicircle';
         /**
           * 波浪动画（仅line类型�?
-          * @default false
          */
         "wave": boolean;
         /**
           * 外径宽度（仅 circle/dashboard），单位 px
-          * @default 120
          */
         "width"?: number;
     }
@@ -4660,22 +4142,18 @@ export namespace Components {
     interface LdesignRadio {
         /**
           * 是否显示边框
-          * @default false
          */
         "border": boolean;
         /**
           * 是否为按钮样式
-          * @default false
          */
         "button": boolean;
         /**
           * 是否选中
-          * @default false
          */
         "checked": boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -4684,7 +4162,6 @@ export namespace Components {
         "name"?: string;
         /**
           * 单选框的尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -4699,12 +4176,10 @@ export namespace Components {
     interface LdesignRadioGroup {
         /**
           * 排列方向
-          * @default 'horizontal'
          */
         "direction": 'horizontal' | 'vertical';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -4713,7 +4188,6 @@ export namespace Components {
         "name"?: string;
         /**
           * 单选框组尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -4729,12 +4203,10 @@ export namespace Components {
     interface LdesignRate {
         /**
           * 再次点击清空（值相同则清零）
-          * @default true
          */
         "allowClear": boolean;
         /**
           * 允许半星
-          * @default false
          */
         "allowHalf": boolean;
         /**
@@ -4743,32 +4215,26 @@ export namespace Components {
         "color"?: string;
         /**
           * 受控模式：为 true 时组件不主动修改 value，仅触发事件
-          * @default false
          */
         "controlled": boolean;
         /**
           * 总星数
-          * @default 5
          */
         "count": number;
         /**
           * 禁用交互
-          * @default false
          */
         "disabled": boolean;
         /**
           * 图标名称（默认 star）
-          * @default 'star'
          */
         "icon": string;
         /**
           * 只读（展示，不可交互）
-          * @default false
          */
         "readonly": boolean;
         /**
           * 尺寸（影响图标大小与间距）
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -4777,7 +4243,6 @@ export namespace Components {
         "tooltips"?: string[] | string;
         /**
           * 当前分值（支持受控）
-          * @default 0
          */
         "value": number;
         /**
@@ -4792,55 +4257,65 @@ export namespace Components {
     interface LdesignResizeBox {
         /**
           * 受控模式：为 true 时，不会修改 width/height，外部应在事件中设置新值传回
-          * @default false
          */
         "controlled": boolean;
         /**
           * 角落把手：top-left/top-right/bottom-right/bottom-left。字符串或数组。默认仅启用 bottom-right。
-          * @default 'bottom-right'
          */
         "corners": string | Array<'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'>;
         /**
           * 允许伸缩的边：top/right/bottom/left。默认允许 right 与 bottom，满足常见的“右/下/右下角”拖拽需求
-          * @default 'right,bottom'
          */
         "directions": string | Array<'top' | 'right' | 'bottom' | 'left'>;
         /**
           * 是否禁用伸缩
-          * @default false
          */
         "disabled": boolean;
         /**
           * 初始高度。可传数字（px）或任何合法 CSS 高度值（如 'auto'）。拖拽后以 px 写回。
-          * @default 200
          */
         "height": number | string;
         "maxHeight"?: number;
         "maxWidth"?: number;
-        /**
-          * @default 60
-         */
         "minHeight": number;
         /**
           * 最小/最大尺寸（px）
-          * @default 80
          */
         "minWidth": number;
         /**
           * 尺寸标识，仅影响样式（边框、把手大小等）
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 吸附步进（px）。>0 时，拖拽尺寸会对齐到该步进的整数倍。
-          * @default 0
          */
         "snap": number;
         /**
           * 初始宽度。可传数字（px）或任何合法 CSS 宽度值（如 '100%'）。拖拽后以 px 写回。
-          * @default 360
          */
         "width": number | string;
+    }
+    /**
+     * Result 结果页组件
+     * 用于反馈操作结果
+     */
+    interface LdesignResult {
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 结果状态
+         */
+        "status": 'success' | 'error' | 'info' | 'warning' | '404' | '403' | '500';
+        /**
+          * 副标题/描述
+         */
+        "subTitle"?: string;
+        /**
+          * 标题
+         */
+        "title"?: string;
     }
     /**
      * Ripple 水波纹效果
@@ -4851,7 +4326,6 @@ export namespace Components {
     interface LdesignRipple {
         /**
           * 是否居中触发
-          * @default false
          */
         "centered": boolean;
         /**
@@ -4864,117 +4338,94 @@ export namespace Components {
         "customClass"?: string;
         /**
           * 波纹方向
-          * @default 'outward'
          */
         "direction": 'outward' | 'inward' | 'both';
         /**
           * 禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 膨胀动画时长(ms)
-          * @default 600
          */
         "duration": number;
         /**
           * 缓动函数
-          * @default 'cubic-bezier(0.4, 0, 0.2, 1)'
          */
         "easing": string;
         /**
           * 淡出时长(ms)
-          * @default 300
          */
         "fadeOutDuration": number;
         /**
           * 是否启用发光效果
-          * @default false
          */
         "glow": boolean;
         /**
           * 发光强度
-          * @default 0.5
          */
         "glowIntensity": number;
         /**
           * 是否启用振动反馈 (需要浏览器支持)
-          * @default false
          */
         "haptic": boolean;
         /**
           * 振动强度 (1-10)
-          * @default 5
          */
         "hapticIntensity": number;
         /**
           * 是否启用键盘触发 (Enter/Space)
-          * @default true
          */
         "keyboardEnabled": boolean;
         /**
           * 多层波纹延迟 (ms)
-          * @default 120
          */
         "layerDelay": number;
         /**
           * 同时存在的最大波纹数量
-          * @default 8
          */
         "maxRipples": number;
         /**
           * 是否启用多层波纹
-          * @default false
          */
         "multiLayer": boolean;
         /**
           * 波纹不透明度
-          * @default 0.24
          */
         "opacity": number;
         /**
           * 半径：auto 或固定像素
-          * @default 'auto'
          */
         "radius": 'auto' | number;
         /**
           * 波纹大小模式
-          * @default 'medium'
          */
-        "size": 'small' | 'medium' | 'large' | 'extra-large';
+        "rippleSize": 'small' | 'medium' | 'large' | 'extra-large';
         /**
           * 是否启用声音反馈
-          * @default false
          */
         "sound": boolean;
         /**
           * 声音音量 (0-1)
-          * @default 0.1
          */
         "soundVolume": number;
         /**
           * 最小触发间隔 (ms)
-          * @default 0
          */
         "throttle": number;
         /**
           * 是否允许触摸设备
-          * @default true
          */
         "touchEnabled": boolean;
         /**
           * 触发方式
-          * @default 'pointerdown'
          */
         "trigger": 'pointerdown' | 'mousedown' | 'click';
         /**
           * 是否不裁剪边界
-          * @default false
          */
         "unbounded": boolean;
         /**
           * 波纹效果类型
-          * @default 'default'
          */
         "variant": 'default' | 'light' | 'strong' | 'pulse' | 'gradient';
     }
@@ -5014,38 +4465,31 @@ export namespace Components {
     interface LdesignScrollbar {
         /**
           * 是否一直显示（默认悬浮显示）
-          * @default false
          */
         "always": boolean;
         /**
           * 自动隐藏延迟（ms）。<=0 表示不自动隐藏（与 always 类似，但 hover 仍会显示）
-          * @default 800
          */
         "autoHideDelay": number;
         /**
           * 方向：vertical | horizontal | both
-          * @default 'both'
          */
         "direction": 'vertical' | 'horizontal' | 'both';
         /**
           * 是否禁用滚动交互
-          * @default false
          */
         "disabled": boolean;
         /**
           * 拖拽滚动（鼠标中键，或按住 Alt+左键）
-          * @default false
          */
         "dragScroll": boolean;
         /**
           * 拖拽触发方式：middle（中键）| left-alt（Alt+左键）| left（左键）
-          * @default 'middle'
          */
         "dragScrollTrigger": 'middle' | 'left-alt' | 'left';
         "getMetrics": () => Promise<any>;
         /**
           * 水平条位置：bottom | top
-          * @default 'bottom'
          */
         "hPosition": 'bottom' | 'top';
         "hideBars": () => Promise<void>;
@@ -5056,32 +4500,26 @@ export namespace Components {
         "initialScrollTop"?: number;
         /**
           * 键盘步进（像素）
-          * @default 40
          */
         "keyStep": number;
         /**
           * 是否启用键盘控制（wrap 聚焦时）
-          * @default true
          */
         "keyboard": boolean;
         /**
           * 布局：overlay 叠加在内容之上；space 预留滚动条空间
-          * @default 'overlay'
          */
         "layout": 'overlay' | 'space';
         /**
           * 使用原生滚动条，不渲染自定义轨道/拇指并且不隐藏系统滚动条
-          * @default false
          */
         "native": boolean;
         /**
           * PageUp/PageDown 的步进（像素），<=0 时按可视高度
-          * @default 0
          */
         "pageStep": number;
         /**
           * RTL 文字方向（用于水平滚动与 scrollLeft 归一化）
-          * @default false
          */
         "rtl": boolean;
         "scrollByDelta": (options: ScrollToOptions) => Promise<void>;
@@ -5104,7 +4542,6 @@ export namespace Components {
         "setCssVars": (vars: Record<string, string | number>) => Promise<void>;
         /**
           * 显示滚动阴影，提示可滚动方向
-          * @default false
          */
         "shadows": boolean;
         /**
@@ -5113,74 +4550,46 @@ export namespace Components {
         "showBarsNow": () => Promise<void>;
         /**
           * 是否显示微调按钮（上下/左右）
-          * @default false
          */
         "showButtons": boolean;
         /**
           * 平滑滚动
-          * @default false
          */
         "smooth": boolean;
-        /**
-          * @default 120
-         */
         "snapDelay": number;
-        /**
-          * @default true
-         */
         "snapEnabled": boolean;
-        /**
-          * @default 'start'
-         */
         "snapMode": 'start' | 'center' | 'end';
         /**
           * 吸附：滚动结束后吸附到最近匹配元素
          */
         "snapSelector"?: string;
-        /**
-          * @default 0
-         */
         "stickyBottom": number;
         /**
           * sticky 偏移（用于阴影起始位置）
-          * @default 0
          */
         "stickyTop": number;
-        /**
-          * @default 'both'
-         */
         "syncAxis": 'vertical' | 'horizontal' | 'both';
-        /**
-          * @default true
-         */
         "syncEnabled": boolean;
         /**
           * 同步滚动组与轴
          */
         "syncGroup"?: string;
-        /**
-          * @default 32
-         */
         "syncThrottle": number;
         /**
           * 最小拇指尺寸（px）
-          * @default 24
          */
         "thumbMinSize": number;
         /**
           * 滚动条类型：bar（仅拇指）| track（显示轨道）
-          * @default 'bar'
          */
         "type": 'bar' | 'track';
         "update": () => Promise<void>;
         /**
           * 垂直条位置：right | left
-          * @default 'right'
          */
         "vPosition": 'right' | 'left';
         /**
           * 滚轮事件是否允许向父容器传播（到达边缘时总是允许）
-          * @default false
          */
         "wheelPropagation": boolean;
     }
@@ -5191,12 +4600,10 @@ export namespace Components {
     interface LdesignSelect {
         /**
           * 是否显示箭头（默认不显示）
-          * @default false
          */
         "arrow": boolean;
         /**
           * 可清空
-          * @default false
          */
         "clearable": boolean;
         /**
@@ -5209,12 +4616,10 @@ export namespace Components {
         "defaultValue"?: string | string[];
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 列表最大高度（px）
-          * @default 240
          */
         "maxHeight": number;
         /**
@@ -5223,32 +4628,26 @@ export namespace Components {
         "maxTagCount"?: number;
         /**
           * 是否多选
-          * @default false
          */
         "multiple": boolean;
         /**
           * 选项列表（可传数组或 JSON 字符串）
-          * @default []
          */
         "options": string | SelectOption[];
         /**
           * 占位文案（无选中项时）
-          * @default '请选择'
          */
         "placeholder": string;
         /**
           * 出现位置（默认 bottom-start）
-          * @default 'bottom-start'
          */
         "placement": SelectPlacement;
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme": 'light' | 'dark';
         /**
           * 触发方式（Select 多数使用 click 或 manual）
-          * @default 'click'
          */
         "trigger": SelectTrigger;
         /**
@@ -5257,7 +4656,6 @@ export namespace Components {
         "value"?: string | string[];
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
-          * @default false
          */
         "visible": boolean;
         /**
@@ -5266,48 +4664,94 @@ export namespace Components {
         "width"?: number | string;
     }
     /**
+     * Skeleton 骨架屏组件
+     * 用于内容加载时的占位效果
+     */
+    interface LdesignSkeleton {
+        /**
+          * 是否显示动画
+         */
+        "animated": boolean;
+        /**
+          * 是否显示头像
+         */
+        "avatar": boolean;
+        /**
+          * 头像形状
+         */
+        "avatarShape": 'circle' | 'square';
+        /**
+          * 头像大小
+         */
+        "avatarSize": 'small' | 'medium' | 'large';
+        /**
+          * 圆角
+         */
+        "borderRadius"?: string | number;
+        /**
+          * 高度
+         */
+        "height"?: string | number;
+        /**
+          * 是否加载中
+         */
+        "loading": boolean;
+        /**
+          * 段落配置
+         */
+        "paragraph": boolean;
+        /**
+          * 渲染行数
+         */
+        "rows": number;
+        /**
+          * 是否显示标题
+         */
+        "title": boolean;
+        /**
+          * 骨架屏类型
+         */
+        "type": 'text' | 'rect' | 'circle' | 'image';
+        /**
+          * 宽度
+         */
+        "width"?: string | number;
+    }
+    /**
      * Slider 滑块组件
      * 通过拖动滑块在一定数值区间内进行选择
      */
     interface LdesignSlider {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 最大值
-          * @default 100
          */
         "max": number;
         /**
           * 最小值
-          * @default 0
          */
         "min": number;
         /**
           * 是否显示当前值提示
-          * @default false
          */
         "showTooltip": boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 步长（> 0）
-          * @default 1
          */
         "step": number;
         /**
           * 当前值
-          * @default 0
          */
         "value": number;
         /**
           * 是否垂直方向
-          * @default false
          */
         "vertical": boolean;
     }
@@ -5318,34 +4762,53 @@ export namespace Components {
     interface LdesignSpace {
         /**
           * 交叉轴对齐方式
-          * @default 'center'
          */
         "align": 'start' | 'center' | 'end' | 'baseline';
         /**
           * 是否占满容器宽度
-          * @default false
          */
         "block": boolean;
         /**
           * 是否自动换行（仅在横向时有效）
-          * @default false
          */
         "breakLine": boolean;
         /**
           * 间距方向
-          * @default 'horizontal'
          */
         "direction": 'horizontal' | 'vertical';
         /**
           * 间距尺寸。可选预设：small | medium | large；也可传数字，单位为 px
-          * @default 'medium'
          */
         "size": Size | number | string;
         /**
           * 分隔符样式：none 不显示分隔符；line 使用 1px 分隔线
-          * @default 'none'
          */
         "split": 'none' | 'line';
+    }
+    /**
+     * Spin 加载指示器组件
+     */
+    interface LdesignSpin {
+        /**
+          * 延迟显示加载效果的时间（毫秒）
+         */
+        "delay": number;
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 是否加载中
+         */
+        "spinning": boolean;
+        /**
+          * 提示文字
+         */
+        "tip"?: string;
     }
     /**
      * Split 面板分割
@@ -5359,53 +4822,125 @@ export namespace Components {
     interface LdesignSplit {
         /**
           * 折叠状态下是否允许通过拖拽恢复
-          * @default true
          */
         "allowDragExpandWhenCollapsed": boolean;
         /**
           * 折叠状态：none | start | end
-          * @default 'none'
          */
         "collapsed": 'none' | 'start' | 'end';
         /**
           * 折叠后保留的尺寸（px）
-          * @default 0
          */
         "collapsedSize": number;
         /**
           * 是否显示快捷折叠按钮
-          * @default false
          */
         "collapsible": boolean;
         /**
           * 分割方向：vertical=左右，horizontal=上下
-          * @default 'vertical'
          */
         "direction": 'vertical' | 'horizontal';
         /**
           * 是否禁用拖拽
-          * @default false
          */
         "disabled": boolean;
         /**
           * 起始/末尾面板的最小尺寸（px）
-          * @default 80
          */
         "firstMin": number;
-        /**
-          * @default 80
-         */
         "secondMin": number;
         /**
           * 分割条厚度（px）
-          * @default 6
          */
         "splitterSize": number;
         /**
           * 起始面板比例（0~1）。拖拽过程中会以小数写回
-          * @default 0.5
          */
         "value": number;
+    }
+    /**
+     * Statistic 统计数值组件
+     * 展示统计数值，支持动画效果
+     */
+    interface LdesignStatistic {
+        /**
+          * 是否启用数字动画
+         */
+        "animated": boolean;
+        /**
+          * 小数点
+         */
+        "decimalSeparator": string;
+        /**
+          * 动画持续时间（毫秒）
+         */
+        "duration": number;
+        /**
+          * 精度（小数位数）
+         */
+        "precision": number;
+        /**
+          * 前缀
+         */
+        "prefix"?: string;
+        /**
+          * 千分位分隔符
+         */
+        "separator": string;
+        /**
+          * 后缀
+         */
+        "suffix"?: string;
+        /**
+          * 标题
+         */
+        "title"?: string;
+        /**
+          * 数值
+         */
+        "value": number;
+        /**
+          * 数值颜色
+         */
+        "valueColor"?: string;
+    }
+    /**
+     * StepItem 步骤项
+     */
+    interface LdesignStepItem {
+        /**
+          * 描述
+         */
+        "description"?: string;
+        /**
+          * 图标
+         */
+        "icon"?: string;
+        /**
+          * 标题
+         */
+        "title": string;
+    }
+    /**
+     * Steps 步骤条组件
+     */
+    interface LdesignSteps {
+        /**
+          * 当前步骤
+         */
+        "current": number;
+        /**
+          * 步骤条方向
+         */
+        "direction": 'horizontal' | 'vertical';
+        /**
+          * 步骤条尺寸
+         */
+        "size": 'small' | 'default';
+        /**
+          * 当前步骤的状态
+         */
+        "status": 'wait' | 'process' | 'finish' | 'error';
     }
     /**
      * ldesign-swiper 轮播图组件
@@ -5424,17 +4959,14 @@ export namespace Components {
     interface LdesignSwiper {
         /**
           * 允许触摸/鼠标拖拽
-          * @default true
          */
         "allowTouchMove": boolean;
         /**
           * 自动播放
-          * @default false
          */
         "autoplay": boolean;
         /**
           * 自动播放间隔（毫秒）
-          * @default 3000
          */
         "autoplayDelay": number;
         /**
@@ -5443,70 +4975,57 @@ export namespace Components {
         "defaultValue"?: number;
         /**
           * 方向
-          * @default 'horizontal'
          */
         "direction": 'horizontal' | 'vertical';
         /**
           * 交互后是否禁用自动播放
-          * @default true
          */
         "disableOnInteraction": boolean;
         /**
           * 拖拽时显示抓手光标
-          * @default true
          */
         "grabCursor": boolean;
         /**
           * 键盘控制
-          * @default false
          */
         "keyboard": boolean;
         /**
           * 循环播放
-          * @default false
          */
         "loop": boolean;
         /**
           * 鼠标拖拽（PC）
-          * @default true
          */
         "mouseDrag": boolean;
         /**
           * 是否显示导航按钮
-          * @default true
          */
         "navigation": boolean;
         "next": () => Promise<void>;
         /**
           * 是否显示分页圆点
-          * @default true
          */
         "pagination": boolean;
         /**
           * 悬浮暂停自动播放
-          * @default true
          */
         "pauseOnHover": boolean;
         "prev": () => Promise<void>;
         "slideTo": (index: number, opts?: { immediate?: boolean; }) => Promise<void>;
         /**
           * 每屏显示的滑块数量（>=1）
-          * @default 1
          */
         "slidesPerView": number;
         /**
           * 滑块间距（像素）
-          * @default 0
          */
         "spaceBetween": number;
         /**
           * 动画过渡时长（毫秒）
-          * @default 300
          */
         "speed": number;
         /**
           * 触发切换的拖拽阈值（像素）
-          * @default 50
          */
         "threshold": number;
         "update": () => Promise<void>;
@@ -5522,7 +5041,6 @@ export namespace Components {
     interface LdesignSwiperSlide {
         /**
           * 激活态（由父级 ldesign-swiper 控制）
-          * @default false
          */
         "active": boolean;
     }
@@ -5533,7 +5051,6 @@ export namespace Components {
     interface LdesignSwitch {
         /**
           * 是否选中
-          * @default false
          */
         "checked": boolean;
         /**
@@ -5546,32 +5063,26 @@ export namespace Components {
         "checkedText"?: string;
         /**
           * 选中时的值
-          * @default true
          */
         "checkedValue"?: string | number | boolean;
         /**
           * 颜色风格 可选：brand | success | warning | error | neutral
-          * @default 'brand'
          */
         "color": 'brand' | 'success' | 'warning' | 'error' | 'neutral';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 是否加载中
-          * @default false
          */
         "loading": boolean;
         /**
           * 形状 可选：pill（胶囊）| rounded（圆角）| square（直角）
-          * @default 'pill'
          */
         "shape": 'pill' | 'rounded' | 'square';
         /**
           * 开关尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
@@ -5584,12 +5095,10 @@ export namespace Components {
         "uncheckedText"?: string;
         /**
           * 未选中时的值
-          * @default false
          */
         "uncheckedValue"?: string | number | boolean;
         /**
           * 外观样式 可选：solid | soft | outline | ghost
-          * @default 'solid'
          */
         "variant": 'solid' | 'soft' | 'outline' | 'ghost';
     }
@@ -5600,7 +5109,6 @@ export namespace Components {
     interface LdesignTabPanel {
         /**
           * 由父组件控制的激活状态（反射到属性便于样式控制）
-          * @default false
          */
         "active": boolean;
         /**
@@ -5609,17 +5117,14 @@ export namespace Components {
         "badge"?: string | number;
         /**
           * 是否可关闭（在标签上显示关闭按钮）
-          * @default false
          */
         "closable": boolean;
         /**
           * 销毁隐藏：在面板隐藏时销毁内容，再次显示时重新渲染
-          * @default false
          */
         "destroyOnHide": boolean;
         /**
           * 禁用状态（不可被激活）
-          * @default false
          */
         "disabled": boolean;
         /**
@@ -5632,12 +5137,10 @@ export namespace Components {
         "label": string;
         /**
           * 懒渲染：首次激活时才渲染插槽内容，之后保持渲染
-          * @default false
          */
         "lazy": boolean;
         /**
           * 加载中状态
-          * @default false
          */
         "loading": boolean;
         /**
@@ -5646,14 +5149,70 @@ export namespace Components {
         "name": string;
         /**
           * 过渡动画类型
-          * @default 'fade'
          */
         "transition": 'fade' | 'slide' | 'zoom' | 'none';
         /**
           * 过渡动画时长（毫秒）
-          * @default 300
          */
         "transitionDuration": number;
+    }
+    /**
+     * Table 高性能数据表格组件
+     * 支持虚拟滚动、排序、筛选、固定列/表头
+     */
+    interface LdesignTable {
+        /**
+          * 是否显示边框
+         */
+        "bordered": boolean;
+        /**
+          * 表格列配置
+         */
+        "columns": TableColumn[] | string;
+        /**
+          * 表格数据
+         */
+        "dataSource": any[] | string;
+        /**
+          * 空数据提示文字
+         */
+        "emptyText": string;
+        /**
+          * 表格高度（启用虚拟滚动时必须指定）
+         */
+        "height"?: number | string;
+        /**
+          * 是否允许hover高亮
+         */
+        "hoverable": boolean;
+        /**
+          * 是否加载中
+         */
+        "loading": boolean;
+        /**
+          * 行高（用于虚拟滚动）
+         */
+        "rowHeight": number;
+        /**
+          * 行键值字段
+         */
+        "rowKey": string;
+        /**
+          * 是否显示表头
+         */
+        "showHeader": boolean;
+        /**
+          * 表格大小
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 是否显示斑马纹
+         */
+        "striped": boolean;
+        /**
+          * 是否启用虚拟滚动
+         */
+        "virtual": boolean;
     }
     /**
      * Tabs 选项卡组件
@@ -5663,12 +5222,10 @@ export namespace Components {
         "addTab": (options: { name: string; label: string; icon?: string; closable?: boolean; }) => Promise<HTMLLdesignTabPanelElement>;
         /**
           * 是否显示新增按钮
-          * @default false
          */
         "addable": boolean;
         /**
           * 动画过渡时长（毫秒）
-          * @default 300
          */
         "animationDuration": number;
         /**
@@ -5677,39 +5234,32 @@ export namespace Components {
         "defaultValue"?: string;
         /**
           * 选项卡位置
-          * @default 'top'
          */
         "placement": TabsPlacement;
         "removeTab": (name: string) => Promise<void>;
         /**
           * 是否自动适应响应式布局
-          * @default true
          */
         "responsive": boolean;
         "selectTab": (name: string) => Promise<void>;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": Size;
         /**
           * 是否可拖拽排序
-          * @default false
          */
         "sortable": boolean;
         /**
           * 是否启用触摸滑动切换
-          * @default false
          */
         "swipeable": boolean;
         /**
           * 选项卡外观类型
-          * @default 'line'
          */
         "type": TabsType;
         /**
           * 是否隐藏超出部分的标签页（使用更多下拉菜单）
-          * @default false
          */
         "useDropdown": boolean;
         /**
@@ -5728,37 +5278,30 @@ export namespace Components {
         "badge"?: string | number;
         /**
           * 右上角角标脉动效果
-          * @default false
          */
         "badgePulse": boolean;
         /**
           * 是否显示边框动画（仅在 checkable 或 clickable 时有效）
-          * @default false
          */
         "borderAnimation": boolean;
         /**
           * 是否可选（切换选中态）
-          * @default false
          */
         "checkable": boolean;
         /**
           * 是否可点击（非选中态），用于标签作为动作的场景
-          * @default false
          */
         "clickable": boolean;
         /**
           * 是否可关闭
-          * @default false
          */
         "closable": boolean;
         /**
           * 关闭按钮的无障碍文案
-          * @default '关闭标签'
          */
         "closeAriaLabel": string;
         /**
           * 语义颜色
-          * @default 'default'
          */
         "color": 'default' | 'primary' | 'success' | 'warning' | 'danger';
         /**
@@ -5767,17 +5310,14 @@ export namespace Components {
         "customColor"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 右上角小圆点
-          * @default false
          */
         "dot": boolean;
         /**
           * 效果风格：none（默认）、gradient（渐变）、glass（毛玻璃）、neon（霓虹）
-          * @default 'none'
          */
         "effect": 'none' | 'gradient' | 'glass' | 'neon';
         /**
@@ -5786,27 +5326,22 @@ export namespace Components {
         "icon"?: string;
         /**
           * 加载状态
-          * @default false
          */
         "loading": boolean;
         /**
           * 选中状态（与 checkable 配合使用）
-          * @default false
          */
         "selected": boolean;
         /**
           * 形状（rectangle：直角；round：全圆角；pill：胶囊）
-          * @default 'rectangle'
          */
         "shape": 'rectangle' | 'round' | 'pill';
         /**
           * 尺寸（small/middle/large，兼容 medium）
-          * @default 'middle'
          */
         "size": Size;
         /**
           * 外观风格 - light: 浅色背景（默认） - solid: 实底 - outline: 描边 - ghost: 透明背景，悬停有轻微填充 - dashed: 虚线描边 - elevated: 浅色+阴影
-          * @default 'light'
          */
         "variant": 'light' | 'solid' | 'outline' | 'ghost' | 'dashed' | 'elevated';
     }
@@ -5820,165 +5355,124 @@ export namespace Components {
     interface LdesignTagGroup {
         /**
           * 添加按钮文本
-          * @default '+ 添加标签'
          */
         "addText": string;
         /**
           * 是否显示添加按钮
-          * @default false
          */
         "addable": boolean;
         /**
           * 新标签默认颜色
-          * @default 'default'
          */
         "defaultColor": 'default' | 'primary' | 'success' | 'warning' | 'danger';
         /**
           * 新标签默认样式
-          * @default 'light'
          */
         "defaultVariant": 'light' | 'solid' | 'outline' | 'ghost' | 'dashed' | 'elevated';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 是否启用拖拽排序
-          * @default false
          */
         "enableDrag": boolean;
         /**
           * 输入框占位符
-          * @default '请输入标签名'
          */
         "inputPlaceholder": string;
         /**
           * more 模式下最多展示的项数（超出将折叠）
-          * @default 5
          */
         "maxVisible": number;
         /**
           * more 展示文本前缀，例如 "+"
-          * @default '+'
          */
         "morePrefix": string;
         /**
           * 溢出策略：wrap（自动换行） | more（+N 收纳）
-          * @default 'wrap'
          */
         "overflow": 'wrap' | 'more';
         /**
           * 标签数据（受控模式）
-          * @default []
          */
         "tags": TagData[];
     }
     interface LdesignTimePicker {
         "breakpoints"?: Breakpoints1;
-        /**
-          * @default false
-         */
         "clearable": boolean;
-        /**
-          * @default true
-         */
         "confirm": boolean;
         "defaultValue"?: string;
-        /**
-          * @default false
-         */
         "disabled": boolean;
         "disabledHours"?: number[];
         "disabledMinutes"?: number[];
         "disabledSeconds"?: number[];
-        /**
-          * @default 'bottom'
-         */
         "drawerPlacement": 'left' | 'right' | 'top' | 'bottom';
         "drawerSize"?: number | string;
         "drawerTitle"?: string;
         "endValue"?: string;
-        /**
-          * @default 1
-         */
         "hourStep": number;
-        /**
-          * @default false
-         */
         "inline": boolean;
-        /**
-          * @default false
-         */
         "loading": boolean;
         "locale"?: TimePickerLocale;
         "maxTime"?: string;
         "minTime"?: string;
-        /**
-          * @default 1
-         */
         "minuteStep": number;
-        /**
-          * @default '24h'
-         */
         "outputFormat": '12h' | '24h';
-        /**
-          * @default 'auto'
-         */
         "overlay": TimePickerOverlay;
         "panelHeight"?: number;
-        /**
-          * @default '选择时间'
-         */
         "placeholder": string;
-        /**
-          * @default 'bottom-start' as Placement
-         */
         "placement": Placement;
         "presets"?: TimePreset[];
-        /**
-          * @default false
-         */
         "range": boolean;
-        /**
-          * @default false
-         */
         "readonly": boolean;
-        /**
-          * @default 1
-         */
         "secondStep": number;
         /**
           * 是否展示"此刻"快捷按钮
-          * @default true
          */
         "showNow": boolean;
-        /**
-          * @default true
-         */
         "showSeconds": boolean;
-        /**
-          * @default 'medium'
-         */
         "size": TimePickerSize;
         "startValue"?: string;
-        /**
-          * @default [1, 1, 1]
-         */
         "steps": number[];
-        /**
-          * @default 'click'
-         */
         "trigger": TimePickerTrigger;
         "value"?: string;
-        /**
-          * @default false
-         */
         "visible": boolean;
-        /**
-          * @default 5
-         */
         "visibleItems": number;
+    }
+    /**
+     * Timeline 时间轴组件
+     */
+    interface LdesignTimeline {
+        /**
+          * 时间轴模式
+         */
+        "mode": 'left' | 'right' | 'alternate';
+        /**
+          * 是否反转
+         */
+        "reverse": boolean;
+    }
+    /**
+     * TimelineItem 时间轴项
+     */
+    interface LdesignTimelineItem {
+        /**
+          * 节点颜色
+         */
+        "color": 'primary' | 'success' | 'warning' | 'error' | 'gray';
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 标签文字
+         */
+        "label"?: string;
+        /**
+          * 时间戳
+         */
+        "timestamp"?: string;
     }
     /**
      * Tooltip 工具提示组件
@@ -5987,22 +5481,18 @@ export namespace Components {
     interface LdesignTooltip {
         /**
           * 动画类型
-          * @default 'scale'
          */
         "animation": TooltipAnimation;
         /**
           * 是否显示箭头
-          * @default true
          */
         "arrow": boolean;
         /**
           * 自动关闭延迟
-          * @default 0
          */
         "autoCloseDelay": number;
         /**
           * 是否显示关闭按钮（仅click触发时有效）
-          * @default false
          */
         "closable": boolean;
         /**
@@ -6011,62 +5501,50 @@ export namespace Components {
         "content": string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled": boolean;
         /**
           * 延迟隐藏时间（毫秒）
-          * @default 100
          */
         "hideDelay": number;
         /**
           * 是否可交互（hover时鼠标可以移入tooltip）
-          * @default false
          */
         "interactive": boolean;
         /**
           * 是否在滚动时锁定位置
-          * @default false
          */
         "lockOnScroll": boolean;
         /**
           * 最大宽度
-          * @default 250
          */
         "maxWidth": number | string;
         /**
           * 动画位移距离
-          * @default 10
          */
         "motionDistance": number;
         /**
           * 动画时长
-          * @default 200
          */
         "motionDuration": number;
         /**
           * 与触发元素的间距
-          * @default 8
          */
         "offsetDistance": number | string;
         /**
           * 提示位置
-          * @default 'top'
          */
         "placement": TooltipPlacement;
         /**
           * 延迟显示时间（毫秒）
-          * @default 100
          */
         "showDelay": number;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size": TooltipSize;
         /**
           * 主题：深色/浅色（默认深色）
-          * @default 'dark'
          */
         "theme": 'dark' | 'light';
         /**
@@ -6079,18 +5557,45 @@ export namespace Components {
         "tooltipTitle"?: string;
         /**
           * 触发方式
-          * @default 'hover'
          */
         "trigger": TooltipTrigger;
         /**
           * 是否受控显示
-          * @default false
          */
         "visible": boolean;
         /**
           * 宽度（覆盖maxWidth）
          */
         "width"?: number | string;
+    }
+    /**
+     * Tour 漫游式引导组件
+     */
+    interface LdesignTour {
+        /**
+          * 关闭引导
+         */
+        "close": () => Promise<void>;
+        /**
+          * 跳到指定步骤
+         */
+        "goTo": (index: number) => Promise<void>;
+        /**
+          * 下一步
+         */
+        "next": () => Promise<void>;
+        /**
+          * 是否打开
+         */
+        "open": boolean;
+        /**
+          * 上一步
+         */
+        "prev": () => Promise<void>;
+        /**
+          * 步骤配置
+         */
+        "steps": TourStep[] | string;
     }
     /**
      * Transfer 穿梭框
@@ -6103,32 +5608,26 @@ export namespace Components {
         "defaultValue"?: string[];
         /**
           * 禁用整个组件
-          * @default false
          */
         "disabled": boolean;
         /**
           * 是否可搜索
-          * @default false
          */
         "filterable": boolean;
         /**
           * 数据源（可传数组或 JSON 字符串）
-          * @default []
          */
         "items": string | TransferItem[];
         /**
           * 左侧面板标题
-          * @default '源列表'
          */
         "leftTitle": string;
         /**
           * 列表高度（px）
-          * @default 240
          */
         "listHeight": number;
         /**
           * 右侧面板标题
-          * @default '目标列表'
          */
         "rightTitle": string;
         /**
@@ -6137,13 +5636,9 @@ export namespace Components {
         "value"?: string[];
     }
     interface LdesignTree {
-        /**
-          * @default true
-         */
         "allowAfter": boolean;
         /**
           * 全局允许放置位置
-          * @default true
          */
         "allowBefore": boolean;
         /**
@@ -6154,13 +5649,9 @@ export namespace Components {
           * 自定义：是否允许在目标位置放置（JS 赋值）
          */
         "allowDrop"?: (dragNode: TreeNode, dropNode: TreeNode, position: 'before' | 'after' | 'inside') => boolean;
-        /**
-          * @default true
-         */
         "allowInside": boolean;
         /**
           * 是否显示复选框
-          * @default false
          */
         "checkable": boolean;
         /**
@@ -6175,12 +5666,10 @@ export namespace Components {
         "dataUrl"?: string;
         /**
           * 默认勾选项（非受控）
-          * @default []
          */
         "defaultCheckedKeys": string[] | string;
         /**
           * 默认展开项（非受控）
-          * @default []
          */
         "defaultExpandedKeys": string[] | string;
         /**
@@ -6189,7 +5678,6 @@ export namespace Components {
         "defaultValue"?: string | string[];
         /**
           * 拖拽悬停自动展开的延迟（毫秒）
-          * @default 400
          */
         "dragExpandDelay": number;
         "expand": (key: string) => Promise<void>;
@@ -6206,12 +5694,10 @@ export namespace Components {
         "getItems": () => Promise<TreeNode[]>;
         /**
           * 层级缩进（px）
-          * @default 16
          */
         "indent": number;
         /**
           * 树数据（可传入 JSON 字符串或对象数组）
-          * @default []
          */
         "items": string | TreeNode[];
         /**
@@ -6220,7 +5706,6 @@ export namespace Components {
         "itemsSelector"?: string;
         /**
           * 启用懒加载：展开时若无 children 则触发加载
-          * @default false
          */
         "lazy": boolean;
         /**
@@ -6234,33 +5719,27 @@ export namespace Components {
         "move": (dragKey: string, dropKey: string, position: "before" | "after" | "inside") => Promise<boolean>;
         /**
           * 是否多选
-          * @default false
          */
         "multiple": boolean;
         /**
           * 是否开启节点拖拽重排
-          * @default false
          */
         "nodeDraggable": boolean;
         /**
           * 懒加载参数名（dataUrl 模式下）：父键参数
-          * @default 'parent'
          */
         "parentParam": string;
         /**
           * 是否启用键盘重排（Alt+方向键）
-          * @default true
          */
         "reorderable": boolean;
         /**
           * 是否可选择（高亮）
-          * @default true
          */
         "selectable": boolean;
         "setItems": (items: string | TreeNode[]) => Promise<void>;
         /**
           * 是否显示连接线（简易）
-          * @default false
          */
         "showLine": boolean;
         /**
@@ -6271,6 +5750,123 @@ export namespace Components {
           * 当前选中项（受控，单选为 string，多选为 string[]）
          */
         "value"?: string | string[];
+    }
+    /**
+     * Upload 文件上传组件
+     */
+    interface LdesignUpload {
+        /**
+          * 接受的文件类型
+         */
+        "accept"?: string;
+        /**
+          * 是否禁用
+         */
+        "disabled": boolean;
+        /**
+          * 是否支持拖拽上传
+         */
+        "drag": boolean;
+        /**
+          * 最大文件数量
+         */
+        "maxCount"?: number;
+        /**
+          * 最大文件大小（字节）
+         */
+        "maxSize"?: number;
+        /**
+          * 是否支持多选
+         */
+        "multiple": boolean;
+    }
+    /**
+     * VirtualList 虚拟列表组件
+     * 高性能长列表渲染，仅渲染可见区域的项目
+     */
+    interface LdesignVirtualList {
+        /**
+          * 缓冲区项目数（渲染可见区域外的额外项目数）
+         */
+        "buffer": number;
+        /**
+          * 获取项目高度的函数（动态高度模式）
+         */
+        "getItemHeight"?: (index: number) => number;
+        /**
+          * 获取项目的唯一key
+         */
+        "getItemKey"?: (item: any, index: number) => string | number;
+        /**
+          * 容器高度
+         */
+        "height": number | string;
+        /**
+          * 水平模式
+         */
+        "horizontal": boolean;
+        /**
+          * 列表项高度（固定高度模式）
+         */
+        "itemHeight": number;
+        /**
+          * 列表项数据
+         */
+        "items": any[];
+        /**
+          * 渲染项目的函数
+         */
+        "renderItem": (item: any, index: number) => any;
+    }
+    /**
+     * Watermark 水印组件
+     * 为页面添加防删除水印
+     */
+    interface LdesignWatermark {
+        /**
+          * 水印文字
+         */
+        "content"?: string | string[];
+        /**
+          * 字体颜色
+         */
+        "fontColor": string;
+        /**
+          * 字体大小
+         */
+        "fontSize": number;
+        /**
+          * 水印间距
+         */
+        "gapX": number;
+        /**
+          * 垂直间距
+         */
+        "gapY": number;
+        /**
+          * 水印高度
+         */
+        "height": number;
+        /**
+          * 水印图片
+         */
+        "image"?: string;
+        /**
+          * 水印透明度
+         */
+        "opacity": number;
+        /**
+          * 旋转角度
+         */
+        "rotate": number;
+        /**
+          * 水印宽度
+         */
+        "width": number;
+        /**
+          * Z-index
+         */
+        "zIndex": number;
     }
 }
 export interface LDropdownPanelCustomEvent<T> extends CustomEvent<T> {
@@ -6352,6 +5948,10 @@ export interface LdesignDropdownCustomEvent<T> extends CustomEvent<T> {
 export interface LdesignEllipsisCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignEllipsisElement;
+}
+export interface LdesignFormCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignFormElement;
 }
 export interface LdesignImageCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -6457,6 +6057,10 @@ export interface LdesignTabPanelCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTabPanelElement;
 }
+export interface LdesignTableCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignTableElement;
+}
 export interface LdesignTabsCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTabsElement;
@@ -6473,6 +6077,10 @@ export interface LdesignTimePickerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTimePickerElement;
 }
+export interface LdesignTourCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignTourElement;
+}
 export interface LdesignTransferCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTransferElement;
@@ -6481,17 +6089,11 @@ export interface LdesignTreeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTreeElement;
 }
+export interface LdesignUploadCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignUploadElement;
+}
 declare global {
-    /**
-     * 组件基类
-     * 提供通用的属性和方法
-     */
-    interface HTMLBaseComponentElement extends Components.BaseComponent, HTMLStencilElement {
-    }
-    var HTMLBaseComponentElement: {
-        prototype: HTMLBaseComponentElement;
-        new (): HTMLBaseComponentElement;
-    };
     interface HTMLLDropdownPanelElementEventMap {
         "visibleChange": boolean;
     }
@@ -6552,6 +6154,25 @@ declare global {
         prototype: HTMLLdesignAlertElement;
         new (): HTMLLdesignAlertElement;
     };
+    /**
+     * Anchor 锚点组件
+     * 用于快速定位到页面内容
+     */
+    interface HTMLLdesignAnchorElement extends Components.LdesignAnchor, HTMLStencilElement {
+    }
+    var HTMLLdesignAnchorElement: {
+        prototype: HTMLLdesignAnchorElement;
+        new (): HTMLLdesignAnchorElement;
+    };
+    /**
+     * AnchorLink 锚点链接
+     */
+    interface HTMLLdesignAnchorLinkElement extends Components.LdesignAnchorLink, HTMLStencilElement {
+    }
+    var HTMLLdesignAnchorLinkElement: {
+        prototype: HTMLLdesignAnchorLinkElement;
+        new (): HTMLLdesignAnchorLinkElement;
+    };
     interface HTMLLdesignAvatarElementEventMap {
         "ldesignLoad": { width: number; height: number; src: string };
         "ldesignError": { src?: string; error: string };
@@ -6604,6 +6225,25 @@ declare global {
         prototype: HTMLLdesignBacktopElement;
         new (): HTMLLdesignBacktopElement;
     };
+    /**
+     * Breadcrumb 面包屑组件
+     * 显示当前页面的路径
+     */
+    interface HTMLLdesignBreadcrumbElement extends Components.LdesignBreadcrumb, HTMLStencilElement {
+    }
+    var HTMLLdesignBreadcrumbElement: {
+        prototype: HTMLLdesignBreadcrumbElement;
+        new (): HTMLLdesignBreadcrumbElement;
+    };
+    /**
+     * BreadcrumbItem 面包屑项
+     */
+    interface HTMLLdesignBreadcrumbItemElement extends Components.LdesignBreadcrumbItem, HTMLStencilElement {
+    }
+    var HTMLLdesignBreadcrumbItemElement: {
+        prototype: HTMLLdesignBreadcrumbItemElement;
+        new (): HTMLLdesignBreadcrumbItemElement;
+    };
     interface HTMLLdesignButtonElementEventMap {
         "ldesignClick": MouseEvent;
     }
@@ -6648,6 +6288,16 @@ declare global {
     var HTMLLdesignCalendarElement: {
         prototype: HTMLLdesignCalendarElement;
         new (): HTMLLdesignCalendarElement;
+    };
+    /**
+     * Card 卡片组件
+     * 通用卡片容器
+     */
+    interface HTMLLdesignCardElement extends Components.LdesignCard, HTMLStencilElement {
+    }
+    var HTMLLdesignCardElement: {
+        prototype: HTMLLdesignCardElement;
+        new (): HTMLLdesignCardElement;
     };
     interface HTMLLdesignCascaderElementEventMap {
         "ldesignChange": { value: string[] | undefined; options: CascaderOption[] };
@@ -6897,6 +6547,34 @@ declare global {
         prototype: HTMLLdesignDatePickerElement;
         new (): HTMLLdesignDatePickerElement;
     };
+    /**
+     * Descriptions 描述列表组件
+     */
+    interface HTMLLdesignDescriptionsElement extends Components.LdesignDescriptions, HTMLStencilElement {
+    }
+    var HTMLLdesignDescriptionsElement: {
+        prototype: HTMLLdesignDescriptionsElement;
+        new (): HTMLLdesignDescriptionsElement;
+    };
+    /**
+     * DescriptionsItem 描述项
+     */
+    interface HTMLLdesignDescriptionsItemElement extends Components.LdesignDescriptionsItem, HTMLStencilElement {
+    }
+    var HTMLLdesignDescriptionsItemElement: {
+        prototype: HTMLLdesignDescriptionsItemElement;
+        new (): HTMLLdesignDescriptionsItemElement;
+    };
+    /**
+     * Divider 分割线组件
+     * 用于分隔不同内容区域
+     */
+    interface HTMLLdesignDividerElement extends Components.LdesignDivider, HTMLStencilElement {
+    }
+    var HTMLLdesignDividerElement: {
+        prototype: HTMLLdesignDividerElement;
+        new (): HTMLLdesignDividerElement;
+    };
     interface HTMLLdesignDraggableElementEventMap {
         "ldesignTransformChange": { scale: number; rotate: number; offsetX: number; offsetY: number };
         "ldesignGestureStart": void;
@@ -6997,6 +6675,48 @@ declare global {
     var HTMLLdesignEllipsisElement: {
         prototype: HTMLLdesignEllipsisElement;
         new (): HTMLLdesignEllipsisElement;
+    };
+    /**
+     * Empty 空状态组件
+     * 用于展示空数据状态
+     */
+    interface HTMLLdesignEmptyElement extends Components.LdesignEmpty, HTMLStencilElement {
+    }
+    var HTMLLdesignEmptyElement: {
+        prototype: HTMLLdesignEmptyElement;
+        new (): HTMLLdesignEmptyElement;
+    };
+    interface HTMLLdesignFormElementEventMap {
+        "ldesignSubmit": Record<string, any>;
+        "ldesignReset": void;
+        "ldesignValidateError": Record<string, string>;
+    }
+    /**
+     * Form 表单组件
+     * 统一管理表单验证和数据
+     */
+    interface HTMLLdesignFormElement extends Components.LdesignForm, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignFormElementEventMap>(type: K, listener: (this: HTMLLdesignFormElement, ev: LdesignFormCustomEvent<HTMLLdesignFormElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignFormElementEventMap>(type: K, listener: (this: HTMLLdesignFormElement, ev: LdesignFormCustomEvent<HTMLLdesignFormElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignFormElement: {
+        prototype: HTMLLdesignFormElement;
+        new (): HTMLLdesignFormElement;
+    };
+    /**
+     * FormItem 表单项
+     */
+    interface HTMLLdesignFormItemElement extends Components.LdesignFormItem, HTMLStencilElement {
+    }
+    var HTMLLdesignFormItemElement: {
+        prototype: HTMLLdesignFormItemElement;
+        new (): HTMLLdesignFormItemElement;
     };
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -7177,6 +6897,51 @@ declare global {
     var HTMLLdesignInputNumberElement: {
         prototype: HTMLLdesignInputNumberElement;
         new (): HTMLLdesignInputNumberElement;
+    };
+    /**
+     * Layout 布局容器
+     */
+    interface HTMLLdesignLayoutElement extends Components.LdesignLayout, HTMLStencilElement {
+    }
+    var HTMLLdesignLayoutElement: {
+        prototype: HTMLLdesignLayoutElement;
+        new (): HTMLLdesignLayoutElement;
+    };
+    /**
+     * Layout Content
+     */
+    interface HTMLLdesignLayoutContentElement extends Components.LdesignLayoutContent, HTMLStencilElement {
+    }
+    var HTMLLdesignLayoutContentElement: {
+        prototype: HTMLLdesignLayoutContentElement;
+        new (): HTMLLdesignLayoutContentElement;
+    };
+    /**
+     * Layout Footer
+     */
+    interface HTMLLdesignLayoutFooterElement extends Components.LdesignLayoutFooter, HTMLStencilElement {
+    }
+    var HTMLLdesignLayoutFooterElement: {
+        prototype: HTMLLdesignLayoutFooterElement;
+        new (): HTMLLdesignLayoutFooterElement;
+    };
+    /**
+     * Layout Header
+     */
+    interface HTMLLdesignLayoutHeaderElement extends Components.LdesignLayoutHeader, HTMLStencilElement {
+    }
+    var HTMLLdesignLayoutHeaderElement: {
+        prototype: HTMLLdesignLayoutHeaderElement;
+        new (): HTMLLdesignLayoutHeaderElement;
+    };
+    /**
+     * Layout Sider
+     */
+    interface HTMLLdesignLayoutSiderElement extends Components.LdesignLayoutSider, HTMLStencilElement {
+    }
+    var HTMLLdesignLayoutSiderElement: {
+        prototype: HTMLLdesignLayoutSiderElement;
+        new (): HTMLLdesignLayoutSiderElement;
     };
     /**
      * Loading 加载组件
@@ -7518,6 +7283,16 @@ declare global {
         new (): HTMLLdesignResizeBoxElement;
     };
     /**
+     * Result 结果页组件
+     * 用于反馈操作结果
+     */
+    interface HTMLLdesignResultElement extends Components.LdesignResult, HTMLStencilElement {
+    }
+    var HTMLLdesignResultElement: {
+        prototype: HTMLLdesignResultElement;
+        new (): HTMLLdesignResultElement;
+    };
+    /**
      * Ripple 水波纹效果
      * 用法：把 <ldesign-ripple /> 放入任意元素内部（建议放最后），即可在该元素上获得点击水波纹效果。
      * 例如：
@@ -7588,6 +7363,16 @@ declare global {
         prototype: HTMLLdesignSelectElement;
         new (): HTMLLdesignSelectElement;
     };
+    /**
+     * Skeleton 骨架屏组件
+     * 用于内容加载时的占位效果
+     */
+    interface HTMLLdesignSkeletonElement extends Components.LdesignSkeleton, HTMLStencilElement {
+    }
+    var HTMLLdesignSkeletonElement: {
+        prototype: HTMLLdesignSkeletonElement;
+        new (): HTMLLdesignSkeletonElement;
+    };
     interface HTMLLdesignSliderElementEventMap {
         "ldesignInput": number;
         "ldesignChange": number;
@@ -7620,6 +7405,15 @@ declare global {
         prototype: HTMLLdesignSpaceElement;
         new (): HTMLLdesignSpaceElement;
     };
+    /**
+     * Spin 加载指示器组件
+     */
+    interface HTMLLdesignSpinElement extends Components.LdesignSpin, HTMLStencilElement {
+    }
+    var HTMLLdesignSpinElement: {
+        prototype: HTMLLdesignSpinElement;
+        new (): HTMLLdesignSpinElement;
+    };
     interface HTMLLdesignSplitElementEventMap {
         "ldesignSplitStart": { value: number; direction: 'vertical' | 'horizontal' };
         "ldesignSplit": { value: number; direction: 'vertical' | 'horizontal' };
@@ -7648,6 +7442,34 @@ declare global {
     var HTMLLdesignSplitElement: {
         prototype: HTMLLdesignSplitElement;
         new (): HTMLLdesignSplitElement;
+    };
+    /**
+     * Statistic 统计数值组件
+     * 展示统计数值，支持动画效果
+     */
+    interface HTMLLdesignStatisticElement extends Components.LdesignStatistic, HTMLStencilElement {
+    }
+    var HTMLLdesignStatisticElement: {
+        prototype: HTMLLdesignStatisticElement;
+        new (): HTMLLdesignStatisticElement;
+    };
+    /**
+     * StepItem 步骤项
+     */
+    interface HTMLLdesignStepItemElement extends Components.LdesignStepItem, HTMLStencilElement {
+    }
+    var HTMLLdesignStepItemElement: {
+        prototype: HTMLLdesignStepItemElement;
+        new (): HTMLLdesignStepItemElement;
+    };
+    /**
+     * Steps 步骤条组件
+     */
+    interface HTMLLdesignStepsElement extends Components.LdesignSteps, HTMLStencilElement {
+    }
+    var HTMLLdesignStepsElement: {
+        prototype: HTMLLdesignStepsElement;
+        new (): HTMLLdesignStepsElement;
     };
     interface HTMLLdesignSwiperElementEventMap {
         "ldesignChange": number;
@@ -7732,6 +7554,28 @@ declare global {
     var HTMLLdesignTabPanelElement: {
         prototype: HTMLLdesignTabPanelElement;
         new (): HTMLLdesignTabPanelElement;
+    };
+    interface HTMLLdesignTableElementEventMap {
+        "ldesignSort": TableSort;
+        "ldesignRowClick": { row: any; index: number };
+    }
+    /**
+     * Table 高性能数据表格组件
+     * 支持虚拟滚动、排序、筛选、固定列/表头
+     */
+    interface HTMLLdesignTableElement extends Components.LdesignTable, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignTableElementEventMap>(type: K, listener: (this: HTMLLdesignTableElement, ev: LdesignTableCustomEvent<HTMLLdesignTableElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignTableElementEventMap>(type: K, listener: (this: HTMLLdesignTableElement, ev: LdesignTableCustomEvent<HTMLLdesignTableElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignTableElement: {
+        prototype: HTMLLdesignTableElement;
+        new (): HTMLLdesignTableElement;
     };
     interface HTMLLdesignTabsElementEventMap {
         "ldesignChange": string;
@@ -7827,6 +7671,24 @@ declare global {
         new (): HTMLLdesignTimePickerElement;
     };
     /**
+     * Timeline 时间轴组件
+     */
+    interface HTMLLdesignTimelineElement extends Components.LdesignTimeline, HTMLStencilElement {
+    }
+    var HTMLLdesignTimelineElement: {
+        prototype: HTMLLdesignTimelineElement;
+        new (): HTMLLdesignTimelineElement;
+    };
+    /**
+     * TimelineItem 时间轴项
+     */
+    interface HTMLLdesignTimelineItemElement extends Components.LdesignTimelineItem, HTMLStencilElement {
+    }
+    var HTMLLdesignTimelineItemElement: {
+        prototype: HTMLLdesignTimelineItemElement;
+        new (): HTMLLdesignTimelineItemElement;
+    };
+    /**
      * Tooltip 工具提示组件
      * 基于最新 Popup 的轻量封装，继承所有新特性
      */
@@ -7835,6 +7697,28 @@ declare global {
     var HTMLLdesignTooltipElement: {
         prototype: HTMLLdesignTooltipElement;
         new (): HTMLLdesignTooltipElement;
+    };
+    interface HTMLLdesignTourElementEventMap {
+        "ldesignClose": void;
+        "ldesignStepChange": number;
+        "ldesignFinish": void;
+    }
+    /**
+     * Tour 漫游式引导组件
+     */
+    interface HTMLLdesignTourElement extends Components.LdesignTour, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignTourElementEventMap>(type: K, listener: (this: HTMLLdesignTourElement, ev: LdesignTourCustomEvent<HTMLLdesignTourElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignTourElementEventMap>(type: K, listener: (this: HTMLLdesignTourElement, ev: LdesignTourCustomEvent<HTMLLdesignTourElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignTourElement: {
+        prototype: HTMLLdesignTourElement;
+        new (): HTMLLdesignTourElement;
     };
     interface HTMLLdesignTransferElementEventMap {
         "ldesignChange": { value: string[]; movedKeys: string[]; direction: 'left' | 'right' };
@@ -7878,16 +7762,64 @@ declare global {
         prototype: HTMLLdesignTreeElement;
         new (): HTMLLdesignTreeElement;
     };
+    interface HTMLLdesignUploadElementEventMap {
+        "ldesignChange": UploadFile[];
+        "ldesignBeforeUpload": File;
+        "ldesignProgress": { file: UploadFile; percent: number };
+        "ldesignSuccess": UploadFile;
+        "ldesignError": { file: UploadFile; error: any };
+    }
+    /**
+     * Upload 文件上传组件
+     */
+    interface HTMLLdesignUploadElement extends Components.LdesignUpload, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignUploadElementEventMap>(type: K, listener: (this: HTMLLdesignUploadElement, ev: LdesignUploadCustomEvent<HTMLLdesignUploadElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignUploadElementEventMap>(type: K, listener: (this: HTMLLdesignUploadElement, ev: LdesignUploadCustomEvent<HTMLLdesignUploadElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignUploadElement: {
+        prototype: HTMLLdesignUploadElement;
+        new (): HTMLLdesignUploadElement;
+    };
+    /**
+     * VirtualList 虚拟列表组件
+     * 高性能长列表渲染，仅渲染可见区域的项目
+     */
+    interface HTMLLdesignVirtualListElement extends Components.LdesignVirtualList, HTMLStencilElement {
+    }
+    var HTMLLdesignVirtualListElement: {
+        prototype: HTMLLdesignVirtualListElement;
+        new (): HTMLLdesignVirtualListElement;
+    };
+    /**
+     * Watermark 水印组件
+     * 为页面添加防删除水印
+     */
+    interface HTMLLdesignWatermarkElement extends Components.LdesignWatermark, HTMLStencilElement {
+    }
+    var HTMLLdesignWatermarkElement: {
+        prototype: HTMLLdesignWatermarkElement;
+        new (): HTMLLdesignWatermarkElement;
+    };
     interface HTMLElementTagNameMap {
-        "base-component": HTMLBaseComponentElement;
         "l-dropdown-panel": HTMLLDropdownPanelElement;
         "ldesign-affix": HTMLLdesignAffixElement;
         "ldesign-alert": HTMLLdesignAlertElement;
+        "ldesign-anchor": HTMLLdesignAnchorElement;
+        "ldesign-anchor-link": HTMLLdesignAnchorLinkElement;
         "ldesign-avatar": HTMLLdesignAvatarElement;
         "ldesign-avatar-group": HTMLLdesignAvatarGroupElement;
         "ldesign-backtop": HTMLLdesignBacktopElement;
+        "ldesign-breadcrumb": HTMLLdesignBreadcrumbElement;
+        "ldesign-breadcrumb-item": HTMLLdesignBreadcrumbItemElement;
         "ldesign-button": HTMLLdesignButtonElement;
         "ldesign-calendar": HTMLLdesignCalendarElement;
+        "ldesign-card": HTMLLdesignCardElement;
         "ldesign-cascader": HTMLLdesignCascaderElement;
         "ldesign-checkbox": HTMLLdesignCheckboxElement;
         "ldesign-checkbox-group": HTMLLdesignCheckboxGroupElement;
@@ -7900,10 +7832,16 @@ declare global {
         "ldesign-color-picker-panel": HTMLLdesignColorPickerPanelElement;
         "ldesign-countdown": HTMLLdesignCountdownElement;
         "ldesign-date-picker": HTMLLdesignDatePickerElement;
+        "ldesign-descriptions": HTMLLdesignDescriptionsElement;
+        "ldesign-descriptions-item": HTMLLdesignDescriptionsItemElement;
+        "ldesign-divider": HTMLLdesignDividerElement;
         "ldesign-draggable": HTMLLdesignDraggableElement;
         "ldesign-drawer": HTMLLdesignDrawerElement;
         "ldesign-dropdown": HTMLLdesignDropdownElement;
         "ldesign-ellipsis": HTMLLdesignEllipsisElement;
+        "ldesign-empty": HTMLLdesignEmptyElement;
+        "ldesign-form": HTMLLdesignFormElement;
+        "ldesign-form-item": HTMLLdesignFormItemElement;
         "ldesign-grid": HTMLLdesignGridElement;
         "ldesign-grid-item": HTMLLdesignGridItemElement;
         "ldesign-icon": HTMLLdesignIconElement;
@@ -7913,6 +7851,11 @@ declare global {
         "ldesign-image-viewer": HTMLLdesignImageViewerElement;
         "ldesign-input": HTMLLdesignInputElement;
         "ldesign-input-number": HTMLLdesignInputNumberElement;
+        "ldesign-layout": HTMLLdesignLayoutElement;
+        "ldesign-layout-content": HTMLLdesignLayoutContentElement;
+        "ldesign-layout-footer": HTMLLdesignLayoutFooterElement;
+        "ldesign-layout-header": HTMLLdesignLayoutHeaderElement;
+        "ldesign-layout-sider": HTMLLdesignLayoutSiderElement;
         "ldesign-loading": HTMLLdesignLoadingElement;
         "ldesign-mention": HTMLLdesignMentionElement;
         "ldesign-menu": HTMLLdesignMenuElement;
@@ -7928,80 +7871,59 @@ declare global {
         "ldesign-radio-group": HTMLLdesignRadioGroupElement;
         "ldesign-rate": HTMLLdesignRateElement;
         "ldesign-resize-box": HTMLLdesignResizeBoxElement;
+        "ldesign-result": HTMLLdesignResultElement;
         "ldesign-ripple": HTMLLdesignRippleElement;
         "ldesign-row": HTMLLdesignRowElement;
         "ldesign-scrollbar": HTMLLdesignScrollbarElement;
         "ldesign-select": HTMLLdesignSelectElement;
+        "ldesign-skeleton": HTMLLdesignSkeletonElement;
         "ldesign-slider": HTMLLdesignSliderElement;
         "ldesign-space": HTMLLdesignSpaceElement;
+        "ldesign-spin": HTMLLdesignSpinElement;
         "ldesign-split": HTMLLdesignSplitElement;
+        "ldesign-statistic": HTMLLdesignStatisticElement;
+        "ldesign-step-item": HTMLLdesignStepItemElement;
+        "ldesign-steps": HTMLLdesignStepsElement;
         "ldesign-swiper": HTMLLdesignSwiperElement;
         "ldesign-swiper-slide": HTMLLdesignSwiperSlideElement;
         "ldesign-switch": HTMLLdesignSwitchElement;
         "ldesign-tab-panel": HTMLLdesignTabPanelElement;
+        "ldesign-table": HTMLLdesignTableElement;
         "ldesign-tabs": HTMLLdesignTabsElement;
         "ldesign-tag": HTMLLdesignTagElement;
         "ldesign-tag-group": HTMLLdesignTagGroupElement;
         "ldesign-time-picker": HTMLLdesignTimePickerElement;
+        "ldesign-timeline": HTMLLdesignTimelineElement;
+        "ldesign-timeline-item": HTMLLdesignTimelineItemElement;
         "ldesign-tooltip": HTMLLdesignTooltipElement;
+        "ldesign-tour": HTMLLdesignTourElement;
         "ldesign-transfer": HTMLLdesignTransferElement;
         "ldesign-tree": HTMLLdesignTreeElement;
+        "ldesign-upload": HTMLLdesignUploadElement;
+        "ldesign-virtual-list": HTMLLdesignVirtualListElement;
+        "ldesign-watermark": HTMLLdesignWatermarkElement;
     }
 }
 declare namespace LocalJSX {
-    /**
-     * 组件基类
-     * 提供通用的属性和方法
-     */
-    interface BaseComponent {
-        /**
-          * 组件类名
-         */
-        "class"?: string;
-        /**
-          * 组件ID
-         */
-        "componentId"?: string;
-        /**
-          * 是否禁用
-          * @default false
-         */
-        "disabled"?: boolean;
-        /**
-          * 组件尺寸
-          * @default 'medium'
-         */
-        "size"?: Size;
-        /**
-          * 主题
-          * @default 'light'
-         */
-        "theme"?: Theme;
-    }
     interface LDropdownPanel {
         /**
           * 动画模式：'scale' 展开动画，'slide' 滑动动画
-          * @default 'scale'
          */
         "animationMode"?: 'scale' | 'slide';
         /**
           * 动画持续时间（毫秒）
-          * @default 300
          */
         "duration"?: number;
         /**
           * 遮罩层背景色
-          * @default 'rgba(0, 0, 0, 0.3)'
          */
         "maskBackground"?: string;
         /**
           * 点击遮罩层是否关闭
-          * @default true
          */
         "maskClosable"?: boolean;
         /**
           * 面板最大高度
-          * @default '60vh'
          */
         "maxHeight"?: string;
         /**
@@ -8010,17 +7932,14 @@ declare namespace LocalJSX {
         "onVisibleChange"?: (event: LDropdownPanelCustomEvent<boolean>) => void;
         /**
           * 面板弹出位置，'top' 或 'bottom'，'auto' 自动判断
-          * @default 'auto'
          */
         "placement"?: 'top' | 'bottom' | 'auto';
         /**
           * 面板与遮罩边缘的安全距离（像素）
-          * @default 16
          */
         "safeDistance"?: number;
         /**
           * 面板是否可见
-          * @default false
          */
         "visible"?: boolean;
     }
@@ -8032,12 +7951,10 @@ declare namespace LocalJSX {
     interface LdesignAffix {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 距离顶部的偏移量（触发吸顶的阈值）
-          * @default 0
          */
         "offset"?: number;
         /**
@@ -8050,12 +7967,10 @@ declare namespace LocalJSX {
         "target"?: string;
         /**
           * 是否在指定滚动容器内部吸附（使用 position: sticky 策略） 仅当设置了 target 且 target 不是 window 时生效
-          * @default false
          */
         "withinTarget"?: boolean;
         /**
           * 自定义层级
-          * @default 1000
          */
         "zIndex"?: number;
     }
@@ -8070,22 +7985,18 @@ declare namespace LocalJSX {
         "alertTitle"?: string;
         /**
           * 是否启用动画效果
-          * @default true
          */
         "animated"?: boolean;
         /**
           * 横幅样式（常用于页面顶部）
-          * @default false
          */
         "banner"?: boolean;
         /**
           * 自定义边框宽度
-          * @default 1
          */
         "borderWidth"?: number;
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable"?: boolean;
         /**
@@ -8094,7 +8005,6 @@ declare namespace LocalJSX {
         "color"?: string;
         /**
           * 是否为紧凑模式
-          * @default false
          */
         "compact"?: boolean;
         /**
@@ -8107,27 +8017,22 @@ declare namespace LocalJSX {
         "iconName"?: string;
         /**
           * 启用滚动公告（Marquee）
-          * @default false
          */
         "marquee"?: boolean;
         /**
           * 方向
-          * @default 'left'
          */
         "marqueeDirection"?: 'left' | 'right';
         /**
           * 两段内容之间的间距（px）
-          * @default 24
          */
         "marqueeGap"?: number;
         /**
           * 悬停时是否暂停
-          * @default true
          */
         "marqueePauseOnHover"?: boolean;
         /**
           * 滚动速度（px/s）
-          * @default 60
          */
         "marqueeSpeed"?: number;
         /**
@@ -8136,34 +8041,59 @@ declare namespace LocalJSX {
         "onLdesignClose"?: (event: LdesignAlertCustomEvent<void>) => void;
         /**
           * 是否圆角
-          * @default true
          */
         "rounded"?: boolean;
         /**
           * 是否带有阴影效果
-          * @default false
          */
         "shadow"?: boolean;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: AlertSize;
         /**
           * 警告类型
-          * @default 'info'
          */
         "type"?: AlertType;
         /**
           * 样式变体
-          * @default 'light'
          */
         "variant"?: AlertVariant;
+    }
+    /**
+     * Anchor 锚点组件
+     * 用于快速定位到页面内容
+     */
+    interface LdesignAnchor {
+        /**
+          * 固定位置
+         */
+        "affix"?: boolean;
+        /**
+          * 滚动容器选择器
+         */
+        "container"?: string;
+        /**
+          * 距离窗口顶部偏移量
+         */
+        "offsetTop"?: number;
+    }
+    /**
+     * AnchorLink 锚点链接
+     */
+    interface LdesignAnchorLink {
+        /**
+          * 链接地址
+         */
+        "href": string;
+        /**
+          * 链接标题
+         */
+        "title": string;
     }
     /**
      * Avatar 头像
@@ -8181,7 +8111,6 @@ declare namespace LocalJSX {
         "alt"?: string;
         /**
           * 是否根据宽度自动缩放文字
-          * @default true
          */
         "autosize"?: boolean;
         /**
@@ -8190,22 +8119,18 @@ declare namespace LocalJSX {
         "background"?: string;
         /**
           * 是否显示徽标红点
-          * @default false
          */
         "badge"?: boolean;
         /**
           * 徽标颜色（红点/气泡背景色）
-          * @default '#ff4d4f'
          */
         "badgeColor"?: string;
         /**
           * 徽标偏移量
-          * @default [0, 0]
          */
         "badgeOffset"?: [number, number];
         /**
           * 徽标位置
-          * @default 'top-right'
          */
         "badgePosition"?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         /**
@@ -8214,22 +8139,18 @@ declare namespace LocalJSX {
         "badgeValue"?: number | string;
         /**
           * 是否显示边框
-          * @default false
          */
         "border"?: boolean;
         /**
           * 边框颜色
-          * @default '#e8e8e8'
          */
         "borderColor"?: string;
         /**
           * 边框宽度
-          * @default 2
          */
         "borderWidth"?: number;
         /**
           * 是否可点击（会添加悬浮效果）
-          * @default false
          */
         "clickable"?: boolean;
         /**
@@ -8238,12 +8159,10 @@ declare namespace LocalJSX {
         "color"?: string;
         /**
           * 图片填充模式
-          * @default 'cover'
          */
         "fit"?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down';
         /**
           * 文字与容器左右间距（px），仅文字头像生效
-          * @default 4
          */
         "gap"?: number;
         /**
@@ -8252,7 +8171,6 @@ declare namespace LocalJSX {
         "icon"?: string;
         /**
           * 是否显示加载态
-          * @default false
          */
         "loading"?: boolean;
         /**
@@ -8269,32 +8187,26 @@ declare namespace LocalJSX {
         "onLdesignLoad"?: (event: LdesignAvatarCustomEvent<{ width: number; height: number; src: string }>) => void;
         /**
           * 响应式尺寸（使用 CSS clamp 设置宽高）
-          * @default false
          */
         "responsive"?: boolean;
         /**
           * clamp 最大像素（responsive 为 true 时生效）
-          * @default 64
          */
         "responsiveMax"?: number;
         /**
           * clamp 中间项，接受任何 CSS 长度表达式，默认 10vw
-          * @default '10vw'
          */
         "responsiveMid"?: string;
         /**
           * clamp 最小像素（responsive 为 true 时生效）
-          * @default 28
          */
         "responsiveMin"?: number;
         /**
           * 形状：圆形或方形
-          * @default 'circle'
          */
         "shape"?: 'circle' | 'square';
         /**
           * 尺寸：预设 small/middle/medium/large 或自定义像素
-          * @default 'medium'
          */
         "size"?: 'small' | 'middle' | 'medium' | 'large' | number;
         /**
@@ -8331,12 +8243,10 @@ declare namespace LocalJSX {
     interface LdesignAvatarGroup {
         /**
           * 边框颜色（用于实现“描边”效果以区分重叠）
-          * @default '#fff'
          */
         "borderColor"?: string;
         /**
           * 重叠间距（正值，单位px），默认 8
-          * @default 8
          */
         "gap"?: number;
         /**
@@ -8373,6 +8283,37 @@ declare namespace LocalJSX {
           * @default 200
          */
         "visibilityHeight"?: number;
+    }
+    /**
+     * Breadcrumb 面包屑组件
+     * 显示当前页面的路径
+     */
+    interface LdesignBreadcrumb {
+        /**
+          * 分隔符
+         */
+        "separator"?: string;
+        /**
+          * 分隔符图标
+         */
+        "separatorIcon"?: string;
+    }
+    /**
+     * BreadcrumbItem 面包屑项
+     */
+    interface LdesignBreadcrumbItem {
+        /**
+          * 是否禁用
+         */
+        "disabled"?: boolean;
+        /**
+          * 链接地址
+         */
+        "href"?: string;
+        /**
+          * 图标
+         */
+        "icon"?: string;
     }
     /**
      * Button 按钮组件
@@ -8447,12 +8388,10 @@ declare namespace LocalJSX {
         "onLdesignClick"?: (event: LdesignButtonCustomEvent<MouseEvent>) => void;
         /**
           * 是否启用水波纹
-          * @default true
          */
         "ripple"?: boolean;
         /**
           * 是否居中触发
-          * @default false
          */
         "rippleCentered"?: boolean;
         /**
@@ -8461,37 +8400,30 @@ declare namespace LocalJSX {
         "rippleColor"?: string;
         /**
           * 扩散动画时长
-          * @default 550
          */
         "rippleDuration"?: number;
         /**
           * 缓动
-          * @default 'cubic-bezier(0.22, 0.61, 0.36, 1)'
          */
         "rippleEasing"?: string;
         /**
           * 淡出时长
-          * @default 260
          */
         "rippleFadeOutDuration"?: number;
         /**
           * 最大并发波纹数
-          * @default 6
          */
         "rippleMaxRipples"?: number;
         /**
           * 波纹不透明度
-          * @default 0.2
          */
         "rippleOpacity"?: number;
         /**
           * 触发方式
-          * @default 'pointerdown'
          */
         "rippleTrigger"?: 'pointerdown' | 'mousedown' | 'click';
         /**
           * 是否不裁剪边界
-          * @default false
          */
         "rippleUnbounded"?: boolean;
         /**
@@ -8519,23 +8451,13 @@ declare namespace LocalJSX {
         "variant"?: ButtonVariant;
     }
     interface LdesignCalendar {
-        /**
-          * @default true
-         */
         "allowCrossWeek"?: boolean;
-        /**
-          * @default true
-         */
         "allowMonthCrossWeek"?: boolean;
         "defaultValue"?: string;
         "disabledDate"?: (d: Date) => boolean;
-        /**
-          * @default false
-         */
         "draggableEvents"?: boolean;
         /**
           * 是否启用内置的CRUD功能
-          * @default true
          */
         "enableCrud"?: boolean;
         /**
@@ -8558,42 +8480,25 @@ declare namespace LocalJSX {
           * 事件数据（JS 设置），与 events 二选一，前者用于 attribute，后者用于 property
          */
         "eventsData"?: Array<CalEvent>;
-        /**
-          * @default 1
-         */
         "firstDayOfWeek"?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /**
-          * @default 'YYYY-MM-DD'
-         */
         "format"?: string;
-        /**
-          * @default 20
-         */
         "hourEnd"?: number;
         /**
           * 时间轴起止与步长（周/日视图）
-          * @default 8
          */
         "hourStart"?: number;
         /**
           * 自定义农历格式化（优先级高于内置），返回文本，例如 “初九” 或 “正月初一”
          */
         "lunarFormatter"?: (d: Date) => string;
-        /**
-          * @default 3
-         */
         "maxAllDayRows"?: number;
         "maxDate"?: string;
         "maxDuration"?: number;
         /**
           * 单元格最多展示的事件条数
-          * @default 3
          */
         "maxEventsPerCell"?: number;
         "minDate"?: string;
-        /**
-          * @default 15
-         */
         "minDuration"?: number;
         "onLdesignChange"?: (event: LdesignCalendarCustomEvent<string>) => void;
         "onLdesignEventClick"?: (event: LdesignCalendarCustomEvent<{ event: any }>) => void;
@@ -8602,37 +8507,58 @@ declare namespace LocalJSX {
         "onLdesignEventDrop"?: (event: LdesignCalendarCustomEvent<{ id?: string; title: string; oldStart?: string; oldEnd?: string; newStart: string; newEnd: string; allDay?: boolean }>) => void;
         "onLdesignEventEdit"?: (event: LdesignCalendarCustomEvent<{ event: any }>) => void;
         "onLdesignEventResize"?: (event: LdesignCalendarCustomEvent<{ id?: string; title: string; oldStart?: string; oldEnd?: string; newStart: string; newEnd: string }>) => void;
-        /**
-          * @default false
-         */
         "resizableEvents"?: boolean;
-        /**
-          * @default true
-         */
         "showAllDay"?: boolean;
         /**
           * 是否显示农历（默认关闭）。若浏览器支持 Intl Chinese Calendar，将自动使用内置格式化
-          * @default false
          */
         "showLunar"?: boolean;
-        /**
-          * @default false
-         */
         "showWeekNumbers"?: boolean;
-        /**
-          * @default true
-         */
         "snapToGrid"?: boolean;
-        /**
-          * @default 30
-         */
         "stepMinutes"?: number;
         "value"?: string;
         /**
           * 视图：月/周/日/年
-          * @default 'month'
          */
         "view"?: 'month' | 'week' | 'day' | 'year';
+    }
+    /**
+     * Card 卡片组件
+     * 通用卡片容器
+     */
+    interface LdesignCard {
+        /**
+          * 主体样式
+         */
+        "bodyStyle"?: string;
+        /**
+          * 是否显示边框
+         */
+        "bordered"?: boolean;
+        /**
+          * 头部样式
+         */
+        "headerStyle"?: string;
+        /**
+          * 是否可悬浮
+         */
+        "hoverable"?: boolean;
+        /**
+          * 是否加载中
+         */
+        "loading"?: boolean;
+        /**
+          * 卡片阴影
+         */
+        "shadow"?: 'never' | 'hover' | 'always';
+        /**
+          * 卡片尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        /**
+          * 卡片标题
+         */
+        "title"?: string;
     }
     /**
      * ldesign-cascader
@@ -8643,71 +8569,35 @@ declare namespace LocalJSX {
         "breakpoints"?: Breakpoints;
         /**
           * 点击非叶子是否直接触发变更（默认仅叶子触发）
-          * @default false
          */
         "changeOnSelect"?: boolean;
-        /**
-          * @default false
-         */
         "clearable"?: boolean;
         /**
           * 选择后是否自动关闭（手动触发模式除外）
-          * @default true
          */
         "closeOnSelect"?: boolean;
         "defaultValue"?: string[];
-        /**
-          * @default false
-         */
         "disabled"?: boolean;
-        /**
-          * @default 'bottom'
-         */
         "drawerPlacement"?: 'left' | 'right' | 'top' | 'bottom';
         "drawerSize"?: number | string;
-        /**
-          * @default '请选择'
-         */
         "drawerTitle"?: string;
         /**
           * 列表最大高度（列会滚动）
-          * @default 280
          */
         "listMaxHeight"?: number;
         "onLdesignChange"?: (event: LdesignCascaderCustomEvent<{ value: string[] | undefined; options: CascaderOption[] }>) => void;
         "onLdesignVisibleChange"?: (event: LdesignCascaderCustomEvent<boolean>) => void;
-        /**
-          * @default []
-         */
         "options"?: string | CascaderOption[];
-        /**
-          * @default 'auto'
-         */
         "overlay"?: CascaderOverlay;
         /**
           * 面板宽度（popup 模式下可用）
          */
         "panelWidth"?: number | string;
-        /**
-          * @default '请选择'
-         */
         "placeholder"?: string;
-        /**
-          * @default 'bottom-start' as Placement
-         */
         "placement"?: Placement;
-        /**
-          * @default ' / '
-         */
         "separator"?: string;
-        /**
-          * @default 'click'
-         */
         "trigger"?: CascaderTrigger;
         "value"?: string[];
-        /**
-          * @default false
-         */
         "visible"?: boolean;
     }
     /**
@@ -8717,27 +8607,22 @@ declare namespace LocalJSX {
     interface LdesignCheckbox {
         /**
           * 是否显示边框（兼容旧 API）
-          * @default false
          */
         "border"?: boolean;
         /**
           * 是否为按钮样式（兼容旧 API）
-          * @default false
          */
         "button"?: boolean;
         /**
           * 是否选中
-          * @default false
          */
         "checked"?: boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 设置半选状态，只负责样式控制
-          * @default false
          */
         "indeterminate"?: boolean;
         /**
@@ -8760,7 +8645,6 @@ declare namespace LocalJSX {
         "shape"?: 'square' | 'round';
         /**
           * 多选框的尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -8785,17 +8669,14 @@ declare namespace LocalJSX {
     interface LdesignCheckboxGroup {
         /**
           * 组方向
-          * @default 'horizontal'
          */
         "direction"?: 'horizontal' | 'vertical';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 统一标签位置（可被子项覆盖）
-          * @default 'right'
          */
         "labelPlacement"?: 'left' | 'right';
         /**
@@ -8812,27 +8693,22 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignCheckboxGroupCustomEvent<Array<string | number>>) => void;
         /**
           * 统一形状（可被子项覆盖）
-          * @default 'square'
          */
         "shape"?: 'square' | 'round';
         /**
           * 复选框组尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 统一外观主题（可被子项覆盖）
-          * @default 'brand'
          */
         "status"?: 'brand' | 'success' | 'warning' | 'danger' | 'info';
         /**
           * 绑定值
-          * @default []
          */
         "value"?: Array<string | number>;
         /**
           * 统一变体（可被子项覆盖）
-          * @default 'default'
          */
         "variant"?: 'default' | 'outline' | 'filled' | 'button';
     }
@@ -8843,70 +8719,55 @@ declare namespace LocalJSX {
     interface LdesignCircleNavigation {
         /**
           * 是否顺时针排布
-          * @default true
          */
         "clockwise"?: boolean;
         /**
           * 椭圆端点轴：auto 根据宽高选择；x 左右为端点；y 上下为端点
-          * @default 'auto'
          */
         "ellipseAxis"?: 'auto' | 'x' | 'y';
         /**
           * 椭圆半弧内的间距策略：'arc' 按弧长均分，'angle' 按角度均分（更“均匀”的视觉效果）
-          * @default 'angle'
          */
         "ellipseSpacing"?: 'arc' | 'angle';
         /**
           * 是否启用拖动旋转
-          * @default true
          */
         "enableDrag"?: boolean;
         /**
           * 惯性摩擦系数（0-1，越小惯性越大）
-          * @default 0.95
          */
         "friction"?: number;
         /**
           * 视角正前方的角度（度），默认 90° 即底部为“最近”
-          * @default 90
          */
         "frontAngle"?: number;
         /**
           * 圆形容器高度（不传则等于 width）
          */
         "height"?: number | string;
-        /**
-          * @default 1.2
-         */
         "maxScale"?: number;
         /**
           * 透视缩放范围：最小与最大缩放因子
-          * @default 0.8
          */
         "minScale"?: number;
         /**
           * 最小旋转速度（度/帧，低于此速度停止旋转）
-          * @default 0.1
          */
         "minVelocity"?: number;
         /**
           * 是否启用惯性/动量效果
-          * @default true
          */
         "momentum"?: boolean;
         /**
           * 与圆边缘的内边距（px），用于避免项目贴边
-          * @default 8
          */
         "padding"?: number;
         /**
           * 是否启用透视（近大远小）效果
-          * @default false
          */
         "perspective"?: boolean;
         /**
           * 3D 透视距离（px，对应 CSS perspective），zDepth>0 时生效
-          * @default 600
          */
         "perspectiveDistance"?: number;
         /**
@@ -8915,47 +8776,38 @@ declare namespace LocalJSX {
         "perspectiveOrigin"?: string;
         /**
           * 旋转灵敏度（度/像素）
-          * @default 0.5
          */
         "rotateSensitivity"?: number;
         /**
           * 是否显示圆形轨道
-          * @default true
          */
         "showTrack"?: boolean;
         /**
           * 吸附角度间隔（度）
-          * @default 45
          */
         "snapAngle"?: number;
         /**
           * 是否启用吸附点
-          * @default false
          */
         "snapPoints"?: boolean;
         /**
           * 吸附阈值（度，在此范围内会自动吸附）
-          * @default 15
          */
         "snapThreshold"?: number;
         /**
           * 起始角度（度），默认 -90 表示第一个项在正上方；0 表示第一个项在最右侧
-          * @default -90
          */
         "startAngle"?: number;
         /**
           * 是否启用触摸手势旋转
-          * @default true
          */
         "touchRotate"?: boolean;
         /**
           * 圆形容器宽度（数字按 px 处理，亦可传入如 '20rem' / '240px' / '50%'）
-          * @default 240
          */
         "width"?: number | string;
         /**
           * 3D 透视：Z 轴偏移幅度（px）。>0 则开启 translateZ；与 perspectiveDistance 联动
-          * @default 0
          */
         "zDepth"?: number;
     }
@@ -8967,7 +8819,6 @@ declare namespace LocalJSX {
     interface LdesignCol {
         /**
           * 占用的列数
-          * @default 1
          */
         "span"?: number;
     }
@@ -8979,62 +8830,50 @@ declare namespace LocalJSX {
     interface LdesignCollapse {
         /**
           * 手风琴模式：同层级仅允许展开一个
-          * @default false
          */
         "accordion"?: boolean;
         /**
           * 动画持续时间（毫秒）
-          * @default 200
          */
         "animationDuration"?: number;
         /**
           * 动画缓动函数
-          * @default 'ease'
          */
         "animationEasing"?: string;
         /**
           * 边框样式
-          * @default true
          */
         "bordered"?: boolean;
         /**
           * 卡片模式
-          * @default false
          */
         "cardStyle"?: boolean;
         /**
           * 内容加载方式
-          * @default 'sync'
          */
         "contentLoading"?: 'sync' | 'async' | 'lazy';
         /**
           * 默认展开的面板标识列表（非受控）
-          * @default []
          */
         "defaultValue"?: string[];
         /**
           * 整体禁用（子面板不可交互）
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 展开图标位置
-          * @default 'left'
          */
         "expandIconPlacement"?: 'left' | 'right';
         /**
           * 幽灵（无背景，仅分隔线）
-          * @default false
          */
         "ghost"?: boolean;
         /**
           * 是否高亮搜索结果
-          * @default true
          */
         "highlightSearch"?: boolean;
         /**
           * 是否可通过键盘导航
-          * @default true
          */
         "keyboardNavigation"?: boolean;
         /**
@@ -9043,12 +8882,10 @@ declare namespace LocalJSX {
         "loadContent"?: (name: string) => Promise<string>;
         /**
           * 折叠模式：普通、紧凑、分离、卡片
-          * @default 'default'
          */
         "mode"?: 'default' | 'compact' | 'separated' | 'card';
         /**
           * 嵌套缩进（像素）
-          * @default 20
          */
         "nestingIndent"?: number;
         /**
@@ -9081,37 +8918,30 @@ declare namespace LocalJSX {
         "onLdesignToggle"?: (event: LdesignCollapseCustomEvent<{ name: string; open: boolean; openKeys: string[] }>) => void;
         /**
           * 圆角样式
-          * @default 'medium'
          */
         "rounded"?: 'none' | 'small' | 'medium' | 'large';
         /**
           * 搜索过滤关键词
-          * @default ''
          */
         "searchKeyword"?: string;
         /**
           * 是否显示阴影
-          * @default false
          */
         "shadow"?: boolean;
         /**
           * 是否显示展开图标
-          * @default true
          */
         "showExpandIcon"?: boolean;
         /**
           * 尺寸变体
-          * @default 'medium'
          */
         "size"?: 'small' | 'medium' | 'large';
         /**
           * 是否可拖拽排序
-          * @default false
          */
         "sortable"?: boolean;
         /**
           * 主题颜色
-          * @default 'default'
          */
         "theme"?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
         /**
@@ -9125,27 +8955,22 @@ declare namespace LocalJSX {
     interface LdesignCollapsePanel {
         /**
           * 激活状态（由父级控制）
-          * @default false
          */
         "active"?: boolean;
         /**
           * 动画延迟
-          * @default 0
          */
         "animationDelay"?: number;
         /**
           * 动画持续时间（毫秒）
-          * @default 200
          */
         "animationDuration"?: number;
         /**
           * 动画缓动函数
-          * @default 'ease'
          */
         "animationEasing"?: string;
         /**
           * 动画曲线预设
-          * @default 'default'
          */
         "animationPreset"?: 'default' | 'spring' | 'bounce' | 'smooth' | 'sharp';
         /**
@@ -9154,12 +8979,10 @@ declare namespace LocalJSX {
         "collapsedIcon"?: string;
         /**
           * 内容动画类型
-          * @default 'fade'
          */
         "contentAnimation"?: 'none' | 'fade' | 'slide' | 'scale' | 'slide-fade';
         /**
           * 内容淡入延迟
-          * @default 100
          */
         "contentFadeDelay"?: number;
         /**
@@ -9168,12 +8991,10 @@ declare namespace LocalJSX {
         "contentPadding"?: string;
         /**
           * 收起后是否销毁内容（优先级高于 lazy）
-          * @default false
          */
         "destroyOnClose"?: boolean;
         /**
           * 禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -9182,12 +9003,10 @@ declare namespace LocalJSX {
         "emptyText"?: string;
         /**
           * 展开图标名称（默认 chevron-right）
-          * @default 'chevron-right'
          */
         "expandIcon"?: string;
         /**
           * 图标位置（由父级传入，也可单独覆盖）
-          * @default 'left'
          */
         "expandIconPlacement"?: 'left' | 'right';
         /**
@@ -9208,17 +9027,14 @@ declare namespace LocalJSX {
         "headerBackground"?: string;
         /**
           * 图标旋转角度
-          * @default 90
          */
         "iconRotation"?: number;
         /**
           * 首次激活才渲染内容（懒渲染）
-          * @default false
          */
         "lazy"?: boolean;
         /**
           * 是否加载中
-          * @default false
          */
         "loading"?: boolean;
         /**
@@ -9227,7 +9043,6 @@ declare namespace LocalJSX {
         "name"?: string;
         /**
           * 嵌套层级
-          * @default 0
          */
         "nestingLevel"?: number;
         /**
@@ -9244,32 +9059,26 @@ declare namespace LocalJSX {
         "onLdesignPanelDrop"?: (event: LdesignCollapsePanelCustomEvent<{ name: string; event: DragEvent }>) => void;
         /**
           * 是否反向旋转图标
-          * @default false
          */
         "reverseIconRotation"?: boolean;
         /**
           * 是否显示分隔线
-          * @default true
          */
         "showDivider"?: boolean;
         /**
           * 是否显示展开图标
-          * @default true
          */
         "showExpandIcon"?: boolean;
         /**
           * 尺寸变体
-          * @default 'medium'
          */
         "size"?: 'small' | 'medium' | 'large';
         /**
           * 是否可排序（由父级传入）
-          * @default false
          */
         "sortable"?: boolean;
         /**
           * 主题颜色
-          * @default 'default'
          */
         "theme"?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
     }
@@ -9281,22 +9090,18 @@ declare namespace LocalJSX {
     interface LdesignColorInput {
         /**
           * 是否可清空
-          * @default true
          */
         "clearable"?: boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 显示/输出格式
-          * @default 'hex'
          */
         "format"?: 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 选择后是否自动关闭弹层
-          * @default true
          */
         "hideOnSelect"?: boolean;
         /**
@@ -9309,47 +9114,38 @@ declare namespace LocalJSX {
         "onLdesignInput"?: (event: LdesignColorInputCustomEvent<string>) => void;
         /**
           * 输入占位符
-          * @default ''
          */
         "placeholder"?: string;
         /**
           * 弹出位置
-          * @default 'bottom-start'
          */
         "placement"?: 'top'|'top-start'|'top-end'|'bottom'|'bottom-start'|'bottom-end'|'left'|'left-start'|'left-end'|'right'|'right-start'|'right-end';
         /**
           * 预设颜色
-          * @default []
          */
         "presets"?: string[];
         /**
           * 最近颜色最大条数
-          * @default 12
          */
         "recentMax"?: number;
         /**
           * 是否显示透明度
-          * @default true
          */
         "showAlpha"?: boolean;
         /**
           * 是否显示最近使用
-          * @default true
          */
         "showHistory"?: boolean;
         /**
           * 是否显示系统预设
-          * @default true
          */
         "showPreset"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 当前颜色字符串（与 ColorPicker 格式一致）
-          * @default '#1677ff'
          */
         "value"?: string;
     }
@@ -9359,96 +9155,57 @@ declare namespace LocalJSX {
      * - 支持 HEX/RGB/HSL/HSV 输入与预设/历史颜色
      */
     interface LdesignColorPicker {
-        /**
-          * @default '取消'
-         */
         "cancelText"?: string;
         /**
           * 自定义按钮文案
-          * @default '确定'
          */
         "confirmText"?: string;
         /**
           * 使用具名插槽自定义触发器（slot="trigger"）；为 true 时不渲染默认触发器
-          * @default false
          */
         "customTrigger"?: boolean;
-        /**
-          * @default false
-         */
         "disabled"?: boolean;
-        /**
-          * @default 'hex'
-         */
         "format"?: 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 渐变类型：'linear' | 'radial' | 'both'（传递给面板）
-          * @default 'both'
          */
         "gradientTypes"?: 'linear' | 'radial' | 'both';
         /**
           * 选择后是否自动关闭弹层
-          * @default true
          */
         "hideOnSelect"?: boolean;
         /**
           * 渐变色标之间的最小间距（百分比，避免重叠），默认 1（透传给面板）
-          * @default 1
          */
         "minStopGap"?: number;
         /**
           * 面板模式：'solid' | 'gradient' | 'both'
-          * @default 'both'
          */
         "modes"?: 'solid' | 'gradient' | 'both';
         "onLdesignChange"?: (event: LdesignColorPickerCustomEvent<string>) => void;
         "onLdesignInput"?: (event: LdesignColorPickerCustomEvent<string>) => void;
         /**
           * 弹出位置
-          * @default 'bottom-start'
          */
         "placement"?: 'top'|'top-start'|'top-end'|'bottom'|'bottom-start'|'bottom-end'|'left'|'left-start'|'left-end'|'right'|'right-start'|'right-end';
         /**
           * 设置弹层宽度（数字或 CSS 长度），panel 将铺满此宽度
          */
         "popupWidth"?: number | string;
-        /**
-          * @default []
-         */
         "presets"?: string[];
-        /**
-          * @default 12
-         */
         "recentMax"?: number;
         /**
           * 是否显示“确定/取消”操作区（默认 false）
-          * @default false
          */
         "showActions"?: boolean;
-        /**
-          * @default true
-         */
         "showAlpha"?: boolean;
-        /**
-          * @default true
-         */
         "showHistory"?: boolean;
-        /**
-          * @default true
-         */
         "showPreset"?: boolean;
-        /**
-          * @default 'medium'
-         */
         "size"?: Size;
         /**
           * 透传面板 UI 模式
-          * @default 'pro'
          */
         "ui"?: 'simple' | 'pro';
-        /**
-          * @default '#1677ff'
-         */
         "value"?: string;
     }
     /**
@@ -9459,79 +9216,64 @@ declare namespace LocalJSX {
     interface LdesignColorPickerPanel {
         /**
           * 是否禁用（禁用交互）
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 默认显示格式
-          * @default 'hex'
          */
         "format"?: 'hex' | 'rgb' | 'hsl' | 'hsv';
         /**
           * 渐变类型：线性/径向/两者（仅在 activeMode=gradient 时生效）
-          * @default 'both'
          */
         "gradientTypes"?: 'linear' | 'radial' | 'both';
         /**
           * 渐变色标之间的最小间距（百分比，避免重叠），默认 1
-          * @default 1
          */
         "minStopGap"?: number;
         /**
           * 面板模式：单色 | 渐变 | 两者
-          * @default 'both'
          */
         "modes"?: 'solid' | 'gradient' | 'both';
         "onLdesignChange"?: (event: LdesignColorPickerPanelCustomEvent<string>) => void;
         "onLdesignInput"?: (event: LdesignColorPickerPanelCustomEvent<string>) => void;
         /**
           * 预设颜色
-          * @default [     '#ff4d4f', '#ff7a45', '#ffa940', '#ffc53d', '#ffec3d', '#bae637', '#73d13d', '#36cfc9', '#40a9ff', '#597ef7', '#9254de', '#f759ab',     '#d4380d', '#d46b08', '#d48806', '#ad8b00', '#5b8c00', '#08979c', '#096dd9', '#1d39c4', '#531dab', '#c41d7f', '#8c8c8c', '#595959',   ]
          */
         "presets"?: string[];
         /**
           * 最近使用最多条数
-          * @default 12
          */
         "recentMax"?: number;
         /**
           * 是否显示透明度
-          * @default true
          */
         "showAlpha"?: boolean;
         /**
           * 是否在渐变面板中显示“线性/径向”切换按钮（默认不显示）
-          * @default false
          */
         "showGradientTypeTabs"?: boolean;
         /**
           * 是否显示最近使用（无数据时自动隐藏）
-          * @default true
          */
         "showHistory"?: boolean;
         /**
           * 是否显示系统预设
-          * @default true
          */
         "showPreset"?: boolean;
         /**
           * 在渐变-径向模式下，于右侧显示径向面板（中心拖拽与参数）
-          * @default false
          */
         "showRadialSidebar"?: boolean;
         /**
           * 尺寸（影响整体间距）
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * UI 模式：simple 为精简界面，仅保留必要控件；pro 为完整界面
-          * @default 'pro'
          */
         "ui"?: 'simple' | 'pro';
         /**
           * 当前颜色（默认 hex），支持 #RRGGBB/#RRGGBBAA、rgb/rgba、hsl/hsla、hsv
-          * @default '#3498db'
          */
         "value"?: string;
     }
@@ -9542,7 +9284,6 @@ declare namespace LocalJSX {
     interface LdesignCountdown {
         /**
           * 是否在初始化时自动开始
-          * @default true
          */
         "autoStart"?: boolean;
         /**
@@ -9551,7 +9292,6 @@ declare namespace LocalJSX {
         "circleSize"?: number;
         /**
           * 环形进度的描边宽度
-          * @default 4
          */
         "circleStroke"?: number;
         /**
@@ -9560,7 +9300,6 @@ declare namespace LocalJSX {
         "endTime"?: number | string | Date;
         /**
           * 显示格式，支持 DD、HH、mm、ss、SSS 令牌组合
-          * @default 'HH:mm:ss'
          */
         "format"?: string;
         /**
@@ -9569,7 +9308,6 @@ declare namespace LocalJSX {
         "label"?: string;
         /**
           * 是否以更高频率更新毫秒（约 50ms 一次）。为 false 时每秒更新一次
-          * @default false
          */
         "millisecond"?: boolean;
         /**
@@ -9582,22 +9320,18 @@ declare namespace LocalJSX {
         "onLdesignFinish"?: (event: LdesignCountdownCustomEvent<void>) => void;
         /**
           * 是否暂停（受控）
-          * @default false
          */
         "paused"?: boolean;
         /**
           * 进度展示采用已消耗还是剩余（用于 progress-* 样式）
-          * @default 'elapsed'
          */
         "progressAs"?: 'elapsed' | 'remaining';
         /**
           * 是否在分段/翻牌样式中显示单位（天/时/分/秒/毫秒）
-          * @default false
          */
         "showUnit"?: boolean;
         /**
           * 尺寸（对齐其他组件的 size 体系）
-          * @default 'middle'
          */
         "size"?: Size;
         /**
@@ -9606,46 +9340,84 @@ declare namespace LocalJSX {
         "value"?: number;
         /**
           * 展现形式：文本、分段、翻牌、进度条、环形进度
-          * @default 'text'
          */
         "variant"?: 'text' | 'segment' | 'flip' | 'progress-line' | 'progress-circle';
     }
     interface LdesignDatePicker {
-        /**
-          * @default true
-         */
         "clearable"?: boolean;
         "defaultValue"?: string;
-        /**
-          * @default false
-         */
         "disabled"?: boolean;
         "disabledDate"?: (d: Date) => boolean;
-        /**
-          * @default 1
-         */
         "firstDayOfWeek"?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /**
-          * @default 'YYYY-MM-DD'
-         */
         "format"?: string;
         "maxDate"?: string;
         "minDate"?: string;
-        /**
-          * @default 'date'
-         */
         "mode"?: 'date' | 'week' | 'month' | 'quarter' | 'year';
         "onLdesignChange"?: (event: LdesignDatePickerCustomEvent<any>) => void;
         "onLdesignVisibleChange"?: (event: LdesignDatePickerCustomEvent<boolean>) => void;
-        /**
-          * @default '请选择日期'
-         */
         "placeholder"?: string;
-        /**
-          * @default false
-         */
         "showWeekNumbers"?: boolean;
         "value"?: string;
+    }
+    /**
+     * Descriptions 描述列表组件
+     */
+    interface LdesignDescriptions {
+        /**
+          * 是否显示边框
+         */
+        "bordered"?: boolean;
+        /**
+          * 列数
+         */
+        "column"?: number;
+        /**
+          * 布局方式
+         */
+        "layout"?: 'horizontal' | 'vertical';
+        /**
+          * 尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        /**
+          * 标题
+         */
+        "title"?: string;
+    }
+    /**
+     * DescriptionsItem 描述项
+     */
+    interface LdesignDescriptionsItem {
+        /**
+          * 标签
+         */
+        "label": string;
+        /**
+          * 跨列数
+         */
+        "span"?: number;
+    }
+    /**
+     * Divider 分割线组件
+     * 用于分隔不同内容区域
+     */
+    interface LdesignDivider {
+        /**
+          * 是否虚线
+         */
+        "dashed"?: boolean;
+        /**
+          * 分割线方向
+         */
+        "direction"?: 'horizontal' | 'vertical';
+        /**
+          * 文字内容
+         */
+        "text"?: string;
+        /**
+          * 文字位置
+         */
+        "textPosition"?: 'left' | 'center' | 'right';
     }
     /**
      * ldesign-draggable
@@ -9663,103 +9435,72 @@ declare namespace LocalJSX {
     interface LdesignDraggable {
         /**
           * 是否允许双击/双指双击缩放
-          * @default true
          */
         "allowDoubleTap"?: boolean;
         "alt"?: string;
         /**
           * 边界弹性系数
-          * @default 0.15
          */
         "boundsElasticity"?: number;
-        /**
-          * @default 'top-right'
-         */
         "controlsPosition"?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         /**
           * 是否禁用右键菜单（避免干扰拖拽）
-          * @default true
          */
         "disableContextMenu"?: boolean;
         /**
           * 双击切换到的缩放倍数
-          * @default 2
          */
         "doubleTapZoom"?: number;
         /**
           * 是否启用网格吸附
-          * @default false
          */
         "enableGrid"?: boolean;
         /**
           * 是否启用撤销/重做
-          * @default false
          */
         "enableHistory"?: boolean;
         /**
           * 是否启用动量滚动
-          * @default true
          */
         "enableMomentum"?: boolean;
         /**
           * 是否允许旋转（移动端双指）
-          * @default true
          */
         "enableRotate"?: boolean;
         /**
           * 网格大小（像素）
-          * @default 20
          */
         "gridSize"?: number;
-        /**
-          * @default 0
-         */
         "initialOffsetX"?: number;
-        /**
-          * @default 0
-         */
         "initialOffsetY"?: number;
-        /**
-          * @default 0
-         */
         "initialRotate"?: number;
         /**
           * 初始状态
-          * @default 1
          */
         "initialScale"?: number;
         /**
           * 按住 Shift 时的平移步长倍率
-          * @default 3
          */
         "keyPanFastMultiplier"?: number;
         /**
           * 方向键平移基础步长（像素）
-          * @default 40
          */
         "keyPanStep"?: number;
         /**
           * 是否启用键盘交互（方向键平移、+/- 缩放、R 旋转、0 重置）
-          * @default true
          */
         "keyboard"?: boolean;
         /**
           * 历史记录最大数量
-          * @default 20
          */
         "maxHistory"?: number;
-        /**
-          * @default 4
-         */
         "maxScale"?: number;
         /**
           * 最小/最大缩放
-          * @default 0.25
          */
         "minScale"?: number;
         /**
           * 缩略图导航位置
-          * @default 'bottom-right'
          */
         "minimapPosition"?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
         "onLdesignGestureEnd"?: (event: LdesignDraggableCustomEvent<void>) => void;
@@ -9772,36 +9513,27 @@ declare namespace LocalJSX {
         "presetViews"?: Array<{ name: string; scale: number; rotate: number; offsetX: number; offsetY: number }>;
         /**
           * 旋转吸附角度（度）。大于 0 时在捏合旋转接近该步进的倍数会吸附
-          * @default 0
          */
         "rotateSnapDeg"?: number;
         /**
           * 旋转吸附阈值（度），仅当与最近倍数的差值不超过该阈值时生效
-          * @default 3
          */
         "rotateSnapEpsilon"?: number;
-        /**
-          * @default false
-         */
         "showControls"?: boolean;
         /**
           * 是否显示缩放/旋转指示器
-          * @default false
          */
         "showIndicators"?: boolean;
         /**
           * 是否启用缩略图导航
-          * @default false
          */
         "showMinimap"?: boolean;
         /**
           * 是否显示性能监控
-          * @default false
          */
         "showPerformance"?: boolean;
         /**
           * 是否启用平滑边界
-          * @default true
          */
         "smoothBounds"?: boolean;
         /**
@@ -9810,44 +9542,36 @@ declare namespace LocalJSX {
         "src"?: string;
         /**
           * 允许使用滚轮进行平移（当未触发缩放时）
-          * @default true
          */
         "wheelPan"?: boolean;
         /**
           * PC 滚轮缩放
-          * @default true
          */
         "wheelZoom"?: boolean;
         /**
           * 是否需要按住 Ctrl/⌘ 才进行滚轮缩放；否则滚轮优先缩放
-          * @default false
          */
         "wheelZoomRequiresCtrl"?: boolean;
         /**
           * 缩放步进（滚轮/按钮）
-          * @default 0.1
          */
         "zoomStep"?: number;
     }
     interface LdesignDrawer {
         /**
           * 是否启用动画
-          * @default true
          */
         "animation"?: boolean;
         /**
           * 动画持续时间（毫秒）
-          * @default 300
          */
         "animationDuration"?: number;
         /**
           * 动画缓动函数
-          * @default 'ease-in-out'
          */
         "animationEasing"?: string;
         /**
           * 动画类型
-          * @default 'slide'
          */
         "animationType"?: string;
         /**
@@ -9856,22 +9580,18 @@ declare namespace LocalJSX {
         "ariaLabelText"?: string;
         /**
           * 自动聚焦
-          * @default true
          */
         "autoFocus"?: boolean;
         /**
           * 圆角大小
-          * @default '8px'
          */
         "borderRadius"?: string;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable"?: boolean;
         /**
           * 按 ESC 关闭
-          * @default true
          */
         "closeOnEsc"?: boolean;
         /**
@@ -9880,17 +9600,14 @@ declare namespace LocalJSX {
         "container"?: string | HTMLElement;
         /**
           * 性能优化：使用 CSS contain
-          * @default true
          */
         "cssContain"?: boolean;
         /**
           * 自定义类名
-          * @default ''
          */
         "customClass"?: string;
         /**
           * 关闭时销毁
-          * @default false
          */
         "destroyOnClose"?: boolean;
         /**
@@ -9899,47 +9616,38 @@ declare namespace LocalJSX {
         "drawerTitle"?: string;
         /**
           * 焦点捕获
-          * @default true
          */
         "focusTrap"?: boolean;
         /**
           * 底部按钮对齐方式
-          * @default 'right'
          */
         "footerAlign"?: 'left' | 'center' | 'right' | 'space-between';
         /**
           * 是否显示底部边框
-          * @default true
          */
         "footerBorder"?: boolean;
         /**
           * 底部按钮配置
-          * @default []
          */
         "footerButtons"?: DrawerButton[];
         /**
           * 是否全屏
-          * @default false
          */
         "fullscreen"?: boolean;
         /**
           * 是否可全屏切换
-          * @default false
          */
         "fullscreenable"?: boolean;
         /**
           * 性能优化：GPU 加速
-          * @default true
          */
         "gpuAcceleration"?: boolean;
         /**
           * 是否显示头部边框
-          * @default true
          */
         "headerBorder"?: boolean;
         /**
           * 头部是否吸顶
-          * @default false
          */
         "headerSticky"?: boolean;
         /**
@@ -9948,62 +9656,50 @@ declare namespace LocalJSX {
         "icon"?: string;
         /**
           * 性能优化：懒加载内容
-          * @default false
          */
         "lazyLoad"?: boolean;
         /**
           * 抽屉层级
-          * @default 'normal'
          */
         "level"?: DrawerLevel;
         /**
           * 是否显示加载状态
-          * @default false
          */
         "loading"?: boolean;
         /**
           * 加载文本
-          * @default '加载中...'
          */
         "loadingText"?: string;
         /**
           * 是否锁定页面滚动
-          * @default true
          */
         "lockScroll"?: boolean;
         /**
           * 是否显示遮罩
-          * @default true
          */
         "mask"?: boolean;
         /**
           * 遮罩样式类名
-          * @default ''
          */
         "maskClass"?: string;
         /**
           * 点击遮罩是否关闭
-          * @default true
          */
         "maskClosable"?: boolean;
         /**
           * 最大尺寸
-          * @default '90%'
          */
         "maxSize"?: number | string;
         /**
           * 是否可最大化
-          * @default false
          */
         "maximizable"?: boolean;
         /**
           * 最小尺寸
-          * @default 200
          */
         "minSize"?: number | string;
         /**
           * 是否可最小化
-          * @default false
          */
         "minimizable"?: boolean;
         /**
@@ -10036,52 +9732,42 @@ declare namespace LocalJSX {
         "onDrawerSwipe"?: (event: LdesignDrawerCustomEvent<{ progress: number }>) => void;
         /**
           * 内容内边距
-          * @default true
          */
         "padding"?: string | boolean;
         /**
           * 抽屉位置
-          * @default 'right'
          */
         "placement"?: DrawerPlacement;
         /**
           * 是否可调整大小
-          * @default false
          */
         "resizable"?: boolean;
         /**
           * 恢复焦点
-          * @default true
          */
         "restoreFocus"?: boolean;
         /**
           * 是否启用圆角
-          * @default true
          */
         "rounded"?: boolean;
         /**
           * 是否显示返回按钮
-          * @default false
          */
         "showBack"?: boolean;
         /**
           * 是否显示尺寸提示
-          * @default true
          */
         "showSizeHint"?: boolean;
         /**
           * 抽屉大小
-          * @default 'md'
          */
         "size"?: number | string | SizePreset;
         /**
           * 吸附点
-          * @default []
          */
         "snapPoints"?: SnapPoint[];
         /**
           * 吸附阈值
-          * @default 30
          */
         "snapThreshold"?: number;
         /**
@@ -10090,42 +9776,34 @@ declare namespace LocalJSX {
         "subtitle"?: string;
         /**
           * 滑动阈值（0-1）
-          * @default 0.3
          */
         "swipeThreshold"?: number;
         /**
           * 是否启用滑动关闭
-          * @default false
          */
         "swipeToClose"?: boolean;
         /**
           * 滑动触发区域
-          * @default 'edge'
          */
         "swipeTriggerArea"?: 'anywhere' | 'handle' | 'header' | 'edge';
         /**
           * 主题
-          * @default 'light'
          */
         "theme"?: DrawerTheme;
         /**
           * 性能优化：使用 transform
-          * @default true
          */
         "useTransform"?: boolean;
         /**
           * 性能优化：使用虚拟滚动
-          * @default false
          */
         "virtualScroll"?: boolean;
         /**
           * 是否显示抽屉
-          * @default false
          */
         "visible"?: boolean;
         /**
           * z-index 层级
-          * @default 1000
          */
         "zIndex"?: number;
     }
@@ -10136,22 +9814,18 @@ declare namespace LocalJSX {
     interface LdesignDropdown {
         /**
           * 移动端选中态颜色（文本与对勾）
-          * @default '#F53F3F'
          */
         "activeColor"?: string;
         /**
           * 浮层挂载位置：默认 body，避免在文档容器中被裁剪
-          * @default 'body'
          */
         "appendTo"?: 'self' | 'body' | 'closest-popup';
         /**
           * 是否显示箭头（默认不显示）
-          * @default false
          */
         "arrow"?: boolean;
         /**
           * 点击选项后是否自动关闭
-          * @default true
          */
         "closeOnSelect"?: boolean;
         /**
@@ -10160,22 +9834,18 @@ declare namespace LocalJSX {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 菜单宽度是否跟随触发器宽度（默认否）
-          * @default false
          */
         "fitTriggerWidth"?: boolean;
         /**
           * 下拉节点（数组或 JSON 字符串）
-          * @default []
          */
         "items"?: string | DropdownNode[];
         /**
           * 列表最大高度（px）
-          * @default 240
          */
         "maxHeight"?: number;
         /**
@@ -10188,37 +9858,30 @@ declare namespace LocalJSX {
         "onLdesignVisibleChange"?: (event: LdesignDropdownCustomEvent<boolean>) => void;
         /**
           * 触发器文本（默认触发器显示的固定文案，不随选择变化）
-          * @default '请选择'
          */
         "placeholder"?: string;
         /**
           * 出现位置
-          * @default 'bottom-start'
          */
         "placement"?: DropdownPlacement;
         /**
           * 是否将选中项同步到默认触发器文本（默认不同步）
-          * @default false
          */
         "reflectSelectionOnTrigger"?: boolean;
         /**
           * 是否在菜单项上展示选中样式（PC，默认不展示）
-          * @default false
          */
         "showSelected"?: boolean;
         /**
           * 子菜单的触发方式（hover/click），默认 hover，仅 PC 生效
-          * @default 'hover'
          */
         "submenuTrigger"?: 'hover' | 'click';
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme"?: 'light' | 'dark';
         /**
           * 触发方式（PC）
-          * @default 'click'
          */
         "trigger"?: DropdownTrigger;
         /**
@@ -10227,12 +9890,10 @@ declare namespace LocalJSX {
         "value"?: string;
         /**
           * 自适应：'auto' | 'pc' | 'mobile'
-          * @default 'auto'
          */
         "variant"?: DropdownVariant;
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
-          * @default false
          */
         "visible"?: boolean;
         /**
@@ -10253,24 +9914,20 @@ declare namespace LocalJSX {
         "actionClass"?: string;
         /**
           * 行为控制：auto（默认）| inline（强制同行右置）| newline（强制换行右对齐）
-          * @default 'auto'
          */
         "actionPlacement"?: 'auto' | 'inline' | 'newline';
         "actionStyle"?: any;
         /**
           * 自动折叠延迟（毫秒，0为不自动折叠）
-          * @default 0
          */
         "autoCollapseDelay"?: number;
         "collapseIcon"?: string;
         /**
           * 展开态允许 ESC 收起
-          * @default false
          */
         "collapseOnEscape"?: boolean;
         /**
           * 收起按钮文案（展开态）
-          * @default '收起'
          */
         "collapseText"?: string;
         /**
@@ -10279,17 +9936,14 @@ declare namespace LocalJSX {
         "content"?: string;
         /**
           * 是否默认展开
-          * @default false
          */
         "defaultExpanded"?: boolean;
         /**
           * 双击文本切换展开/收起
-          * @default false
          */
         "doubleClickToggle"?: boolean;
         /**
           * 按钮悬浮效果增强
-          * @default true
          */
         "enhancedHover"?: boolean;
         /**
@@ -10298,7 +9952,6 @@ declare namespace LocalJSX {
         "expandIcon"?: string;
         /**
           * 展开按钮文案（折叠态）
-          * @default '更多'
          */
         "expandText"?: string;
         /**
@@ -10311,17 +9964,14 @@ declare namespace LocalJSX {
         "fadeColors"?: string;
         /**
           * 渐变遮罩宽度（如 40% 或 120）
-          * @default '40%'
          */
         "fadeWidth"?: number | string;
         /**
           * 同行放置时，文本与"收起"的间距（像素）
-          * @default 8
          */
         "inlineGap"?: number;
         /**
           * 折叠时显示的行数
-          * @default 3
          */
         "lines"?: number;
         /**
@@ -10334,39 +9984,117 @@ declare namespace LocalJSX {
         "onLdesignTruncateChange"?: (event: LdesignEllipsisCustomEvent<{ overflowed: boolean }>) => void;
         /**
           * 收起时滚动到组件顶部
-          * @default false
          */
         "scrollIntoViewOnCollapse"?: boolean;
         /**
           * 展开时滚动到组件顶部
-          * @default false
          */
         "scrollIntoViewOnExpand"?: boolean;
         /**
           * 折叠态是否显示渐变遮罩
-          * @default true
          */
         "showFade"?: boolean;
         /**
           * Tooltip 最大宽度
-          * @default 320
          */
         "tooltipMaxWidth"?: number;
         /**
           * 折叠且溢出时，悬浮显示全文
-          * @default false
          */
         "tooltipOnCollapsed"?: boolean;
         /**
           * Tooltip 位置
-          * @default 'top'
          */
         "tooltipPlacement"?: string;
         /**
           * 展开/收起高度变化动画时长（ms）
-          * @default 200
          */
         "transitionDuration"?: number;
+    }
+    /**
+     * Empty 空状态组件
+     * 用于展示空数据状态
+     */
+    interface LdesignEmpty {
+        /**
+          * 空状态描述文字
+         */
+        "description"?: string;
+        /**
+          * 图片地址
+         */
+        "image"?: string;
+        /**
+          * 图片大小
+         */
+        "imageSize"?: 'small' | 'medium' | 'large';
+        /**
+          * 预设图片类型
+         */
+        "imageType"?: 'default' | 'simple' | 'search';
+    }
+    /**
+     * Form 表单组件
+     * 统一管理表单验证和数据
+     */
+    interface LdesignForm {
+        /**
+          * 是否禁用
+         */
+        "disabled"?: boolean;
+        /**
+          * 标签位置
+         */
+        "labelAlign"?: 'left' | 'right';
+        /**
+          * 标签宽度
+         */
+        "labelWidth"?: string | number;
+        /**
+          * 表单布局
+         */
+        "layout"?: 'horizontal' | 'vertical' | 'inline';
+        /**
+          * 表单重置事件
+         */
+        "onLdesignReset"?: (event: LdesignFormCustomEvent<void>) => void;
+        /**
+          * 表单提交事件
+         */
+        "onLdesignSubmit"?: (event: LdesignFormCustomEvent<Record<string, any>>) => void;
+        /**
+          * 验证失败事件
+         */
+        "onLdesignValidateError"?: (event: LdesignFormCustomEvent<Record<string, string>>) => void;
+        /**
+          * 表单尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+    }
+    /**
+     * FormItem 表单项
+     */
+    interface LdesignFormItem {
+        /**
+          * 错误提示
+         */
+        "error"?: string;
+        /**
+          * 帮助文本
+         */
+        "help"?: string;
+        /**
+          * 字段标签
+         */
+        "label"?: string;
+        /**
+          * 字段名称
+         */
+        "name": string;
+        /**
+          * 是否必填
+         */
+        "required"?: boolean;
     }
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -10384,7 +10112,6 @@ declare namespace LocalJSX {
         "defaultRows"?: number;
         /**
           * 是否使用密集填充（尽量填补空位）；显式定位下仅作类名标识
-          * @default false
          */
         "dense"?: boolean;
         /**
@@ -10393,12 +10120,10 @@ declare namespace LocalJSX {
         "gap"?: number | string;
         /**
           * 每列的最小宽度，用于自适应计算列数；数字为 px；默认 240
-          * @default 240
          */
         "minColWidth"?: number | string;
         /**
           * 展开按钮所在列宽（span）
-          * @default 8
          */
         "toggleSpan"?: number;
         /**
@@ -10418,7 +10143,6 @@ declare namespace LocalJSX {
     interface LdesignGridItem {
         /**
           * 占用的列数
-          * @default 1
          */
         "span"?: number;
     }
@@ -10429,7 +10153,6 @@ declare namespace LocalJSX {
     interface LdesignIcon {
         /**
           * 动画类型
-          * @default 'none'
          */
         "animation"?: 'spin' | 'pulse' | 'bounce' | 'flash' | 'shake' | 'none';
         /**
@@ -10442,7 +10165,6 @@ declare namespace LocalJSX {
         "customSvg"?: string;
         /**
           * 是否为装饰性图标（无语义）
-          * @default false
          */
         "decorative"?: boolean;
         /**
@@ -10451,7 +10173,6 @@ declare namespace LocalJSX {
         "flip"?: 'horizontal' | 'vertical' | 'both';
         /**
           * 是否使用渐变色
-          * @default false
          */
         "gradient"?: boolean;
         /**
@@ -10460,7 +10181,6 @@ declare namespace LocalJSX {
         "gradientColors"?: string | string[];
         /**
           * 渐变方向
-          * @default 'horizontal'
          */
         "gradientDirection"?: 'horizontal' | 'vertical' | 'diagonal';
         /**
@@ -10477,17 +10197,14 @@ declare namespace LocalJSX {
         "rotate"?: number;
         /**
           * 图标尺寸
-          * @default 'medium'
          */
         "size"?: Size | number;
         /**
           * 是否旋转（兼容旧版）
-          * @default false
          */
         "spin"?: boolean;
         /**
           * 描边宽度
-          * @default 2
          */
         "strokeWidth"?: number;
     }
@@ -10510,7 +10227,6 @@ declare namespace LocalJSX {
         "blurhash"?: string;
         /**
           * 启用图片对比模式
-          * @default false
          */
         "comparison"?: boolean;
         /**
@@ -10523,17 +10239,14 @@ declare namespace LocalJSX {
         "crossorigin"?: 'anonymous' | 'use-credentials';
         /**
           * HTMLImageElement.decoding
-          * @default 'auto'
          */
         "decoding"?: 'async' | 'sync' | 'auto';
         /**
           * 是否禁用（影响交互，如预览）
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 预览工具栏显示下载按钮
-          * @default true
          */
         "downloadable"?: boolean;
         /**
@@ -10542,27 +10255,22 @@ declare namespace LocalJSX {
         "fallback"?: string;
         /**
           * 图片加载优先级
-          * @default 'auto'
          */
         "fetchpriority"?: 'high' | 'low' | 'auto';
         /**
           * 图片滤镜效果
-          * @default 'none'
          */
         "filter"?: 'grayscale' | 'sepia' | 'blur' | 'brightness' | 'contrast' | 'none';
         /**
           * object-fit
-          * @default 'cover'
          */
         "fit"?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down';
         /**
           * 预览工具栏显示全屏按钮
-          * @default true
          */
         "fullscreenable"?: boolean;
         /**
           * GIF 默认静止，点击播放。建议同时提供 gifPreviewSrc（第一帧快照）与 ratio 避免CLS
-          * @default false
          */
         "gifPlayOnClick"?: boolean;
         /**
@@ -10575,7 +10283,6 @@ declare namespace LocalJSX {
         "height"?: number | string;
         /**
           * 是否允许拖拽原图（仅影响 img 的原生 draggable 属性，预览层可拖拽不受此限制）
-          * @default false
          */
         "imgDraggable"?: boolean;
         /**
@@ -10584,17 +10291,14 @@ declare namespace LocalJSX {
         "imgTitle"?: string;
         /**
           * IntersectionObserver rootMargin（预加载阈值）
-          * @default '200px'
          */
         "intersectionRootMargin"?: string;
         /**
           * 是否懒加载（首屏建议关闭）
-          * @default true
          */
         "lazy"?: boolean;
         /**
           * 最大重试次数
-          * @default 3
          */
         "maxRetries"?: number;
         /**
@@ -10623,32 +10327,26 @@ declare namespace LocalJSX {
         "placeholder"?: string;
         /**
           * 占位背景颜色（无自定义占位图时显示）
-          * @default '#f5f5f5'
          */
         "placeholderColor"?: string;
         /**
           * object-position
-          * @default 'center center'
          */
         "position"?: string;
         /**
           * 点击开启预览
-          * @default false
          */
         "preview"?: boolean;
         /**
           * 预览遮罩主题
-          * @default 'dark'
          */
         "previewBackdrop"?: 'dark' | 'light';
         /**
           * 当前图片在预览组中的索引
-          * @default 0
          */
         "previewCurrentIndex"?: number;
         /**
           * 预览图片组（用于gallery模式）
-          * @default []
          */
         "previewImages"?: string[];
         /**
@@ -10669,37 +10367,30 @@ declare namespace LocalJSX {
         "referrerPolicy"?: string;
         /**
           * 显示重试按钮
-          * @default true
          */
         "retryable"?: boolean;
         /**
           * 预览工具栏显示旋转按钮
-          * @default true
          */
         "rotatable"?: boolean;
         /**
           * 形状：square（默认）| rounded | circle
-          * @default 'square'
          */
         "shape"?: 'square' | 'rounded' | 'circle';
         /**
           * 是否展示错误占位层
-          * @default true
          */
         "showError"?: boolean;
         /**
           * 显示图片信息（尺寸、大小等）
-          * @default false
          */
         "showInfo"?: boolean;
         /**
           * 是否展示加载中骨架（当无自定义占位图时）
-          * @default true
          */
         "showLoading"?: boolean;
         /**
           * 显示加载进度条
-          * @default false
          */
         "showProgress"?: boolean;
         /**
@@ -10720,7 +10411,6 @@ declare namespace LocalJSX {
         "srcset"?: string;
         /**
           * 使用外部预览组件（用于多图gallery模式）
-          * @default false
          */
         "useExternalPreview"?: boolean;
         /**
@@ -10729,7 +10419,6 @@ declare namespace LocalJSX {
         "watermark"?: string;
         /**
           * 水印位置
-          * @default 'bottom-right'
          */
         "watermarkPosition"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
         /**
@@ -10738,7 +10427,6 @@ declare namespace LocalJSX {
         "width"?: number | string;
         /**
           * 预览是否可缩放
-          * @default true
          */
         "zoomable"?: boolean;
     }
@@ -10751,12 +10439,10 @@ declare namespace LocalJSX {
     interface LdesignImageGroup {
         /**
           * 列数
-          * @default 3
          */
         "columns"?: number;
         /**
           * 间距（px）
-          * @default 8
          */
         "gap"?: number;
         /**
@@ -10777,47 +10463,38 @@ declare namespace LocalJSX {
     interface LdesignImagePreview {
         /**
           * 当前显示的图片索引
-          * @default 0
          */
         "currentIndex"?: number;
         /**
           * 是否启用旋转
-          * @default true
          */
         "enableRotate"?: boolean;
         /**
           * 当前预览的图片列表
-          * @default []
          */
         "images"?: string[];
         /**
           * 初始缩放比例
-          * @default 1
          */
         "initialScale"?: number;
         /**
           * 是否启用键盘操作
-          * @default true
          */
         "keyboard"?: boolean;
         /**
           * 是否循环切换
-          * @default true
          */
         "loop"?: boolean;
         /**
           * 是否在点击遮罩时关闭
-          * @default true
          */
         "maskClosable"?: boolean;
         /**
           * 最大缩放比例
-          * @default 4
          */
         "maxScale"?: number;
         /**
           * 最小缩放比例
-          * @default 0.25
          */
         "minScale"?: number;
         "onLdesignPreviewChange"?: (event: LdesignImagePreviewCustomEvent<{ index: number, image: string }>) => void;
@@ -10826,27 +10503,22 @@ declare namespace LocalJSX {
         "onLdesignPreviewOpen"?: (event: LdesignImagePreviewCustomEvent<{ images: string[], index: number }>) => void;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "showCloseBtn"?: boolean;
         /**
           * 是否显示图片索引
-          * @default true
          */
         "showIndex"?: boolean;
         /**
           * 是否显示工具栏
-          * @default true
          */
         "showToolbar"?: boolean;
         /**
           * 动画过渡时长 (ms)
-          * @default 300
          */
         "transitionDuration"?: number;
         /**
           * 是否显示预览
-          * @default false
          */
         "visible"?: boolean;
     }
@@ -10860,17 +10532,14 @@ declare namespace LocalJSX {
     interface LdesignImageViewer {
         /**
           * 主题：暗色/亮色遮罩
-          * @default 'dark'
          */
         "backdrop"?: 'dark' | 'light';
         /**
           * 标题与描述的对齐方式：left 左对齐；center 居中；right 右对齐
-          * @default 'center'
          */
         "captionAlign"?: 'left' | 'center' | 'right';
         /**
           * 标题与描述的显示位置：bottom 底部（工具栏上方）；top 顶部（缩略图下方）
-          * @default 'bottom'
          */
         "captionPosition"?: 'bottom' | 'top';
         /**
@@ -10887,26 +10556,19 @@ declare namespace LocalJSX {
         "images": string | Array<ImageViewerItem | string>;
         /**
           * 是否启用键盘快捷键
-          * @default true
          */
         "keyboard"?: boolean;
         /**
           * 是否循环播放
-          * @default true
          */
         "loop"?: boolean;
         /**
           * 点击遮罩是否可关闭
-          * @default true
          */
         "maskClosable"?: boolean;
-        /**
-          * @default 4
-         */
         "maxScale"?: number;
         /**
           * 最小/最大缩放
-          * @default 0.25
          */
         "minScale"?: number;
         "onLdesignChange"?: (event: LdesignImageViewerCustomEvent<{ index: number }>) => void;
@@ -10915,7 +10577,6 @@ declare namespace LocalJSX {
         "onLdesignVisibleChange"?: (event: LdesignImageViewerCustomEvent<boolean>) => void;
         /**
           * 打开/关闭动画效果：fade 淡入淡出；zoom 缩放；slide-up 上滑；slide-down 下滑；none 无动画
-          * @default 'fade-zoom'
          */
         "openAnimation"?: 'fade' | 'zoom' | 'fade-zoom' | 'slide-up' | 'slide-down' | 'none';
         /**
@@ -10924,7 +10585,6 @@ declare namespace LocalJSX {
         "openDuration"?: number;
         /**
           * 小窗拖拽方式：title 标题栏拖拽；anywhere 全面板可拖拽
-          * @default 'title'
          */
         "panelDraggable"?: 'title' | 'anywhere';
         "panelHeight"?: number | string;
@@ -10934,37 +10594,30 @@ declare namespace LocalJSX {
         "panelWidth"?: number | string;
         /**
           * 是否显示标题与描述
-          * @default true
          */
         "showCaption"?: boolean;
         /**
           * 是否展示顶部缩略图
-          * @default true
          */
         "showThumbnails"?: boolean;
         /**
           * 初始索引
-          * @default 0
          */
         "startIndex"?: number;
         /**
           * 图片切换过渡类型
-          * @default 'fade-zoom'
          */
         "transition"?: 'fade' | 'fade-zoom';
         /**
           * 过渡时长（ms）
-          * @default 240
          */
         "transitionDuration"?: number;
         /**
           * 过渡缓动函数
-          * @default 'cubic-bezier(0.22, 0.61, 0.36, 1)'
          */
         "transitionEasing"?: string;
         /**
           * 查看窗口模式：overlay 全屏；modal 小窗
-          * @default 'overlay'
          */
         "viewerMode"?: 'overlay' | 'modal' | 'embedded';
         /**
@@ -10973,22 +10626,18 @@ declare namespace LocalJSX {
         "viewerTitle"?: string;
         /**
           * 是否显示
-          * @default false
          */
         "visible"?: boolean;
         /**
           * 是否启用滚轮缩放
-          * @default true
          */
         "wheelZoom"?: boolean;
         /**
           * z-index
-          * @default 1000
          */
         "zIndex"?: number;
         /**
           * 缩放步进
-          * @default 0.1
          */
         "zoomStep"?: number;
     }
@@ -11003,22 +10652,18 @@ declare namespace LocalJSX {
         "allowInput"?: RegExp | ((value: string) => boolean);
         /**
           * 自适应内容高度（仅对 textarea 有效）
-          * @default false
          */
         "autosize"?: boolean | { minRows?: number; maxRows?: number };
         /**
           * 是否可清空
-          * @default false
          */
         "clearable"?: boolean;
         /**
           * 是否受控组件
-          * @default false
          */
         "controlled"?: boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -11059,27 +10704,22 @@ declare namespace LocalJSX {
         "prefixIcon"?: string;
         /**
           * 是否只读
-          * @default false
          */
         "readonly"?: boolean;
         /**
           * 输入框行数（仅对 textarea 有效）
-          * @default 2
          */
         "rows"?: number;
         /**
           * 是否显示输入数量统计
-          * @default false
          */
         "showCount"?: boolean;
         /**
           * 是否显示切换密码图标
-          * @default false
          */
         "showPassword"?: boolean;
         /**
           * 输入框尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -11092,12 +10732,10 @@ declare namespace LocalJSX {
         "suffixIcon"?: string;
         /**
           * 输入框类型
-          * @default 'text'
          */
         "type"?: 'text' | 'password' | 'textarea' | 'number' | 'email' | 'url' | 'tel';
         /**
           * 输入框的值
-          * @default ''
          */
         "value"?: string;
     }
@@ -11109,7 +10747,6 @@ declare namespace LocalJSX {
     interface LdesignInputNumber {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -11118,7 +10755,6 @@ declare namespace LocalJSX {
         "formatter"?: (value: number | null) => string;
         /**
           * 是否启用键盘增减（方向键/页键）
-          * @default true
          */
         "keyboard"?: boolean;
         /**
@@ -11131,7 +10767,6 @@ declare namespace LocalJSX {
         "min"?: number;
         /**
           * 是否允许鼠标滚轮调整
-          * @default false
          */
         "mouseWheel"?: boolean;
         "onLdesignBlur"?: (event: LdesignInputNumberCustomEvent<FocusEvent>) => void;
@@ -11161,12 +10796,10 @@ declare namespace LocalJSX {
         "precision"?: number;
         /**
           * 是否只读（可选，禁用输入但可复制）
-          * @default false
          */
         "readonly"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -11175,14 +10808,65 @@ declare namespace LocalJSX {
         "status"?: 'error' | 'warning' | 'success';
         /**
           * 步长（增减用，不强制对齐输入）
-          * @default 1
          */
         "step"?: number;
         /**
           * 当前值（受控，支持双向）
-          * @default 0
          */
         "value"?: number | null;
+    }
+    /**
+     * Layout 布局容器
+     */
+    interface LdesignLayout {
+        /**
+          * 布局方向
+         */
+        "direction"?: 'horizontal' | 'vertical';
+    }
+    /**
+     * Layout Content
+     */
+    interface LdesignLayoutContent {
+    }
+    /**
+     * Layout Footer
+     */
+    interface LdesignLayoutFooter {
+        /**
+          * 高度
+         */
+        "height"?: string;
+    }
+    /**
+     * Layout Header
+     */
+    interface LdesignLayoutHeader {
+        /**
+          * 高度
+         */
+        "height"?: string;
+    }
+    /**
+     * Layout Sider
+     */
+    interface LdesignLayoutSider {
+        /**
+          * 是否已折叠
+         */
+        "collapsed"?: boolean;
+        /**
+          * 折叠后的宽度
+         */
+        "collapsedWidth"?: string;
+        /**
+          * 是否可折叠
+         */
+        "collapsible"?: boolean;
+        /**
+          * 宽度
+         */
+        "width"?: string;
     }
     /**
      * Loading 加载组件
@@ -11191,27 +10875,22 @@ declare namespace LocalJSX {
     interface LdesignLoading {
         /**
           * 全屏模式（覆盖整个视口）
-          * @default false
          */
         "fullscreen"?: boolean;
         /**
           * 全屏时是否锁定页面滚动
-          * @default true
          */
         "lockScroll"?: boolean;
         /**
           * 全屏时是否显示遮罩背景
-          * @default true
          */
         "mask"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 是否处于加载中
-          * @default true
          */
         "spinning"?: boolean;
         /**
@@ -11220,12 +10899,10 @@ declare namespace LocalJSX {
         "tip"?: string;
         /**
           * 加载指示类型
-          * @default 'spinner'
          */
         "type"?: 'spinner' | 'dots';
         /**
           * 垂直布局（图标在上、文字在下）
-          * @default false
          */
         "vertical"?: boolean;
         /**
@@ -11241,22 +10918,18 @@ declare namespace LocalJSX {
     interface LdesignMention {
         /**
           * 浮层挂载到：self|body|closest-popup（透传给 popup）
-          * @default 'body'
          */
         "appendTo"?: 'self' | 'body' | 'closest-popup';
         /**
           * 自动聚焦
-          * @default false
          */
         "autofocus"?: boolean;
         /**
           * token 是否默认可关闭
-          * @default true
          */
         "closable"?: boolean;
         /**
           * 受控模式（为 true 时不在内部修改 value）
-          * @default false
          */
         "controlled"?: boolean;
         /**
@@ -11265,7 +10938,6 @@ declare namespace LocalJSX {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -11274,12 +10946,10 @@ declare namespace LocalJSX {
         "filterOption"?: (input: string, option: MentionItem) => boolean;
         /**
           * 加载中（用于异步搜索）
-          * @default false
          */
         "loading"?: boolean;
         /**
           * 列表最大高度
-          * @default 240
          */
         "maxHeight"?: number;
         /**
@@ -11292,7 +10962,6 @@ declare namespace LocalJSX {
         "model"?: string | MentionSegment[];
         /**
           * 是否多行模式。多行模式下允许回车换行，并可按 rows/maxRows 控制显示高度
-          * @default false
          */
         "multiline"?: boolean;
         "onLdesignBlur"?: (event: LdesignMentionCustomEvent<FocusEvent>) => void;
@@ -11322,7 +10991,6 @@ declare namespace LocalJSX {
         "onLdesignValueChange"?: (event: LdesignMentionCustomEvent<{ text: string; mentions: MentionEntity[]; model: MentionSegment[] }>) => void;
         /**
           * 候选项（数组或 JSON 字符串）
-          * @default []
          */
         "options"?: string | MentionItem[];
         /**
@@ -11332,7 +11000,6 @@ declare namespace LocalJSX {
         "parseOnInit"?: boolean;
         /**
           * 解析策略：label（直接转换）/options（仅命中候选时转换）
-          * @default 'label'
          */
         "parseStrategy"?: 'label' | 'options';
         /**
@@ -11341,32 +11008,26 @@ declare namespace LocalJSX {
         "placeholder"?: string;
         /**
           * 是否只读
-          * @default false
          */
         "readonly"?: boolean;
         /**
           * 是否允许用户手动拖拽调整高度（vertical）
-          * @default true
          */
         "resizable"?: boolean;
         /**
           * 初始可见行数（用于计算最小高度）
-          * @default 3
          */
         "rows"?: number;
         /**
           * 尺寸（影响样式）
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 默认 token 外观
-          * @default 'primary'
          */
         "tokenType"?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
         /**
           * 触发字符（如 @ 或 #），兼容旧属性
-          * @default '@'
          */
         "trigger"?: string;
         /**
@@ -11380,12 +11041,10 @@ declare namespace LocalJSX {
         /**
           * 当前值（受控，文本值，包含渲染后的
           * @name 文本）
-          * @default ''
          */
         "value"?: string;
         /**
           * 事件/受控值格式（默认 model）
-          * @default 'model'
          */
         "valueFormat"?: 'model' | 'segments' | 'text';
         /**
@@ -11396,17 +11055,14 @@ declare namespace LocalJSX {
     interface LdesignMenu {
         /**
           * 手风琴模式：同层级只允许展开一个
-          * @default false
          */
         "accordion"?: boolean;
         /**
           * 折叠模式：仅显示一级图标，悬停右侧弹出；无子级时显示 tooltip（仅纵向）
-          * @default false
          */
         "collapse"?: boolean;
         /**
           * 默认打开的子菜单 key 列表（非受控）
-          * @default []
          */
         "defaultOpenKeys"?: string[];
         /**
@@ -11415,22 +11071,18 @@ declare namespace LocalJSX {
         "defaultValue"?: string;
         /**
           * 子级缩进（px）
-          * @default 16
          */
         "indent"?: number;
         /**
           * 菜单数据（可传入 JSON 字符串或对象数组）
-          * @default []
          */
         "items"?: string | MenuItem[];
         /**
           * 展示模式：vertical（纵向）| horizontal（横向）
-          * @default 'vertical'
          */
         "mode"?: 'vertical' | 'horizontal';
         /**
           * 横向模式下 “更多” 文案
-          * @default '更多'
          */
         "moreLabel"?: string;
         /**
@@ -11451,17 +11103,14 @@ declare namespace LocalJSX {
         "openKeys"?: string[];
         /**
           * 顶层（一级）是否强制显示图标占位（保证对齐）。若条目没有 icon，将渲染一个占位。
-          * @default true
          */
         "requireTopIcon"?: boolean;
         /**
           * 弹出子菜单的触发方式（仅在 flyout/mixed 生效；横向模式同样适用）
-          * @default 'hover'
          */
         "submenuTrigger"?: SubmenuTrigger;
         /**
           * 纵向模式：顶层互斥展开（无论 inline 或 flyout），默认开启
-          * @default true
          */
         "topLevelExclusive"?: boolean;
         /**
@@ -11470,7 +11119,6 @@ declare namespace LocalJSX {
         "value"?: string;
         /**
           * 垂直模式展开方式：inline（内嵌）、flyout（右侧弹出）、mixed（一级内嵌，其余弹出）
-          * @default 'inline'
          */
         "verticalExpand"?: VerticalExpand;
     }
@@ -11488,7 +11136,6 @@ declare namespace LocalJSX {
     interface LdesignMessage {
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable"?: boolean;
         /**
@@ -11497,12 +11144,10 @@ declare namespace LocalJSX {
         "customClass"?: string;
         /**
           * 自动关闭的时长（毫秒）；设为 0 则不自动关闭
-          * @default 3000
          */
         "duration"?: number;
         /**
           * 是否支持HTML内容
-          * @default false
          */
         "html"?: boolean;
         /**
@@ -11527,22 +11172,18 @@ declare namespace LocalJSX {
         "onLdesignClose"?: (event: LdesignMessageCustomEvent<void>) => void;
         /**
           * 消息内容
-          * @default true
          */
         "pauseOnHover"?: boolean;
         /**
           * 出现位置
-          * @default 'top'
          */
         "placement"?: 'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right' | 'center';
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon"?: boolean;
         /**
           * 提示类型
-          * @default 'info'
          */
         "type"?: MessageType;
     }
@@ -11553,22 +11194,18 @@ declare namespace LocalJSX {
         "animEase"?: string;
         /**
           * 动画效果类型
-          * @default 'zoom'
          */
         "animation"?: ModalAnimation;
         /**
           * 新增：是否显示动画效果
-          * @default true
          */
         "animationEnabled"?: boolean;
         /**
           * 新增：自动检测系统深色模式
-          * @default true
          */
         "autoDetectDarkMode"?: boolean;
         /**
           * 软键盘（移动端）避让
-          * @default true
          */
         "avoidKeyboard"?: boolean;
         /**
@@ -11581,12 +11218,10 @@ declare namespace LocalJSX {
         "beforeStepChange"?: (from: number, to: number) => boolean | Promise<boolean>;
         /**
           * 新增：模糊程度
-          * @default 10
          */
         "blurAmount"?: number;
         /**
           * 新增：模糊背景
-          * @default false
          */
         "blurBackground"?: boolean;
         /**
@@ -11594,37 +11229,26 @@ declare namespace LocalJSX {
          */
         "bodyPadding"?: string | number;
         "breakpoints"?: { xs: number; sm: number; md: number; lg: number };
-        /**
-          * @default '取消'
-         */
         "cancelText"?: string;
-        /**
-          * @default 'secondary'
-         */
         "cancelType"?: ButtonType;
         /**
           * 是否居中显示
-          * @default false
          */
         "centered"?: boolean;
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable"?: boolean;
         /**
           * 新增：是否显示关闭动画
-          * @default true
          */
         "closeAnimation"?: boolean;
         /**
           * 图标可配置
-          * @default 'close'
          */
         "closeIcon"?: string;
         /**
           * 当前步骤（0-based，可受控）
-          * @default 0
          */
         "currentStep"?: number;
         /**
@@ -11643,22 +11267,18 @@ declare namespace LocalJSX {
         "customClass"?: string;
         /**
           * 新增：深色模式
-          * @default false
          */
         "darkMode"?: boolean;
         /**
           * 新增：是否允许双击标题栏最大化
-          * @default true
          */
         "dblclickMaximize"?: boolean;
         /**
           * 是否销毁子元素
-          * @default false
          */
         "destroyOnClose"?: boolean;
         /**
           * 新增：是否禁用过渡效果
-          * @default false
          */
         "disableTransition"?: boolean;
         /**
@@ -11667,7 +11287,6 @@ declare namespace LocalJSX {
         "drawerCloseThreshold"?: number | string;
         /**
           * Drawer 边缘滑动关闭
-          * @default true
          */
         "drawerSwipeToClose"?: boolean;
         /**
@@ -11677,27 +11296,22 @@ declare namespace LocalJSX {
         "ease"?: string;
         /**
           * 边缘感应宽度（px）
-          * @default 24
          */
         "edgeSwipeWidth"?: number;
         /**
           * 新增：是否启用手势操作
-          * @default true
          */
         "enableGestures"?: boolean;
         /**
           * 新增：是否支持画中画模式
-          * @default false
          */
         "enablePictureInPicture"?: boolean;
         /**
           * 新增：底部按钮对齐
-          * @default 'right'
          */
         "footerAlign"?: 'left' | 'center' | 'right' | 'space-between';
         /**
           * 新增：是否默认满屏
-          * @default false
          */
         "fullscreen"?: boolean;
         /**
@@ -11715,44 +11329,34 @@ declare namespace LocalJSX {
         "initialFocus"?: string;
         /**
           * 是否可拖拽
-          * @default false
          */
         "isDraggable"?: boolean;
         /**
           * 按ESC键是否关闭
-          * @default true
          */
         "keyboard"?: boolean;
         /**
           * 新增：是否展示加载状态
-          * @default false
          */
         "loading"?: boolean;
         /**
           * 新增：加载文字
-          * @default '加载中...'
          */
         "loadingText"?: string;
         /**
           * 是否显示遮罩层
-          * @default true
          */
         "mask"?: boolean;
         /**
           * 点击遮罩层是否关闭
-          * @default true
          */
         "maskClosable"?: boolean;
         "maxHeight"?: number;
         "maxWidth"?: number;
         /**
           * 是否可最大化
-          * @default false
          */
         "maximizable"?: boolean;
-        /**
-          * @default 'maximize'
-         */
         "maximizeIcon"?: string;
         "minHeight"?: number;
         /**
@@ -11763,23 +11367,15 @@ declare namespace LocalJSX {
           * 模态框标题
          */
         "modalTitle"?: string;
-        /**
-          * @default false
-         */
         "okDisabled"?: boolean;
         /**
           * OK 按钮状态
-          * @default false
          */
         "okLoading"?: boolean;
         /**
           * 底部按钮文案和类型控制（仅在未自定义 footer 时生效）
-          * @default '确定'
          */
         "okText"?: string;
-        /**
-          * @default 'primary'
-         */
         "okType"?: ButtonType;
         /**
           * 关闭事件
@@ -11796,62 +11392,48 @@ declare namespace LocalJSX {
         "onLdesignVisibleChange"?: (event: LdesignModalCustomEvent<boolean>) => void;
         /**
           * 屏幕边缘滑动打开抽屉（需 destroyOnClose=false 以便组件常驻）
-          * @default false
          */
         "openOnEdgeSwipe"?: boolean;
         "preOk"?: () => boolean | Promise<boolean>;
         /**
           * 新增：当前进度（0-100）
-          * @default 0
          */
         "progress"?: number;
         /**
           * 是否可调整大小
-          * @default false
          */
         "resizable"?: boolean;
-        /**
-          * @default 'restore'
-         */
         "restoreIcon"?: string;
         /**
           * 新增：是否显示取消按钮
-          * @default true
          */
         "showCancelButton"?: boolean;
         /**
           * 新增：是否显示底部分割线
-          * @default true
          */
         "showFooterDivider"?: boolean;
         /**
           * 新增：是否显示满屏按钮
-          * @default false
          */
         "showFullscreenButton"?: boolean;
         /**
           * 新增：是否显示头部分割线
-          * @default true
          */
         "showHeaderDivider"?: boolean;
         /**
           * 新增：是否显示确认按钮
-          * @default true
          */
         "showOkButton"?: boolean;
         /**
           * 新增：是否显示进度指示器
-          * @default false
          */
         "showProgress"?: boolean;
         /**
           * 新增：是否显示阴影
-          * @default true
          */
         "showShadow"?: boolean;
         /**
           * 模态框尺寸
-          * @default 'medium'
          */
         "size"?: ModalSize;
         /**
@@ -11860,7 +11442,6 @@ declare namespace LocalJSX {
         "steps"?: string[];
         /**
           * 新增：主题
-          * @default 'light'
          */
         "theme"?: ModalTheme;
         /**
@@ -11869,12 +11450,10 @@ declare namespace LocalJSX {
         "top"?: number | string;
         /**
           * 焦点与可访问性
-          * @default true
          */
         "trapFocus"?: boolean;
         /**
           * 变体：抽屉/底部弹层等
-          * @default 'modal'
          */
         "variant"?: ModalVariant;
         /**
@@ -11883,12 +11462,10 @@ declare namespace LocalJSX {
         "variantAt"?: Partial<Record<'xs'|'sm'|'md'|'lg', ModalVariant>>;
         /**
           * 新增：支持虚拟化滚动
-          * @default false
          */
         "virtualScroll"?: boolean;
         /**
           * 是否显示模态框
-          * @default false
          */
         "visible"?: boolean;
         /**
@@ -11897,12 +11474,10 @@ declare namespace LocalJSX {
         "width"?: number | string;
         /**
           * 向导模式
-          * @default false
          */
         "wizard"?: boolean;
         /**
           * z-index
-          * @default 1000
          */
         "zIndex"?: number;
     }
@@ -11913,7 +11488,6 @@ declare namespace LocalJSX {
     interface LdesignNotification {
         /**
           * 是否显示关闭按钮
-          * @default true
          */
         "closable"?: boolean;
         /**
@@ -11922,7 +11496,6 @@ declare namespace LocalJSX {
         "description"?: string;
         /**
           * 自动关闭的时长（毫秒）；设为 0 则不自动关闭
-          * @default 4500
          */
         "duration"?: number;
         /**
@@ -11935,22 +11508,18 @@ declare namespace LocalJSX {
         "onLdesignClose"?: (event: LdesignNotificationCustomEvent<void>) => void;
         /**
           * 悬浮时是否暂停计时
-          * @default true
          */
         "pauseOnHover"?: boolean;
         /**
           * 出现位置
-          * @default 'top-right'
          */
         "placement"?: NotificationPlacement;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon"?: boolean;
         /**
           * 通知类型
-          * @default 'info'
          */
         "type"?: NotificationType;
     }
@@ -11961,7 +11530,6 @@ declare namespace LocalJSX {
     interface LdesignPagination {
         /**
           * 页码省略边界数（两端保留）
-          * @default 1
          */
         "boundaryCount"?: number;
         /**
@@ -11970,22 +11538,18 @@ declare namespace LocalJSX {
         "current"?: number;
         /**
           * 默认当前页（非受控）
-          * @default 1
          */
         "defaultCurrent"?: number;
         /**
           * 默认每页条数（非受控）
-          * @default 10
          */
         "defaultPageSize"?: number;
         /**
           * 组件禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 仅一页时是否隐藏
-          * @default false
          */
         "hideOnSinglePage"?: boolean;
         /**
@@ -12002,67 +11566,54 @@ declare namespace LocalJSX {
         "pageSize"?: number;
         /**
           * 页大小选项（可传数组或逗号分隔字符串）
-          * @default [10, 20, 50, 100]
          */
         "pageSizeOptions"?: number[] | string;
         /**
           * 下拉展示文案模板，仅在 dropdown 模式下生效，支持 {size}
-          * @default '{size} 条/页'
          */
         "pageSizeText"?: string;
         /**
           * 页信息文案模板，支持 {current}、{pageCount}
-          * @default '{current}/{pageCount} 页'
          */
         "pageText"?: string;
         /**
           * 是否显示首页/末页
-          * @default false
          */
         "showFirstLast"?: boolean;
         /**
           * 是否显示快速跳转输入框
-          * @default false
          */
         "showQuickJumper"?: boolean;
         /**
           * 是否显示每页条数切换器
-          * @default false
          */
         "showSizeChanger"?: boolean;
         /**
           * 是否显示总数文案
-          * @default false
          */
         "showTotal"?: boolean;
         /**
           * 当前页两侧展示的邻接页数
-          * @default 1
          */
         "siblingCount"?: number;
         /**
           * 简洁模式（仅上一页/下一页 + 页码输入）
-          * @default false
          */
         "simple"?: boolean;
         /**
           * 组件尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 切换器类型：native 原生下拉；dropdown 使用组件弹层
-          * @default 'dropdown'
          */
         "sizeChangerType"?: 'native' | 'dropdown';
         /**
           * 总条目数
-          * @default 0
          */
         "total"?: number;
         /**
           * 总数文案模板，支持 {total}、{rangeStart}、{rangeEnd}
-          * @default '共 {total} 条'
          */
         "totalText"?: string;
     }
@@ -12085,12 +11636,10 @@ declare namespace LocalJSX {
         "defaultValue"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 手势拖拽跟随比例（0-1），1 表示 1:1 跟手，越小阻力越大，默认 1
-          * @default 1
          */
         "dragFollow"?: number;
         /**
@@ -12099,27 +11648,22 @@ declare namespace LocalJSX {
         "dragSmoothing"?: number;
         /**
           * 是否启用 3D 效果
-          * @default false
          */
         "enable3d"?: boolean;
         /**
           * 惯性摩擦 0-1（越小减速越快）
-          * @default 0.92
          */
         "friction"?: number;
         /**
           * 是否启用触觉反馈（需要浏览器支持 Vibration API）
-          * @default true
          */
         "hapticFeedback"?: boolean;
         /**
           * 触觉反馈强度（毫秒）
-          * @default 5
          */
         "hapticIntensity"?: number;
         /**
           * 搜索时是否高亮匹配文本
-          * @default true
          */
         "highlightMatch"?: boolean;
         /**
@@ -12128,7 +11672,6 @@ declare namespace LocalJSX {
         "itemHeight"?: number;
         /**
           * 键盘快捷定位是否启用（输入字母快速定位）
-          * @default true
          */
         "keyboardQuickJump"?: boolean;
         /**
@@ -12141,7 +11684,6 @@ declare namespace LocalJSX {
         "maxOverscrollRatio"?: number;
         /**
           * 是否启用惯性
-          * @default true
          */
         "momentum"?: boolean;
         /**
@@ -12154,7 +11696,6 @@ declare namespace LocalJSX {
         "onLdesignPick"?: (event: LdesignPickerCustomEvent<{ value: string | undefined; option?: PickerOption; context: { trigger: 'click' | 'scroll' | 'touch' | 'wheel' | 'keyboard' } }>) => void;
         /**
           * 选项列表（数组或 JSON 字符串）
-          * @default []
          */
         "options"?: string | PickerOption[];
         /**
@@ -12163,7 +11704,6 @@ declare namespace LocalJSX {
         "panelHeight"?: number;
         /**
           * 边界阻力系数 0-1（越小阻力越大）
-          * @default 0.3
          */
         "resistance"?: number;
         /**
@@ -12172,32 +11712,26 @@ declare namespace LocalJSX {
         "rotateStep"?: number;
         /**
           * 搜索防抖延迟（毫秒）
-          * @default 300
          */
         "searchDebounce"?: number;
         /**
           * 是否在搜索时大小写不敏感
-          * @default true
          */
         "searchIgnoreCase"?: boolean;
         /**
           * 搜索框占位符
-          * @default '搜索选项...'
          */
         "searchPlaceholder"?: string;
         /**
           * 是否显示搜索框
-          * @default false
          */
         "searchable"?: boolean;
         /**
           * 是否显示渐变遮罩
-          * @default true
          */
         "showMask"?: boolean;
         /**
           * 尺寸，影响每行高度
-          * @default 'medium'
          */
         "size"?: 'small' | 'medium' | 'large';
         /**
@@ -12210,7 +11744,6 @@ declare namespace LocalJSX {
         "snapDurationWheel"?: number;
         /**
           * 是否启用音效
-          * @default false
          */
         "soundEffects"?: boolean;
         /**
@@ -12219,7 +11752,6 @@ declare namespace LocalJSX {
         "soundUrl"?: string;
         /**
           * 音效音量 (0-1)
-          * @default 0.3
          */
         "soundVolume"?: number;
         /**
@@ -12228,12 +11760,10 @@ declare namespace LocalJSX {
         "springBackDuration"?: number;
         /**
           * 边界回弹模式：'bounce' 弹簧回弹（默认） | 'ease' 缓慢恢复
-          * @default 'bounce'
          */
         "springBackMode"?: 'bounce' | 'ease';
         /**
           * 主题模式
-          * @default 'light'
          */
         "theme"?: 'light' | 'dark' | 'auto';
         /**
@@ -12242,7 +11772,6 @@ declare namespace LocalJSX {
         "value"?: string;
         /**
           * 可视条目数（未显式 panelHeight 时生效，建议奇数：3/5/7）
-          * @default 5
          */
         "visibleItems"?: number;
         /**
@@ -12258,69 +11787,52 @@ declare namespace LocalJSX {
     interface LdesignPopconfirm {
         /**
           * 动画类型（继承自 popup）
-          * @default 'scale'
          */
         "animation"?: 'fade' | 'scale' | 'slide';
         /**
           * 箭头（默认显示），透传给 Popup
-          * @default true
          */
         "arrow"?: boolean;
         /**
           * 自动关闭延迟（毫秒），0 表示不自动关闭
-          * @default 0
          */
         "autoCloseDelay"?: number;
-        /**
-          * @default '取消'
-         */
         "cancelText"?: string;
         /**
           * 取消按钮类型（默认使用次要/描边样式）
-          * @default 'outline'
          */
         "cancelType"?: 'primary' | 'secondary' | 'outline' | 'text' | 'danger';
         /**
           * 点击外部是否关闭（仅点击触发较常用）
-          * @default true
          */
         "closeOnOutside"?: boolean;
         /**
           * 确认按钮加载状态
-          * @default false
          */
         "confirmLoading"?: boolean;
         /**
           * 辅助说明（可选，支持默认 slot 覆盖）
          */
         "description"?: string;
-        /**
-          * @default 0
-         */
         "hideDelay"?: number;
         /**
           * 图标类型/名称
-          * @default 'question'
          */
         "icon"?: PopconfirmIcon;
         /**
           * 是否显示加载状态
-          * @default false
          */
         "loading"?: boolean;
         /**
           * 与触发元素的距离
-          * @default 8
          */
         "offsetDistance"?: number;
         /**
           * 确认/取消按钮文本
-          * @default '确定'
          */
         "okText"?: string;
         /**
           * 确认按钮类型（影响颜色）
-          * @default 'primary'
          */
         "okType"?: 'primary' | 'secondary' | 'outline' | 'text' | 'danger';
         /**
@@ -12337,42 +11849,34 @@ declare namespace LocalJSX {
         "onLdesignVisibleChange"?: (event: LdesignPopconfirmCustomEvent<boolean>) => void;
         /**
           * 出现位置（透传给 Popup）
-          * @default 'top'
          */
         "placement"?: PopconfirmPlacement;
         /**
           * 确认标题（支持 slot=title 覆盖）
-          * @default '确定要执行该操作吗？'
          */
         "popconfirmTitle"?: string;
         /**
           * 延迟显示/隐藏（毫秒），透传给 Popup
-          * @default 0
          */
         "showDelay"?: number;
         /**
           * 是否显示图标
-          * @default true
          */
         "showIcon"?: boolean;
         /**
           * 尺寸（影响内容区域大小）
-          * @default 'medium'
          */
         "size"?: 'small' | 'medium' | 'large';
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme"?: 'light' | 'dark';
         /**
           * 触发方式（默认点击）
-          * @default 'click'
          */
         "trigger"?: PopconfirmTrigger;
         /**
           * 外部受控可见性（仅在 trigger='manual' 时生效）
-          * @default false
          */
         "visible"?: boolean;
     }
@@ -12389,119 +11893,63 @@ declare namespace LocalJSX {
     interface LdesignPopup {
         /**
           * 动画类型
-          * @default 'scale'
          */
         "animation"?: PopupAnimation;
-        /**
-          * @default 'self'
-         */
         "appendTo"?: 'self' | 'body' | 'closest-popup';
-        /**
-          * @default true
-         */
         "arrow"?: boolean;
         /**
           * 自动关闭延迟（ms），0表示不自动关闭
-          * @default 0
          */
         "autoCloseDelay"?: number;
         /**
           * 是否显示关闭按钮
-          * @default false
          */
         "closable"?: boolean;
-        /**
-          * @default true
-         */
         "closeOnEsc"?: boolean;
-        /**
-          * @default true
-         */
         "closeOnOutside"?: boolean;
         "content"?: string;
-        /**
-          * @default false
-         */
         "debug"?: boolean;
-        /**
-          * @default false
-         */
         "disabled"?: boolean;
-        /**
-          * @default 0
-         */
         "hideDelay"?: number;
-        /**
-          * @default true
-         */
         "interactive"?: boolean;
         /**
           * 加载状态
-          * @default false
          */
         "loading"?: boolean;
-        /**
-          * @default false
-         */
         "lockOnScroll"?: boolean;
         "maxWidth"?: number | string;
         /**
           * 动画位移距离（px），用于"朝触发器靠近"的起始位移
-          * @default 10
          */
         "motionDistance"?: number;
         /**
           * 动画时长（ms）
-          * @default 200
          */
         "motionDuration"?: number;
         /**
           * 是否开启动画（基于 data-placement 的定向靠近/离开）
-          * @default true
          */
         "motionEnabled"?: boolean;
         /**
           * 与触发元素的距离：参见组件注释中的语义说明
-          * @default 8
          */
         "offsetDistance"?: number | string;
         "onLdesignVisibleChange"?: (event: LdesignPopupCustomEvent<boolean>) => void;
-        /**
-          * @default 'bottom'
-         */
         "placement"?: PopupPlacement;
         /**
           * 自定义弹层类名
          */
         "popupClass"?: string;
-        /**
-          * @default 'dialog'
-         */
         "popupRole"?: string;
         "popupTitle"?: string;
-        /**
-          * @default 0
-         */
         "showDelay"?: number;
         /**
           * 预设尺寸
          */
         "size"?: PopupSize;
-        /**
-          * @default 'auto'
-         */
         "strategy"?: 'auto' | 'fixed' | 'absolute';
-        /**
-          * @default 'light'
-         */
         "theme"?: 'light' | 'dark';
-        /**
-          * @default 'hover'
-         */
         "trigger"?: PopupTrigger;
-        /**
-          * @default false
-         */
         "visible"?: boolean;
         "width"?: number | string;
     }
@@ -12512,12 +11960,10 @@ declare namespace LocalJSX {
     interface LdesignProgress {
         /**
           * 启用百分比过渡动�?
-          * @default false
          */
         "animated"?: boolean;
         /**
           * 圆形分段之间的间隔角度（度数�?
-          * @default 2
          */
         "circleStepGapDegree"?: number;
         /**
@@ -12526,17 +11972,14 @@ declare namespace LocalJSX {
         "circleSteps"?: number;
         /**
           * 仪表盘变体（仅dashboard类型）：standard | bottom | left | right | fan
-          * @default 'standard'
          */
         "dashboardVariant"?: 'standard' | 'bottom' | 'left' | 'right' | 'fan';
         /**
           * 3D效果（仅line类型�?
-          * @default false
          */
         "effect3d"?: boolean;
         /**
           * 文本格式化，使用 {percent} 占位符，例如�?{percent} / 100"
-          * @default '{percent}%'
          */
         "format"?: string;
         /**
@@ -12545,17 +11988,14 @@ declare namespace LocalJSX {
         "gapDegree"?: number;
         /**
           * 缺口位置（top/right/bottom/left，仅 circle/dashboard�?
-          * @default 'top'
          */
         "gapPosition"?: 'top' | 'right' | 'bottom' | 'left';
         /**
           * 发光效果
-          * @default false
          */
         "glow"?: boolean;
         /**
           * 渐变方向：horizontal | vertical | diagonal
-          * @default 'horizontal'
          */
         "gradientDirection"?: 'horizontal' | 'vertical' | 'diagonal';
         /**
@@ -12569,12 +12009,10 @@ declare namespace LocalJSX {
         "gradientTo"?: string;
         /**
           * 不确定状态（显示循环动画，忽�?percent�?
-          * @default false
          */
         "indeterminate"?: boolean;
         /**
           * 线形文本位置
-          * @default 'right'
          */
         "infoPosition"?: 'right' | 'left' | 'inside' | 'bottom';
         /**
@@ -12595,37 +12033,30 @@ declare namespace LocalJSX {
         "onPercentChange"?: (event: LdesignProgressCustomEvent<number>) => void;
         /**
           * 百分�?0-100
-          * @default 0
          */
         "percent"?: number;
         /**
           * 脉冲动画
-          * @default false
          */
         "pulse"?: boolean;
         /**
           * 半圆位置（type=semicircle），top 表示显示上半圆，bottom 表示下半�?
-          * @default 'top'
          */
         "semiPosition"?: 'top' | 'bottom';
         /**
           * 进度条阴�?
-          * @default false
          */
         "shadow"?: boolean;
         /**
           * 是否显示信息文本（line：默认右侧；circle/dashboard：内部）
-          * @default true
          */
         "showInfo"?: boolean;
         /**
           * 组件尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 状态：normal | active | success | exception
-          * @default 'normal'
          */
         "status"?: 'normal' | 'active' | 'success' | 'exception';
         /**
@@ -12634,17 +12065,14 @@ declare namespace LocalJSX {
         "steps"?: number;
         /**
           * 步骤间隙 px（仅 steps�?
-          * @default 2
          */
         "stepsGap"?: number;
         /**
           * 步骤条的块圆�?
-          * @default 100
          */
         "stepsRadius"?: number;
         /**
           * 条纹动画（active 状态下默认开启）
-          * @default true
          */
         "striped"?: boolean;
         /**
@@ -12653,7 +12081,6 @@ declare namespace LocalJSX {
         "strokeColor"?: string;
         /**
           * 端点样式：round | square | butt（仅 circle 有效，line 以圆角呈�?round�?
-          * @default 'round'
          */
         "strokeLinecap"?: 'round' | 'square' | 'butt';
         /**
@@ -12662,7 +12089,6 @@ declare namespace LocalJSX {
         "strokeWidth"?: number;
         /**
           * 成功颜色
-          * @default 'var(--ldesign-success-color, #42bd42)'
          */
         "successColor"?: string;
         /**
@@ -12671,7 +12097,6 @@ declare namespace LocalJSX {
         "successPercent"?: number;
         /**
           * 视觉主题：default | neon | gradient3d | candy | water | glass | metallic
-          * @default 'default'
          */
         "theme"?: 'default' | 'neon' | 'gradient3d' | 'candy' | 'water' | 'glass' | 'metallic';
         /**
@@ -12680,17 +12105,14 @@ declare namespace LocalJSX {
         "trailColor"?: string;
         /**
           * 类型：line（默认）| circle | dashboard | steps | semicircle
-          * @default 'line'
          */
         "type"?: 'line' | 'circle' | 'dashboard' | 'steps' | 'semicircle';
         /**
           * 波浪动画（仅line类型�?
-          * @default false
          */
         "wave"?: boolean;
         /**
           * 外径宽度（仅 circle/dashboard），单位 px
-          * @default 120
          */
         "width"?: number;
     }
@@ -12701,22 +12123,18 @@ declare namespace LocalJSX {
     interface LdesignRadio {
         /**
           * 是否显示边框
-          * @default false
          */
         "border"?: boolean;
         /**
           * 是否为按钮样式
-          * @default false
          */
         "button"?: boolean;
         /**
           * 是否选中
-          * @default false
          */
         "checked"?: boolean;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -12729,7 +12147,6 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignRadioCustomEvent<string | number>) => void;
         /**
           * 单选框的尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -12744,12 +12161,10 @@ declare namespace LocalJSX {
     interface LdesignRadioGroup {
         /**
           * 排列方向
-          * @default 'horizontal'
          */
         "direction"?: 'horizontal' | 'vertical';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -12762,7 +12177,6 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignRadioGroupCustomEvent<string | number>) => void;
         /**
           * 单选框组尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -12778,12 +12192,10 @@ declare namespace LocalJSX {
     interface LdesignRate {
         /**
           * 再次点击清空（值相同则清零）
-          * @default true
          */
         "allowClear"?: boolean;
         /**
           * 允许半星
-          * @default false
          */
         "allowHalf"?: boolean;
         /**
@@ -12792,22 +12204,18 @@ declare namespace LocalJSX {
         "color"?: string;
         /**
           * 受控模式：为 true 时组件不主动修改 value，仅触发事件
-          * @default false
          */
         "controlled"?: boolean;
         /**
           * 总星数
-          * @default 5
          */
         "count"?: number;
         /**
           * 禁用交互
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 图标名称（默认 star）
-          * @default 'star'
          */
         "icon"?: string;
         /**
@@ -12820,12 +12228,10 @@ declare namespace LocalJSX {
         "onLdesignHoverChange"?: (event: LdesignRateCustomEvent<number>) => void;
         /**
           * 只读（展示，不可交互）
-          * @default false
          */
         "readonly"?: boolean;
         /**
           * 尺寸（影响图标大小与间距）
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -12834,7 +12240,6 @@ declare namespace LocalJSX {
         "tooltips"?: string[] | string;
         /**
           * 当前分值（支持受控）
-          * @default 0
          */
         "value"?: number;
         /**
@@ -12849,38 +12254,29 @@ declare namespace LocalJSX {
     interface LdesignResizeBox {
         /**
           * 受控模式：为 true 时，不会修改 width/height，外部应在事件中设置新值传回
-          * @default false
          */
         "controlled"?: boolean;
         /**
           * 角落把手：top-left/top-right/bottom-right/bottom-left。字符串或数组。默认仅启用 bottom-right。
-          * @default 'bottom-right'
          */
         "corners"?: string | Array<'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'>;
         /**
           * 允许伸缩的边：top/right/bottom/left。默认允许 right 与 bottom，满足常见的“右/下/右下角”拖拽需求
-          * @default 'right,bottom'
          */
         "directions"?: string | Array<'top' | 'right' | 'bottom' | 'left'>;
         /**
           * 是否禁用伸缩
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 初始高度。可传数字（px）或任何合法 CSS 高度值（如 'auto'）。拖拽后以 px 写回。
-          * @default 200
          */
         "height"?: number | string;
         "maxHeight"?: number;
         "maxWidth"?: number;
-        /**
-          * @default 60
-         */
         "minHeight"?: number;
         /**
           * 最小/最大尺寸（px）
-          * @default 80
          */
         "minWidth"?: number;
         "onLdesignResize"?: (event: LdesignResizeBoxCustomEvent<{ width: number; height: number; edge: string }>) => void;
@@ -12891,19 +12287,38 @@ declare namespace LocalJSX {
         "onLdesignResizeStart"?: (event: LdesignResizeBoxCustomEvent<{ width: number; height: number; edge: string }>) => void;
         /**
           * 尺寸标识，仅影响样式（边框、把手大小等）
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 吸附步进（px）。>0 时，拖拽尺寸会对齐到该步进的整数倍。
-          * @default 0
          */
         "snap"?: number;
         /**
           * 初始宽度。可传数字（px）或任何合法 CSS 宽度值（如 '100%'）。拖拽后以 px 写回。
-          * @default 360
          */
         "width"?: number | string;
+    }
+    /**
+     * Result 结果页组件
+     * 用于反馈操作结果
+     */
+    interface LdesignResult {
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 结果状态
+         */
+        "status"?: 'success' | 'error' | 'info' | 'warning' | '404' | '403' | '500';
+        /**
+          * 副标题/描述
+         */
+        "subTitle"?: string;
+        /**
+          * 标题
+         */
+        "title"?: string;
     }
     /**
      * Ripple 水波纹效果
@@ -12914,7 +12329,6 @@ declare namespace LocalJSX {
     interface LdesignRipple {
         /**
           * 是否居中触发
-          * @default false
          */
         "centered"?: boolean;
         /**
@@ -12927,117 +12341,94 @@ declare namespace LocalJSX {
         "customClass"?: string;
         /**
           * 波纹方向
-          * @default 'outward'
          */
         "direction"?: 'outward' | 'inward' | 'both';
         /**
           * 禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 膨胀动画时长(ms)
-          * @default 600
          */
         "duration"?: number;
         /**
           * 缓动函数
-          * @default 'cubic-bezier(0.4, 0, 0.2, 1)'
          */
         "easing"?: string;
         /**
           * 淡出时长(ms)
-          * @default 300
          */
         "fadeOutDuration"?: number;
         /**
           * 是否启用发光效果
-          * @default false
          */
         "glow"?: boolean;
         /**
           * 发光强度
-          * @default 0.5
          */
         "glowIntensity"?: number;
         /**
           * 是否启用振动反馈 (需要浏览器支持)
-          * @default false
          */
         "haptic"?: boolean;
         /**
           * 振动强度 (1-10)
-          * @default 5
          */
         "hapticIntensity"?: number;
         /**
           * 是否启用键盘触发 (Enter/Space)
-          * @default true
          */
         "keyboardEnabled"?: boolean;
         /**
           * 多层波纹延迟 (ms)
-          * @default 120
          */
         "layerDelay"?: number;
         /**
           * 同时存在的最大波纹数量
-          * @default 8
          */
         "maxRipples"?: number;
         /**
           * 是否启用多层波纹
-          * @default false
          */
         "multiLayer"?: boolean;
         /**
           * 波纹不透明度
-          * @default 0.24
          */
         "opacity"?: number;
         /**
           * 半径：auto 或固定像素
-          * @default 'auto'
          */
         "radius"?: 'auto' | number;
         /**
           * 波纹大小模式
-          * @default 'medium'
          */
-        "size"?: 'small' | 'medium' | 'large' | 'extra-large';
+        "rippleSize"?: 'small' | 'medium' | 'large' | 'extra-large';
         /**
           * 是否启用声音反馈
-          * @default false
          */
         "sound"?: boolean;
         /**
           * 声音音量 (0-1)
-          * @default 0.1
          */
         "soundVolume"?: number;
         /**
           * 最小触发间隔 (ms)
-          * @default 0
          */
         "throttle"?: number;
         /**
           * 是否允许触摸设备
-          * @default true
          */
         "touchEnabled"?: boolean;
         /**
           * 触发方式
-          * @default 'pointerdown'
          */
         "trigger"?: 'pointerdown' | 'mousedown' | 'click';
         /**
           * 是否不裁剪边界
-          * @default false
          */
         "unbounded"?: boolean;
         /**
           * 波纹效果类型
-          * @default 'default'
          */
         "variant"?: 'default' | 'light' | 'strong' | 'pulse' | 'gradient';
     }
@@ -13077,37 +12468,30 @@ declare namespace LocalJSX {
     interface LdesignScrollbar {
         /**
           * 是否一直显示（默认悬浮显示）
-          * @default false
          */
         "always"?: boolean;
         /**
           * 自动隐藏延迟（ms）。<=0 表示不自动隐藏（与 always 类似，但 hover 仍会显示）
-          * @default 800
          */
         "autoHideDelay"?: number;
         /**
           * 方向：vertical | horizontal | both
-          * @default 'both'
          */
         "direction"?: 'vertical' | 'horizontal' | 'both';
         /**
           * 是否禁用滚动交互
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 拖拽滚动（鼠标中键，或按住 Alt+左键）
-          * @default false
          */
         "dragScroll"?: boolean;
         /**
           * 拖拽触发方式：middle（中键）| left-alt（Alt+左键）| left（左键）
-          * @default 'middle'
          */
         "dragScrollTrigger"?: 'middle' | 'left-alt' | 'left';
         /**
           * 水平条位置：bottom | top
-          * @default 'bottom'
          */
         "hPosition"?: 'bottom' | 'top';
         "initialScrollLeft"?: number;
@@ -13117,22 +12501,18 @@ declare namespace LocalJSX {
         "initialScrollTop"?: number;
         /**
           * 键盘步进（像素）
-          * @default 40
          */
         "keyStep"?: number;
         /**
           * 是否启用键盘控制（wrap 聚焦时）
-          * @default true
          */
         "keyboard"?: boolean;
         /**
           * 布局：overlay 叠加在内容之上；space 预留滚动条空间
-          * @default 'overlay'
          */
         "layout"?: 'overlay' | 'space';
         /**
           * 使用原生滚动条，不渲染自定义轨道/拇指并且不隐藏系统滚动条
-          * @default false
          */
         "native"?: boolean;
         /**
@@ -13150,88 +12530,57 @@ declare namespace LocalJSX {
         "onLdesignScrollStart"?: (event: LdesignScrollbarCustomEvent<void>) => void;
         /**
           * PageUp/PageDown 的步进（像素），<=0 时按可视高度
-          * @default 0
          */
         "pageStep"?: number;
         /**
           * RTL 文字方向（用于水平滚动与 scrollLeft 归一化）
-          * @default false
          */
         "rtl"?: boolean;
         /**
           * 显示滚动阴影，提示可滚动方向
-          * @default false
          */
         "shadows"?: boolean;
         /**
           * 是否显示微调按钮（上下/左右）
-          * @default false
          */
         "showButtons"?: boolean;
         /**
           * 平滑滚动
-          * @default false
          */
         "smooth"?: boolean;
-        /**
-          * @default 120
-         */
         "snapDelay"?: number;
-        /**
-          * @default true
-         */
         "snapEnabled"?: boolean;
-        /**
-          * @default 'start'
-         */
         "snapMode"?: 'start' | 'center' | 'end';
         /**
           * 吸附：滚动结束后吸附到最近匹配元素
          */
         "snapSelector"?: string;
-        /**
-          * @default 0
-         */
         "stickyBottom"?: number;
         /**
           * sticky 偏移（用于阴影起始位置）
-          * @default 0
          */
         "stickyTop"?: number;
-        /**
-          * @default 'both'
-         */
         "syncAxis"?: 'vertical' | 'horizontal' | 'both';
-        /**
-          * @default true
-         */
         "syncEnabled"?: boolean;
         /**
           * 同步滚动组与轴
          */
         "syncGroup"?: string;
-        /**
-          * @default 32
-         */
         "syncThrottle"?: number;
         /**
           * 最小拇指尺寸（px）
-          * @default 24
          */
         "thumbMinSize"?: number;
         /**
           * 滚动条类型：bar（仅拇指）| track（显示轨道）
-          * @default 'bar'
          */
         "type"?: 'bar' | 'track';
         /**
           * 垂直条位置：right | left
-          * @default 'right'
          */
         "vPosition"?: 'right' | 'left';
         /**
           * 滚轮事件是否允许向父容器传播（到达边缘时总是允许）
-          * @default false
          */
         "wheelPropagation"?: boolean;
     }
@@ -13242,12 +12591,10 @@ declare namespace LocalJSX {
     interface LdesignSelect {
         /**
           * 是否显示箭头（默认不显示）
-          * @default false
          */
         "arrow"?: boolean;
         /**
           * 可清空
-          * @default false
          */
         "clearable"?: boolean;
         /**
@@ -13260,12 +12607,10 @@ declare namespace LocalJSX {
         "defaultValue"?: string | string[];
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 列表最大高度（px）
-          * @default 240
          */
         "maxHeight"?: number;
         /**
@@ -13274,7 +12619,6 @@ declare namespace LocalJSX {
         "maxTagCount"?: number;
         /**
           * 是否多选
-          * @default false
          */
         "multiple"?: boolean;
         /**
@@ -13287,27 +12631,22 @@ declare namespace LocalJSX {
         "onLdesignVisibleChange"?: (event: LdesignSelectCustomEvent<boolean>) => void;
         /**
           * 选项列表（可传数组或 JSON 字符串）
-          * @default []
          */
         "options"?: string | SelectOption[];
         /**
           * 占位文案（无选中项时）
-          * @default '请选择'
          */
         "placeholder"?: string;
         /**
           * 出现位置（默认 bottom-start）
-          * @default 'bottom-start'
          */
         "placement"?: SelectPlacement;
         /**
           * 主题（浅色/深色），透传给 Popup
-          * @default 'light'
          */
         "theme"?: 'light' | 'dark';
         /**
           * 触发方式（Select 多数使用 click 或 manual）
-          * @default 'click'
          */
         "trigger"?: SelectTrigger;
         /**
@@ -13316,7 +12655,6 @@ declare namespace LocalJSX {
         "value"?: string | string[];
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
-          * @default false
          */
         "visible"?: boolean;
         /**
@@ -13325,23 +12663,74 @@ declare namespace LocalJSX {
         "width"?: number | string;
     }
     /**
+     * Skeleton 骨架屏组件
+     * 用于内容加载时的占位效果
+     */
+    interface LdesignSkeleton {
+        /**
+          * 是否显示动画
+         */
+        "animated"?: boolean;
+        /**
+          * 是否显示头像
+         */
+        "avatar"?: boolean;
+        /**
+          * 头像形状
+         */
+        "avatarShape"?: 'circle' | 'square';
+        /**
+          * 头像大小
+         */
+        "avatarSize"?: 'small' | 'medium' | 'large';
+        /**
+          * 圆角
+         */
+        "borderRadius"?: string | number;
+        /**
+          * 高度
+         */
+        "height"?: string | number;
+        /**
+          * 是否加载中
+         */
+        "loading"?: boolean;
+        /**
+          * 段落配置
+         */
+        "paragraph"?: boolean;
+        /**
+          * 渲染行数
+         */
+        "rows"?: number;
+        /**
+          * 是否显示标题
+         */
+        "title"?: boolean;
+        /**
+          * 骨架屏类型
+         */
+        "type"?: 'text' | 'rect' | 'circle' | 'image';
+        /**
+          * 宽度
+         */
+        "width"?: string | number;
+    }
+    /**
      * Slider 滑块组件
      * 通过拖动滑块在一定数值区间内进行选择
      */
     interface LdesignSlider {
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 最大值
-          * @default 100
          */
         "max"?: number;
         /**
           * 最小值
-          * @default 0
          */
         "min"?: number;
         /**
@@ -13354,27 +12743,22 @@ declare namespace LocalJSX {
         "onLdesignInput"?: (event: LdesignSliderCustomEvent<number>) => void;
         /**
           * 是否显示当前值提示
-          * @default false
          */
         "showTooltip"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 步长（> 0）
-          * @default 1
          */
         "step"?: number;
         /**
           * 当前值
-          * @default 0
          */
         "value"?: number;
         /**
           * 是否垂直方向
-          * @default false
          */
         "vertical"?: boolean;
     }
@@ -13385,34 +12769,53 @@ declare namespace LocalJSX {
     interface LdesignSpace {
         /**
           * 交叉轴对齐方式
-          * @default 'center'
          */
         "align"?: 'start' | 'center' | 'end' | 'baseline';
         /**
           * 是否占满容器宽度
-          * @default false
          */
         "block"?: boolean;
         /**
           * 是否自动换行（仅在横向时有效）
-          * @default false
          */
         "breakLine"?: boolean;
         /**
           * 间距方向
-          * @default 'horizontal'
          */
         "direction"?: 'horizontal' | 'vertical';
         /**
           * 间距尺寸。可选预设：small | medium | large；也可传数字，单位为 px
-          * @default 'medium'
          */
         "size"?: Size | number | string;
         /**
           * 分隔符样式：none 不显示分隔符；line 使用 1px 分隔线
-          * @default 'none'
          */
         "split"?: 'none' | 'line';
+    }
+    /**
+     * Spin 加载指示器组件
+     */
+    interface LdesignSpin {
+        /**
+          * 延迟显示加载效果的时间（毫秒）
+         */
+        "delay"?: number;
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        /**
+          * 是否加载中
+         */
+        "spinning"?: boolean;
+        /**
+          * 提示文字
+         */
+        "tip"?: string;
     }
     /**
      * Split 面板分割
@@ -13426,37 +12829,30 @@ declare namespace LocalJSX {
     interface LdesignSplit {
         /**
           * 折叠状态下是否允许通过拖拽恢复
-          * @default true
          */
         "allowDragExpandWhenCollapsed"?: boolean;
         /**
           * 折叠状态：none | start | end
-          * @default 'none'
          */
         "collapsed"?: 'none' | 'start' | 'end';
         /**
           * 折叠后保留的尺寸（px）
-          * @default 0
          */
         "collapsedSize"?: number;
         /**
           * 是否显示快捷折叠按钮
-          * @default false
          */
         "collapsible"?: boolean;
         /**
           * 分割方向：vertical=左右，horizontal=上下
-          * @default 'vertical'
          */
         "direction"?: 'vertical' | 'horizontal';
         /**
           * 是否禁用拖拽
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 起始/末尾面板的最小尺寸（px）
-          * @default 80
          */
         "firstMin"?: number;
         "onLdesignSplit"?: (event: LdesignSplitCustomEvent<{ value: number; direction: 'vertical' | 'horizontal' }>) => void;
@@ -13469,20 +12865,99 @@ declare namespace LocalJSX {
           * 拖拽事件
          */
         "onLdesignSplitStart"?: (event: LdesignSplitCustomEvent<{ value: number; direction: 'vertical' | 'horizontal' }>) => void;
-        /**
-          * @default 80
-         */
         "secondMin"?: number;
         /**
           * 分割条厚度（px）
-          * @default 6
          */
         "splitterSize"?: number;
         /**
           * 起始面板比例（0~1）。拖拽过程中会以小数写回
-          * @default 0.5
          */
         "value"?: number;
+    }
+    /**
+     * Statistic 统计数值组件
+     * 展示统计数值，支持动画效果
+     */
+    interface LdesignStatistic {
+        /**
+          * 是否启用数字动画
+         */
+        "animated"?: boolean;
+        /**
+          * 小数点
+         */
+        "decimalSeparator"?: string;
+        /**
+          * 动画持续时间（毫秒）
+         */
+        "duration"?: number;
+        /**
+          * 精度（小数位数）
+         */
+        "precision"?: number;
+        /**
+          * 前缀
+         */
+        "prefix"?: string;
+        /**
+          * 千分位分隔符
+         */
+        "separator"?: string;
+        /**
+          * 后缀
+         */
+        "suffix"?: string;
+        /**
+          * 标题
+         */
+        "title"?: string;
+        /**
+          * 数值
+         */
+        "value": number;
+        /**
+          * 数值颜色
+         */
+        "valueColor"?: string;
+    }
+    /**
+     * StepItem 步骤项
+     */
+    interface LdesignStepItem {
+        /**
+          * 描述
+         */
+        "description"?: string;
+        /**
+          * 图标
+         */
+        "icon"?: string;
+        /**
+          * 标题
+         */
+        "title": string;
+    }
+    /**
+     * Steps 步骤条组件
+     */
+    interface LdesignSteps {
+        /**
+          * 当前步骤
+         */
+        "current"?: number;
+        /**
+          * 步骤条方向
+         */
+        "direction"?: 'horizontal' | 'vertical';
+        /**
+          * 步骤条尺寸
+         */
+        "size"?: 'small' | 'default';
+        /**
+          * 当前步骤的状态
+         */
+        "status"?: 'wait' | 'process' | 'finish' | 'error';
     }
     /**
      * ldesign-swiper 轮播图组件
@@ -13501,17 +12976,14 @@ declare namespace LocalJSX {
     interface LdesignSwiper {
         /**
           * 允许触摸/鼠标拖拽
-          * @default true
          */
         "allowTouchMove"?: boolean;
         /**
           * 自动播放
-          * @default false
          */
         "autoplay"?: boolean;
         /**
           * 自动播放间隔（毫秒）
-          * @default 3000
          */
         "autoplayDelay"?: number;
         /**
@@ -13520,37 +12992,30 @@ declare namespace LocalJSX {
         "defaultValue"?: number;
         /**
           * 方向
-          * @default 'horizontal'
          */
         "direction"?: 'horizontal' | 'vertical';
         /**
           * 交互后是否禁用自动播放
-          * @default true
          */
         "disableOnInteraction"?: boolean;
         /**
           * 拖拽时显示抓手光标
-          * @default true
          */
         "grabCursor"?: boolean;
         /**
           * 键盘控制
-          * @default false
          */
         "keyboard"?: boolean;
         /**
           * 循环播放
-          * @default false
          */
         "loop"?: boolean;
         /**
           * 鼠标拖拽（PC）
-          * @default true
          */
         "mouseDrag"?: boolean;
         /**
           * 是否显示导航按钮
-          * @default true
          */
         "navigation"?: boolean;
         /**
@@ -13559,32 +13024,26 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignSwiperCustomEvent<number>) => void;
         /**
           * 是否显示分页圆点
-          * @default true
          */
         "pagination"?: boolean;
         /**
           * 悬浮暂停自动播放
-          * @default true
          */
         "pauseOnHover"?: boolean;
         /**
           * 每屏显示的滑块数量（>=1）
-          * @default 1
          */
         "slidesPerView"?: number;
         /**
           * 滑块间距（像素）
-          * @default 0
          */
         "spaceBetween"?: number;
         /**
           * 动画过渡时长（毫秒）
-          * @default 300
          */
         "speed"?: number;
         /**
           * 触发切换的拖拽阈值（像素）
-          * @default 50
          */
         "threshold"?: number;
         /**
@@ -13599,7 +13058,6 @@ declare namespace LocalJSX {
     interface LdesignSwiperSlide {
         /**
           * 激活态（由父级 ldesign-swiper 控制）
-          * @default false
          */
         "active"?: boolean;
     }
@@ -13610,7 +13068,6 @@ declare namespace LocalJSX {
     interface LdesignSwitch {
         /**
           * 是否选中
-          * @default false
          */
         "checked"?: boolean;
         /**
@@ -13623,22 +13080,18 @@ declare namespace LocalJSX {
         "checkedText"?: string;
         /**
           * 选中时的值
-          * @default true
          */
         "checkedValue"?: string | number | boolean;
         /**
           * 颜色风格 可选：brand | success | warning | error | neutral
-          * @default 'brand'
          */
         "color"?: 'brand' | 'success' | 'warning' | 'error' | 'neutral';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 是否加载中
-          * @default false
          */
         "loading"?: boolean;
         /**
@@ -13647,12 +13100,10 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignSwitchCustomEvent<string | number | boolean>) => void;
         /**
           * 形状 可选：pill（胶囊）| rounded（圆角）| square（直角）
-          * @default 'pill'
          */
         "shape"?: 'pill' | 'rounded' | 'square';
         /**
           * 开关尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
@@ -13665,12 +13116,10 @@ declare namespace LocalJSX {
         "uncheckedText"?: string;
         /**
           * 未选中时的值
-          * @default false
          */
         "uncheckedValue"?: string | number | boolean;
         /**
           * 外观样式 可选：solid | soft | outline | ghost
-          * @default 'solid'
          */
         "variant"?: 'solid' | 'soft' | 'outline' | 'ghost';
     }
@@ -13681,7 +13130,6 @@ declare namespace LocalJSX {
     interface LdesignTabPanel {
         /**
           * 由父组件控制的激活状态（反射到属性便于样式控制）
-          * @default false
          */
         "active"?: boolean;
         /**
@@ -13690,17 +13138,14 @@ declare namespace LocalJSX {
         "badge"?: string | number;
         /**
           * 是否可关闭（在标签上显示关闭按钮）
-          * @default false
          */
         "closable"?: boolean;
         /**
           * 销毁隐藏：在面板隐藏时销毁内容，再次显示时重新渲染
-          * @default false
          */
         "destroyOnHide"?: boolean;
         /**
           * 禁用状态（不可被激活）
-          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -13713,12 +13158,10 @@ declare namespace LocalJSX {
         "label": string;
         /**
           * 懒渲染：首次激活时才渲染插槽内容，之后保持渲染
-          * @default false
          */
         "lazy"?: boolean;
         /**
           * 加载中状态
-          * @default false
          */
         "loading"?: boolean;
         /**
@@ -13735,14 +13178,78 @@ declare namespace LocalJSX {
         "onLdesignPanelLoad"?: (event: LdesignTabPanelCustomEvent<void>) => void;
         /**
           * 过渡动画类型
-          * @default 'fade'
          */
         "transition"?: 'fade' | 'slide' | 'zoom' | 'none';
         /**
           * 过渡动画时长（毫秒）
-          * @default 300
          */
         "transitionDuration"?: number;
+    }
+    /**
+     * Table 高性能数据表格组件
+     * 支持虚拟滚动、排序、筛选、固定列/表头
+     */
+    interface LdesignTable {
+        /**
+          * 是否显示边框
+         */
+        "bordered"?: boolean;
+        /**
+          * 表格列配置
+         */
+        "columns"?: TableColumn[] | string;
+        /**
+          * 表格数据
+         */
+        "dataSource"?: any[] | string;
+        /**
+          * 空数据提示文字
+         */
+        "emptyText"?: string;
+        /**
+          * 表格高度（启用虚拟滚动时必须指定）
+         */
+        "height"?: number | string;
+        /**
+          * 是否允许hover高亮
+         */
+        "hoverable"?: boolean;
+        /**
+          * 是否加载中
+         */
+        "loading"?: boolean;
+        /**
+          * 行点击事件
+         */
+        "onLdesignRowClick"?: (event: LdesignTableCustomEvent<{ row: any; index: number }>) => void;
+        /**
+          * 排序变化事件
+         */
+        "onLdesignSort"?: (event: LdesignTableCustomEvent<TableSort>) => void;
+        /**
+          * 行高（用于虚拟滚动）
+         */
+        "rowHeight"?: number;
+        /**
+          * 行键值字段
+         */
+        "rowKey"?: string;
+        /**
+          * 是否显示表头
+         */
+        "showHeader"?: boolean;
+        /**
+          * 表格大小
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        /**
+          * 是否显示斑马纹
+         */
+        "striped"?: boolean;
+        /**
+          * 是否启用虚拟滚动
+         */
+        "virtual"?: boolean;
     }
     /**
      * Tabs 选项卡组件
@@ -13751,12 +13258,10 @@ declare namespace LocalJSX {
     interface LdesignTabs {
         /**
           * 是否显示新增按钮
-          * @default false
          */
         "addable"?: boolean;
         /**
           * 动画过渡时长（毫秒）
-          * @default 300
          */
         "animationDuration"?: number;
         /**
@@ -13781,37 +13286,30 @@ declare namespace LocalJSX {
         "onLdesignReorder"?: (event: LdesignTabsCustomEvent<{ items: TabMeta[] }>) => void;
         /**
           * 选项卡位置
-          * @default 'top'
          */
         "placement"?: TabsPlacement;
         /**
           * 是否自动适应响应式布局
-          * @default true
          */
         "responsive"?: boolean;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: Size;
         /**
           * 是否可拖拽排序
-          * @default false
          */
         "sortable"?: boolean;
         /**
           * 是否启用触摸滑动切换
-          * @default false
          */
         "swipeable"?: boolean;
         /**
           * 选项卡外观类型
-          * @default 'line'
          */
         "type"?: TabsType;
         /**
           * 是否隐藏超出部分的标签页（使用更多下拉菜单）
-          * @default false
          */
         "useDropdown"?: boolean;
         /**
@@ -13830,37 +13328,30 @@ declare namespace LocalJSX {
         "badge"?: string | number;
         /**
           * 右上角角标脉动效果
-          * @default false
          */
         "badgePulse"?: boolean;
         /**
           * 是否显示边框动画（仅在 checkable 或 clickable 时有效）
-          * @default false
          */
         "borderAnimation"?: boolean;
         /**
           * 是否可选（切换选中态）
-          * @default false
          */
         "checkable"?: boolean;
         /**
           * 是否可点击（非选中态），用于标签作为动作的场景
-          * @default false
          */
         "clickable"?: boolean;
         /**
           * 是否可关闭
-          * @default false
          */
         "closable"?: boolean;
         /**
           * 关闭按钮的无障碍文案
-          * @default '关闭标签'
          */
         "closeAriaLabel"?: string;
         /**
           * 语义颜色
-          * @default 'default'
          */
         "color"?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
         /**
@@ -13869,17 +13360,14 @@ declare namespace LocalJSX {
         "customColor"?: string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 右上角小圆点
-          * @default false
          */
         "dot"?: boolean;
         /**
           * 效果风格：none（默认）、gradient（渐变）、glass（毛玻璃）、neon（霓虹）
-          * @default 'none'
          */
         "effect"?: 'none' | 'gradient' | 'glass' | 'neon';
         /**
@@ -13888,7 +13376,6 @@ declare namespace LocalJSX {
         "icon"?: string;
         /**
           * 加载状态
-          * @default false
          */
         "loading"?: boolean;
         /**
@@ -13901,22 +13388,18 @@ declare namespace LocalJSX {
         "onLdesignClose"?: (event: LdesignTagCustomEvent<MouseEvent>) => void;
         /**
           * 选中状态（与 checkable 配合使用）
-          * @default false
          */
         "selected"?: boolean;
         /**
           * 形状（rectangle：直角；round：全圆角；pill：胶囊）
-          * @default 'rectangle'
          */
         "shape"?: 'rectangle' | 'round' | 'pill';
         /**
           * 尺寸（small/middle/large，兼容 medium）
-          * @default 'middle'
          */
         "size"?: Size;
         /**
           * 外观风格 - light: 浅色背景（默认） - solid: 实底 - outline: 描边 - ghost: 透明背景，悬停有轻微填充 - dashed: 虚线描边 - elevated: 浅色+阴影
-          * @default 'light'
          */
         "variant"?: 'light' | 'solid' | 'outline' | 'ghost' | 'dashed' | 'elevated';
     }
@@ -13930,47 +13413,38 @@ declare namespace LocalJSX {
     interface LdesignTagGroup {
         /**
           * 添加按钮文本
-          * @default '+ 添加标签'
          */
         "addText"?: string;
         /**
           * 是否显示添加按钮
-          * @default false
          */
         "addable"?: boolean;
         /**
           * 新标签默认颜色
-          * @default 'default'
          */
         "defaultColor"?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
         /**
           * 新标签默认样式
-          * @default 'light'
          */
         "defaultVariant"?: 'light' | 'solid' | 'outline' | 'ghost' | 'dashed' | 'elevated';
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 是否启用拖拽排序
-          * @default false
          */
         "enableDrag"?: boolean;
         /**
           * 输入框占位符
-          * @default '请输入标签名'
          */
         "inputPlaceholder"?: string;
         /**
           * more 模式下最多展示的项数（超出将折叠）
-          * @default 5
          */
         "maxVisible"?: number;
         /**
           * more 展示文本前缀，例如 "+"
-          * @default '+'
          */
         "morePrefix"?: string;
         /**
@@ -13987,125 +13461,93 @@ declare namespace LocalJSX {
         "onLdesignRemove"?: (event: LdesignTagGroupCustomEvent<{ tag: TagData; index: number }>) => void;
         /**
           * 溢出策略：wrap（自动换行） | more（+N 收纳）
-          * @default 'wrap'
          */
         "overflow"?: 'wrap' | 'more';
         /**
           * 标签数据（受控模式）
-          * @default []
          */
         "tags"?: TagData[];
     }
     interface LdesignTimePicker {
         "breakpoints"?: Breakpoints1;
-        /**
-          * @default false
-         */
         "clearable"?: boolean;
-        /**
-          * @default true
-         */
         "confirm"?: boolean;
         "defaultValue"?: string;
-        /**
-          * @default false
-         */
         "disabled"?: boolean;
         "disabledHours"?: number[];
         "disabledMinutes"?: number[];
         "disabledSeconds"?: number[];
-        /**
-          * @default 'bottom'
-         */
         "drawerPlacement"?: 'left' | 'right' | 'top' | 'bottom';
         "drawerSize"?: number | string;
         "drawerTitle"?: string;
         "endValue"?: string;
-        /**
-          * @default 1
-         */
         "hourStep"?: number;
-        /**
-          * @default false
-         */
         "inline"?: boolean;
-        /**
-          * @default false
-         */
         "loading"?: boolean;
         "locale"?: TimePickerLocale;
         "maxTime"?: string;
         "minTime"?: string;
-        /**
-          * @default 1
-         */
         "minuteStep"?: number;
         "onLdesignChange"?: (event: LdesignTimePickerCustomEvent<string | undefined | { start: string; end: string }>) => void;
         "onLdesignClose"?: (event: LdesignTimePickerCustomEvent<void>) => void;
         "onLdesignOpen"?: (event: LdesignTimePickerCustomEvent<void>) => void;
         "onLdesignPick"?: (event: LdesignTimePickerCustomEvent<{ value: string; context: { trigger: 'click' | 'scroll' | 'keyboard' | 'now' | 'clear' | 'preset' | 'touch' | 'wheel' } }>) => void;
         "onLdesignVisibleChange"?: (event: LdesignTimePickerCustomEvent<boolean>) => void;
-        /**
-          * @default '24h'
-         */
         "outputFormat"?: '12h' | '24h';
-        /**
-          * @default 'auto'
-         */
         "overlay"?: TimePickerOverlay;
         "panelHeight"?: number;
-        /**
-          * @default '选择时间'
-         */
         "placeholder"?: string;
-        /**
-          * @default 'bottom-start' as Placement
-         */
         "placement"?: Placement;
         "presets"?: TimePreset[];
-        /**
-          * @default false
-         */
         "range"?: boolean;
-        /**
-          * @default false
-         */
         "readonly"?: boolean;
-        /**
-          * @default 1
-         */
         "secondStep"?: number;
         /**
           * 是否展示"此刻"快捷按钮
-          * @default true
          */
         "showNow"?: boolean;
-        /**
-          * @default true
-         */
         "showSeconds"?: boolean;
-        /**
-          * @default 'medium'
-         */
         "size"?: TimePickerSize;
         "startValue"?: string;
-        /**
-          * @default [1, 1, 1]
-         */
         "steps"?: number[];
-        /**
-          * @default 'click'
-         */
         "trigger"?: TimePickerTrigger;
         "value"?: string;
-        /**
-          * @default false
-         */
         "visible"?: boolean;
-        /**
-          * @default 5
-         */
         "visibleItems"?: number;
+    }
+    /**
+     * Timeline 时间轴组件
+     */
+    interface LdesignTimeline {
+        /**
+          * 时间轴模式
+         */
+        "mode"?: 'left' | 'right' | 'alternate';
+        /**
+          * 是否反转
+         */
+        "reverse"?: boolean;
+    }
+    /**
+     * TimelineItem 时间轴项
+     */
+    interface LdesignTimelineItem {
+        /**
+          * 节点颜色
+         */
+        "color"?: 'primary' | 'success' | 'warning' | 'error' | 'gray';
+        /**
+          * 自定义图标
+         */
+        "icon"?: string;
+        /**
+          * 标签文字
+         */
+        "label"?: string;
+        /**
+          * 时间戳
+         */
+        "timestamp"?: string;
     }
     /**
      * Tooltip 工具提示组件
@@ -14114,22 +13556,18 @@ declare namespace LocalJSX {
     interface LdesignTooltip {
         /**
           * 动画类型
-          * @default 'scale'
          */
         "animation"?: TooltipAnimation;
         /**
           * 是否显示箭头
-          * @default true
          */
         "arrow"?: boolean;
         /**
           * 自动关闭延迟
-          * @default 0
          */
         "autoCloseDelay"?: number;
         /**
           * 是否显示关闭按钮（仅click触发时有效）
-          * @default false
          */
         "closable"?: boolean;
         /**
@@ -14138,62 +13576,50 @@ declare namespace LocalJSX {
         "content": string;
         /**
           * 是否禁用
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 延迟隐藏时间（毫秒）
-          * @default 100
          */
         "hideDelay"?: number;
         /**
           * 是否可交互（hover时鼠标可以移入tooltip）
-          * @default false
          */
         "interactive"?: boolean;
         /**
           * 是否在滚动时锁定位置
-          * @default false
          */
         "lockOnScroll"?: boolean;
         /**
           * 最大宽度
-          * @default 250
          */
         "maxWidth"?: number | string;
         /**
           * 动画位移距离
-          * @default 10
          */
         "motionDistance"?: number;
         /**
           * 动画时长
-          * @default 200
          */
         "motionDuration"?: number;
         /**
           * 与触发元素的间距
-          * @default 8
          */
         "offsetDistance"?: number | string;
         /**
           * 提示位置
-          * @default 'top'
          */
         "placement"?: TooltipPlacement;
         /**
           * 延迟显示时间（毫秒）
-          * @default 100
          */
         "showDelay"?: number;
         /**
           * 尺寸
-          * @default 'medium'
          */
         "size"?: TooltipSize;
         /**
           * 主题：深色/浅色（默认深色）
-          * @default 'dark'
          */
         "theme"?: 'dark' | 'light';
         /**
@@ -14206,18 +13632,41 @@ declare namespace LocalJSX {
         "tooltipTitle"?: string;
         /**
           * 触发方式
-          * @default 'hover'
          */
         "trigger"?: TooltipTrigger;
         /**
           * 是否受控显示
-          * @default false
          */
         "visible"?: boolean;
         /**
           * 宽度（覆盖maxWidth）
          */
         "width"?: number | string;
+    }
+    /**
+     * Tour 漫游式引导组件
+     */
+    interface LdesignTour {
+        /**
+          * 关闭事件
+         */
+        "onLdesignClose"?: (event: LdesignTourCustomEvent<void>) => void;
+        /**
+          * 完成事件
+         */
+        "onLdesignFinish"?: (event: LdesignTourCustomEvent<void>) => void;
+        /**
+          * 步骤变化事件
+         */
+        "onLdesignStepChange"?: (event: LdesignTourCustomEvent<number>) => void;
+        /**
+          * 是否打开
+         */
+        "open"?: boolean;
+        /**
+          * 步骤配置
+         */
+        "steps"?: TourStep[] | string;
     }
     /**
      * Transfer 穿梭框
@@ -14230,27 +13679,22 @@ declare namespace LocalJSX {
         "defaultValue"?: string[];
         /**
           * 禁用整个组件
-          * @default false
          */
         "disabled"?: boolean;
         /**
           * 是否可搜索
-          * @default false
          */
         "filterable"?: boolean;
         /**
           * 数据源（可传数组或 JSON 字符串）
-          * @default []
          */
         "items"?: string | TransferItem[];
         /**
           * 左侧面板标题
-          * @default '源列表'
          */
         "leftTitle"?: string;
         /**
           * 列表高度（px）
-          * @default 240
          */
         "listHeight"?: number;
         /**
@@ -14259,7 +13703,6 @@ declare namespace LocalJSX {
         "onLdesignChange"?: (event: LdesignTransferCustomEvent<{ value: string[]; movedKeys: string[]; direction: 'left' | 'right' }>) => void;
         /**
           * 右侧面板标题
-          * @default '目标列表'
          */
         "rightTitle"?: string;
         /**
@@ -14268,13 +13711,9 @@ declare namespace LocalJSX {
         "value"?: string[];
     }
     interface LdesignTree {
-        /**
-          * @default true
-         */
         "allowAfter"?: boolean;
         /**
           * 全局允许放置位置
-          * @default true
          */
         "allowBefore"?: boolean;
         /**
@@ -14285,13 +13724,9 @@ declare namespace LocalJSX {
           * 自定义：是否允许在目标位置放置（JS 赋值）
          */
         "allowDrop"?: (dragNode: TreeNode, dropNode: TreeNode, position: 'before' | 'after' | 'inside') => boolean;
-        /**
-          * @default true
-         */
         "allowInside"?: boolean;
         /**
           * 是否显示复选框
-          * @default false
          */
         "checkable"?: boolean;
         /**
@@ -14304,12 +13739,10 @@ declare namespace LocalJSX {
         "dataUrl"?: string;
         /**
           * 默认勾选项（非受控）
-          * @default []
          */
         "defaultCheckedKeys"?: string[] | string;
         /**
           * 默认展开项（非受控）
-          * @default []
          */
         "defaultExpandedKeys"?: string[] | string;
         /**
@@ -14318,7 +13751,6 @@ declare namespace LocalJSX {
         "defaultValue"?: string | string[];
         /**
           * 拖拽悬停自动展开的延迟（毫秒）
-          * @default 400
          */
         "dragExpandDelay"?: number;
         /**
@@ -14331,12 +13763,10 @@ declare namespace LocalJSX {
         "fieldMap"?: string | { key: string; label: string; children?: string; isLeaf?: string; disabled?: string; icon?: string };
         /**
           * 层级缩进（px）
-          * @default 16
          */
         "indent"?: number;
         /**
           * 树数据（可传入 JSON 字符串或对象数组）
-          * @default []
          */
         "items"?: string | TreeNode[];
         /**
@@ -14345,7 +13775,6 @@ declare namespace LocalJSX {
         "itemsSelector"?: string;
         /**
           * 启用懒加载：展开时若无 children 则触发加载
-          * @default false
          */
         "lazy"?: boolean;
         /**
@@ -14358,12 +13787,10 @@ declare namespace LocalJSX {
         "maxDepth"?: number;
         /**
           * 是否多选
-          * @default false
          */
         "multiple"?: boolean;
         /**
           * 是否开启节点拖拽重排
-          * @default false
          */
         "nodeDraggable"?: boolean;
         /**
@@ -14388,22 +13815,18 @@ declare namespace LocalJSX {
         "onLdesignSelect"?: (event: LdesignTreeCustomEvent<{ key: string; keys: string[]; node?: TreeNode }>) => void;
         /**
           * 懒加载参数名（dataUrl 模式下）：父键参数
-          * @default 'parent'
          */
         "parentParam"?: string;
         /**
           * 是否启用键盘重排（Alt+方向键）
-          * @default true
          */
         "reorderable"?: boolean;
         /**
           * 是否可选择（高亮）
-          * @default true
          */
         "selectable"?: boolean;
         /**
           * 是否显示连接线（简易）
-          * @default false
          */
         "showLine"?: boolean;
         /**
@@ -14415,16 +13838,157 @@ declare namespace LocalJSX {
          */
         "value"?: string | string[];
     }
+    /**
+     * Upload 文件上传组件
+     */
+    interface LdesignUpload {
+        /**
+          * 接受的文件类型
+         */
+        "accept"?: string;
+        /**
+          * 是否禁用
+         */
+        "disabled"?: boolean;
+        /**
+          * 是否支持拖拽上传
+         */
+        "drag"?: boolean;
+        /**
+          * 最大文件数量
+         */
+        "maxCount"?: number;
+        /**
+          * 最大文件大小（字节）
+         */
+        "maxSize"?: number;
+        /**
+          * 是否支持多选
+         */
+        "multiple"?: boolean;
+        /**
+          * 文件上传前事件
+         */
+        "onLdesignBeforeUpload"?: (event: LdesignUploadCustomEvent<File>) => void;
+        /**
+          * 文件选择事件
+         */
+        "onLdesignChange"?: (event: LdesignUploadCustomEvent<UploadFile[]>) => void;
+        /**
+          * 上传失败事件
+         */
+        "onLdesignError"?: (event: LdesignUploadCustomEvent<{ file: UploadFile; error: any }>) => void;
+        /**
+          * 上传进度事件
+         */
+        "onLdesignProgress"?: (event: LdesignUploadCustomEvent<{ file: UploadFile; percent: number }>) => void;
+        /**
+          * 上传成功事件
+         */
+        "onLdesignSuccess"?: (event: LdesignUploadCustomEvent<UploadFile>) => void;
+    }
+    /**
+     * VirtualList 虚拟列表组件
+     * 高性能长列表渲染，仅渲染可见区域的项目
+     */
+    interface LdesignVirtualList {
+        /**
+          * 缓冲区项目数（渲染可见区域外的额外项目数）
+         */
+        "buffer"?: number;
+        /**
+          * 获取项目高度的函数（动态高度模式）
+         */
+        "getItemHeight"?: (index: number) => number;
+        /**
+          * 获取项目的唯一key
+         */
+        "getItemKey"?: (item: any, index: number) => string | number;
+        /**
+          * 容器高度
+         */
+        "height"?: number | string;
+        /**
+          * 水平模式
+         */
+        "horizontal"?: boolean;
+        /**
+          * 列表项高度（固定高度模式）
+         */
+        "itemHeight"?: number;
+        /**
+          * 列表项数据
+         */
+        "items"?: any[];
+        /**
+          * 渲染项目的函数
+         */
+        "renderItem": (item: any, index: number) => any;
+    }
+    /**
+     * Watermark 水印组件
+     * 为页面添加防删除水印
+     */
+    interface LdesignWatermark {
+        /**
+          * 水印文字
+         */
+        "content"?: string | string[];
+        /**
+          * 字体颜色
+         */
+        "fontColor"?: string;
+        /**
+          * 字体大小
+         */
+        "fontSize"?: number;
+        /**
+          * 水印间距
+         */
+        "gapX"?: number;
+        /**
+          * 垂直间距
+         */
+        "gapY"?: number;
+        /**
+          * 水印高度
+         */
+        "height"?: number;
+        /**
+          * 水印图片
+         */
+        "image"?: string;
+        /**
+          * 水印透明度
+         */
+        "opacity"?: number;
+        /**
+          * 旋转角度
+         */
+        "rotate"?: number;
+        /**
+          * 水印宽度
+         */
+        "width"?: number;
+        /**
+          * Z-index
+         */
+        "zIndex"?: number;
+    }
     interface IntrinsicElements {
-        "base-component": BaseComponent;
         "l-dropdown-panel": LDropdownPanel;
         "ldesign-affix": LdesignAffix;
         "ldesign-alert": LdesignAlert;
+        "ldesign-anchor": LdesignAnchor;
+        "ldesign-anchor-link": LdesignAnchorLink;
         "ldesign-avatar": LdesignAvatar;
         "ldesign-avatar-group": LdesignAvatarGroup;
         "ldesign-backtop": LdesignBacktop;
+        "ldesign-breadcrumb": LdesignBreadcrumb;
+        "ldesign-breadcrumb-item": LdesignBreadcrumbItem;
         "ldesign-button": LdesignButton;
         "ldesign-calendar": LdesignCalendar;
+        "ldesign-card": LdesignCard;
         "ldesign-cascader": LdesignCascader;
         "ldesign-checkbox": LdesignCheckbox;
         "ldesign-checkbox-group": LdesignCheckboxGroup;
@@ -14437,10 +14001,16 @@ declare namespace LocalJSX {
         "ldesign-color-picker-panel": LdesignColorPickerPanel;
         "ldesign-countdown": LdesignCountdown;
         "ldesign-date-picker": LdesignDatePicker;
+        "ldesign-descriptions": LdesignDescriptions;
+        "ldesign-descriptions-item": LdesignDescriptionsItem;
+        "ldesign-divider": LdesignDivider;
         "ldesign-draggable": LdesignDraggable;
         "ldesign-drawer": LdesignDrawer;
         "ldesign-dropdown": LdesignDropdown;
         "ldesign-ellipsis": LdesignEllipsis;
+        "ldesign-empty": LdesignEmpty;
+        "ldesign-form": LdesignForm;
+        "ldesign-form-item": LdesignFormItem;
         "ldesign-grid": LdesignGrid;
         "ldesign-grid-item": LdesignGridItem;
         "ldesign-icon": LdesignIcon;
@@ -14450,6 +14020,11 @@ declare namespace LocalJSX {
         "ldesign-image-viewer": LdesignImageViewer;
         "ldesign-input": LdesignInput;
         "ldesign-input-number": LdesignInputNumber;
+        "ldesign-layout": LdesignLayout;
+        "ldesign-layout-content": LdesignLayoutContent;
+        "ldesign-layout-footer": LdesignLayoutFooter;
+        "ldesign-layout-header": LdesignLayoutHeader;
+        "ldesign-layout-sider": LdesignLayoutSider;
         "ldesign-loading": LdesignLoading;
         "ldesign-mention": LdesignMention;
         "ldesign-menu": LdesignMenu;
@@ -14465,35 +14040,43 @@ declare namespace LocalJSX {
         "ldesign-radio-group": LdesignRadioGroup;
         "ldesign-rate": LdesignRate;
         "ldesign-resize-box": LdesignResizeBox;
+        "ldesign-result": LdesignResult;
         "ldesign-ripple": LdesignRipple;
         "ldesign-row": LdesignRow;
         "ldesign-scrollbar": LdesignScrollbar;
         "ldesign-select": LdesignSelect;
+        "ldesign-skeleton": LdesignSkeleton;
         "ldesign-slider": LdesignSlider;
         "ldesign-space": LdesignSpace;
+        "ldesign-spin": LdesignSpin;
         "ldesign-split": LdesignSplit;
+        "ldesign-statistic": LdesignStatistic;
+        "ldesign-step-item": LdesignStepItem;
+        "ldesign-steps": LdesignSteps;
         "ldesign-swiper": LdesignSwiper;
         "ldesign-swiper-slide": LdesignSwiperSlide;
         "ldesign-switch": LdesignSwitch;
         "ldesign-tab-panel": LdesignTabPanel;
+        "ldesign-table": LdesignTable;
         "ldesign-tabs": LdesignTabs;
         "ldesign-tag": LdesignTag;
         "ldesign-tag-group": LdesignTagGroup;
         "ldesign-time-picker": LdesignTimePicker;
+        "ldesign-timeline": LdesignTimeline;
+        "ldesign-timeline-item": LdesignTimelineItem;
         "ldesign-tooltip": LdesignTooltip;
+        "ldesign-tour": LdesignTour;
         "ldesign-transfer": LdesignTransfer;
         "ldesign-tree": LdesignTree;
+        "ldesign-upload": LdesignUpload;
+        "ldesign-virtual-list": LdesignVirtualList;
+        "ldesign-watermark": LdesignWatermark;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            /**
-             * 组件基类
-             * 提供通用的属性和方法
-             */
-            "base-component": LocalJSX.BaseComponent & JSXBase.HTMLAttributes<HTMLBaseComponentElement>;
             "l-dropdown-panel": LocalJSX.LDropdownPanel & JSXBase.HTMLAttributes<HTMLLDropdownPanelElement>;
             /**
              * Affix 固钉组件
@@ -14506,6 +14089,15 @@ declare module "@stencil/core" {
              * 用于在页面中展示重要的提示信息，支持多种状态、样式变体、尺寸、标题/描述、操作区与可关闭。
              */
             "ldesign-alert": LocalJSX.LdesignAlert & JSXBase.HTMLAttributes<HTMLLdesignAlertElement>;
+            /**
+             * Anchor 锚点组件
+             * 用于快速定位到页面内容
+             */
+            "ldesign-anchor": LocalJSX.LdesignAnchor & JSXBase.HTMLAttributes<HTMLLdesignAnchorElement>;
+            /**
+             * AnchorLink 锚点链接
+             */
+            "ldesign-anchor-link": LocalJSX.LdesignAnchorLink & JSXBase.HTMLAttributes<HTMLLdesignAnchorLinkElement>;
             /**
              * Avatar 头像
              * - 三种展示形态：图片、图标、文字
@@ -14531,12 +14123,26 @@ declare module "@stencil/core" {
              */
             "ldesign-backtop": LocalJSX.LdesignBacktop & JSXBase.HTMLAttributes<HTMLLdesignBacktopElement>;
             /**
+             * Breadcrumb 面包屑组件
+             * 显示当前页面的路径
+             */
+            "ldesign-breadcrumb": LocalJSX.LdesignBreadcrumb & JSXBase.HTMLAttributes<HTMLLdesignBreadcrumbElement>;
+            /**
+             * BreadcrumbItem 面包屑项
+             */
+            "ldesign-breadcrumb-item": LocalJSX.LdesignBreadcrumbItem & JSXBase.HTMLAttributes<HTMLLdesignBreadcrumbItemElement>;
+            /**
              * Button 按钮组件
              * 基于 Ant Design 按钮组件架构重构
              * 提供多种类型、尺寸、状态的按钮
              */
             "ldesign-button": LocalJSX.LdesignButton & JSXBase.HTMLAttributes<HTMLLdesignButtonElement>;
             "ldesign-calendar": LocalJSX.LdesignCalendar & JSXBase.HTMLAttributes<HTMLLdesignCalendarElement>;
+            /**
+             * Card 卡片组件
+             * 通用卡片容器
+             */
+            "ldesign-card": LocalJSX.LdesignCard & JSXBase.HTMLAttributes<HTMLLdesignCardElement>;
             /**
              * ldesign-cascader
              * - PC: 多层级 popup (每层独立弹出)
@@ -14599,6 +14205,19 @@ declare module "@stencil/core" {
             "ldesign-countdown": LocalJSX.LdesignCountdown & JSXBase.HTMLAttributes<HTMLLdesignCountdownElement>;
             "ldesign-date-picker": LocalJSX.LdesignDatePicker & JSXBase.HTMLAttributes<HTMLLdesignDatePickerElement>;
             /**
+             * Descriptions 描述列表组件
+             */
+            "ldesign-descriptions": LocalJSX.LdesignDescriptions & JSXBase.HTMLAttributes<HTMLLdesignDescriptionsElement>;
+            /**
+             * DescriptionsItem 描述项
+             */
+            "ldesign-descriptions-item": LocalJSX.LdesignDescriptionsItem & JSXBase.HTMLAttributes<HTMLLdesignDescriptionsItemElement>;
+            /**
+             * Divider 分割线组件
+             * 用于分隔不同内容区域
+             */
+            "ldesign-divider": LocalJSX.LdesignDivider & JSXBase.HTMLAttributes<HTMLLdesignDividerElement>;
+            /**
              * ldesign-draggable
              * 通用可拖拽/缩放/旋转容器（图片优先），支持：
              * - PC：滚轮缩放、拖拽平移、双击 1x/2x 切换
@@ -14625,6 +14244,20 @@ declare module "@stencil/core" {
              * - 兼容 PC 与移动端，按钮有较大点击热区
              */
             "ldesign-ellipsis": LocalJSX.LdesignEllipsis & JSXBase.HTMLAttributes<HTMLLdesignEllipsisElement>;
+            /**
+             * Empty 空状态组件
+             * 用于展示空数据状态
+             */
+            "ldesign-empty": LocalJSX.LdesignEmpty & JSXBase.HTMLAttributes<HTMLLdesignEmptyElement>;
+            /**
+             * Form 表单组件
+             * 统一管理表单验证和数据
+             */
+            "ldesign-form": LocalJSX.LdesignForm & JSXBase.HTMLAttributes<HTMLLdesignFormElement>;
+            /**
+             * FormItem 表单项
+             */
+            "ldesign-form-item": LocalJSX.LdesignFormItem & JSXBase.HTMLAttributes<HTMLLdesignFormItemElement>;
             /**
              * Grid 容器（grid -> grid-item 用法）
              * - 在内部通过计算为每个 grid-item 设置明确的行/列位置与跨度
@@ -14688,6 +14321,26 @@ declare module "@stencil/core" {
              * - 提供 formatter / parser 以实现显示格式化与解析
              */
             "ldesign-input-number": LocalJSX.LdesignInputNumber & JSXBase.HTMLAttributes<HTMLLdesignInputNumberElement>;
+            /**
+             * Layout 布局容器
+             */
+            "ldesign-layout": LocalJSX.LdesignLayout & JSXBase.HTMLAttributes<HTMLLdesignLayoutElement>;
+            /**
+             * Layout Content
+             */
+            "ldesign-layout-content": LocalJSX.LdesignLayoutContent & JSXBase.HTMLAttributes<HTMLLdesignLayoutContentElement>;
+            /**
+             * Layout Footer
+             */
+            "ldesign-layout-footer": LocalJSX.LdesignLayoutFooter & JSXBase.HTMLAttributes<HTMLLdesignLayoutFooterElement>;
+            /**
+             * Layout Header
+             */
+            "ldesign-layout-header": LocalJSX.LdesignLayoutHeader & JSXBase.HTMLAttributes<HTMLLdesignLayoutHeaderElement>;
+            /**
+             * Layout Sider
+             */
+            "ldesign-layout-sider": LocalJSX.LdesignLayoutSider & JSXBase.HTMLAttributes<HTMLLdesignLayoutSiderElement>;
             /**
              * Loading 加载组件
              * 轻量的加载指示器，支持两种形态：spinner | dots
@@ -14779,6 +14432,11 @@ declare module "@stencil/core" {
              */
             "ldesign-resize-box": LocalJSX.LdesignResizeBox & JSXBase.HTMLAttributes<HTMLLdesignResizeBoxElement>;
             /**
+             * Result 结果页组件
+             * 用于反馈操作结果
+             */
+            "ldesign-result": LocalJSX.LdesignResult & JSXBase.HTMLAttributes<HTMLLdesignResultElement>;
+            /**
              * Ripple 水波纹效果
              * 用法：把 <ldesign-ripple /> 放入任意元素内部（建议放最后），即可在该元素上获得点击水波纹效果。
              * 例如：
@@ -14804,6 +14462,11 @@ declare module "@stencil/core" {
              */
             "ldesign-select": LocalJSX.LdesignSelect & JSXBase.HTMLAttributes<HTMLLdesignSelectElement>;
             /**
+             * Skeleton 骨架屏组件
+             * 用于内容加载时的占位效果
+             */
+            "ldesign-skeleton": LocalJSX.LdesignSkeleton & JSXBase.HTMLAttributes<HTMLLdesignSkeletonElement>;
+            /**
              * Slider 滑块组件
              * 通过拖动滑块在一定数值区间内进行选择
              */
@@ -14814,6 +14477,10 @@ declare module "@stencil/core" {
              */
             "ldesign-space": LocalJSX.LdesignSpace & JSXBase.HTMLAttributes<HTMLLdesignSpaceElement>;
             /**
+             * Spin 加载指示器组件
+             */
+            "ldesign-spin": LocalJSX.LdesignSpin & JSXBase.HTMLAttributes<HTMLLdesignSpinElement>;
+            /**
              * Split 面板分割
              * 将容器分为左右（vertical）或上下（horizontal）两部分，通过拖拽中间分割条调整比例。
              * - 组件名：<ldesign-split>
@@ -14823,6 +14490,19 @@ declare module "@stencil/core" {
              * - 事件：ldesignSplitStart / ldesignSplit / ldesignSplitEnd
              */
             "ldesign-split": LocalJSX.LdesignSplit & JSXBase.HTMLAttributes<HTMLLdesignSplitElement>;
+            /**
+             * Statistic 统计数值组件
+             * 展示统计数值，支持动画效果
+             */
+            "ldesign-statistic": LocalJSX.LdesignStatistic & JSXBase.HTMLAttributes<HTMLLdesignStatisticElement>;
+            /**
+             * StepItem 步骤项
+             */
+            "ldesign-step-item": LocalJSX.LdesignStepItem & JSXBase.HTMLAttributes<HTMLLdesignStepItemElement>;
+            /**
+             * Steps 步骤条组件
+             */
+            "ldesign-steps": LocalJSX.LdesignSteps & JSXBase.HTMLAttributes<HTMLLdesignStepsElement>;
             /**
              * ldesign-swiper 轮播图组件
              * 功能：
@@ -14854,6 +14534,11 @@ declare module "@stencil/core" {
              */
             "ldesign-tab-panel": LocalJSX.LdesignTabPanel & JSXBase.HTMLAttributes<HTMLLdesignTabPanelElement>;
             /**
+             * Table 高性能数据表格组件
+             * 支持虚拟滚动、排序、筛选、固定列/表头
+             */
+            "ldesign-table": LocalJSX.LdesignTable & JSXBase.HTMLAttributes<HTMLLdesignTableElement>;
+            /**
              * Tabs 选项卡组件
              * - 通过水平或垂直的标签页切换展示内容
              */
@@ -14873,16 +14558,42 @@ declare module "@stencil/core" {
             "ldesign-tag-group": LocalJSX.LdesignTagGroup & JSXBase.HTMLAttributes<HTMLLdesignTagGroupElement>;
             "ldesign-time-picker": LocalJSX.LdesignTimePicker & JSXBase.HTMLAttributes<HTMLLdesignTimePickerElement>;
             /**
+             * Timeline 时间轴组件
+             */
+            "ldesign-timeline": LocalJSX.LdesignTimeline & JSXBase.HTMLAttributes<HTMLLdesignTimelineElement>;
+            /**
+             * TimelineItem 时间轴项
+             */
+            "ldesign-timeline-item": LocalJSX.LdesignTimelineItem & JSXBase.HTMLAttributes<HTMLLdesignTimelineItemElement>;
+            /**
              * Tooltip 工具提示组件
              * 基于最新 Popup 的轻量封装，继承所有新特性
              */
             "ldesign-tooltip": LocalJSX.LdesignTooltip & JSXBase.HTMLAttributes<HTMLLdesignTooltipElement>;
+            /**
+             * Tour 漫游式引导组件
+             */
+            "ldesign-tour": LocalJSX.LdesignTour & JSXBase.HTMLAttributes<HTMLLdesignTourElement>;
             /**
              * Transfer 穿梭框
              * 支持左右两栏列表，通过按钮将条目在两侧移动。
              */
             "ldesign-transfer": LocalJSX.LdesignTransfer & JSXBase.HTMLAttributes<HTMLLdesignTransferElement>;
             "ldesign-tree": LocalJSX.LdesignTree & JSXBase.HTMLAttributes<HTMLLdesignTreeElement>;
+            /**
+             * Upload 文件上传组件
+             */
+            "ldesign-upload": LocalJSX.LdesignUpload & JSXBase.HTMLAttributes<HTMLLdesignUploadElement>;
+            /**
+             * VirtualList 虚拟列表组件
+             * 高性能长列表渲染，仅渲染可见区域的项目
+             */
+            "ldesign-virtual-list": LocalJSX.LdesignVirtualList & JSXBase.HTMLAttributes<HTMLLdesignVirtualListElement>;
+            /**
+             * Watermark 水印组件
+             * 为页面添加防删除水印
+             */
+            "ldesign-watermark": LocalJSX.LdesignWatermark & JSXBase.HTMLAttributes<HTMLLdesignWatermarkElement>;
         }
     }
 }

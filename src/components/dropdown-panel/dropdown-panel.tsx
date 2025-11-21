@@ -1,4 +1,5 @@
 import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, State, Watch } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * @slot trigger - 触发器内容
@@ -66,6 +67,7 @@ export class DropdownPanel {
   private triggerRef?: HTMLDivElement;
   private panelRef?: HTMLDivElement;
   private resizeObserver?: ResizeObserver;
+  private resources = new ResourceManager();
   private previousPlacement: 'top' | 'bottom' = 'bottom';
 
   componentDidLoad() {
@@ -79,12 +81,12 @@ export class DropdownPanel {
     this.resizeObserver.observe(document.body);
 
     // 监听滚动事件
-    window.addEventListener('scroll', this.handleScroll, true);
+    this.resources.addSafeEventListener(window, 'scroll', this.handleScroll as EventListener, { capture: true });
   }
 
   disconnectedCallback() {
     this.resizeObserver?.disconnect();
-    window.removeEventListener('scroll', this.handleScroll, true);
+    this.resources.cleanup();
   }
 
   @Watch('visible')
@@ -93,35 +95,35 @@ export class DropdownPanel {
       // 打开：先重置isReady，然后更新位置和方向
       this.isReady = false;
       this.updateTriggerRect();
-      
+
       // 计算并更新新的placement，确保在动画开始前就是正确的
       const newPlacement = this.getNewPlacement();
       const placementChanged = this.actualPlacement !== newPlacement;
-      
-      
+
+
       // 如果 placement 改变了，需要先禁用 transition，避免从旧状态到新状态的过渡动画
       if (placementChanged) {
         this.disableTransition = true;
       }
-      
+
       this.actualPlacement = newPlacement;
       this.previousPlacement = newPlacement;
       this.lockBodyScroll();
-      
+
       // 双RAF确保：第一次RAF让Stencil完成DOM渲染和CSS类更新，第二次RAF让浏览器完成初始状态绘制
       requestAnimationFrame(() => {
         // 如果禁用了 transition，在这里重新启用
         if (this.disableTransition) {
           this.disableTransition = false;
         }
-        
+
         requestAnimationFrame(() => {
-          
+
           if (this.visible) {
             this.isReady = true;
             if (this.panelRef) {
               this.panelHeight = this.panelRef.scrollHeight;
-              
+
             } else {
               console.warn('[open] panelRef is null!');
             }
@@ -132,7 +134,7 @@ export class DropdownPanel {
       // 关闭：先隐藏动画
       this.isReady = false;
       this.unlockBodyScroll();
-      
+
       // 动画完成后清理 - 不清空triggerRect，保留以便下次打开时有初始渲染条件
       // 注释掉：triggerRect的更新由下次打开时的updateTriggerRect处理
     }
@@ -167,29 +169,29 @@ export class DropdownPanel {
     if (this.visible) {
       const oldPlacement = this.actualPlacement;
       this.updateTriggerRect();
-      
+
       // 计算新的方向（但不立即应用）
       const newPlacement = this.getNewPlacement();
-      
+
       // 如果方向改变了，需要先隐藏，然后改变方向，再显示
       if (oldPlacement !== newPlacement) {
-        
+
         // 先隐藏面板
         this.isReady = false;
-        
+
         // 等待隐藏动画完成，然后更新方向并重新显示
         requestAnimationFrame(() => {
           // 禁用 transition，避免从旧状态到新状态的过渡动画
           this.disableTransition = true;
-          
+
           // 更新方向
           this.actualPlacement = newPlacement;
-          
+
           // 等待DOM更新，启用 transition，然后显示
           requestAnimationFrame(() => {
             // 重新启用 transition
             this.disableTransition = false;
-            
+
             requestAnimationFrame(() => {
               if (this.visible) {
                 this.isReady = true;
@@ -218,7 +220,7 @@ export class DropdownPanel {
     const windowHeight = window.innerHeight;
     const spaceBelow = windowHeight - this.triggerRect.bottom - this.safeDistance;
     const spaceAbove = this.triggerRect.top - this.safeDistance;
-    
+
     // 估算面板高度：优先使用实际测量的高度，否则使用maxHeight配置
     let estimatedPanelHeight: number;
     if (this.panelHeight > 0) {
@@ -255,7 +257,7 @@ export class DropdownPanel {
 
     // 手动指定方向，但需要检查空间是否足够，不足时智能切换
     const preferredPlacement = this.placement as 'top' | 'bottom';
-    
+
     if (preferredPlacement === 'bottom') {
       // 想从下方弹出，检查下方空间是否足够
       if (spaceBelow < estimatedPanelHeight && spaceAbove > spaceBelow) {
@@ -312,7 +314,7 @@ export class DropdownPanel {
       // 从下方弹出：遮罩高度 - 底部安全距离
       const maskHeight = windowHeight - this.triggerRect.bottom;
       const availableSpace = maskHeight - this.safeDistance;
-      const userMaxHeight = this.maxHeight.includes('vh') 
+      const userMaxHeight = this.maxHeight.includes('vh')
         ? parseFloat(this.maxHeight) * windowHeight / 100
         : parseFloat(this.maxHeight);
       calculatedMaxHeight = `${Math.min(availableSpace, userMaxHeight)}px`;
@@ -320,7 +322,7 @@ export class DropdownPanel {
       // 从上方弹出：遮罩高度 - 顶部安全距离
       const maskHeight = this.triggerRect.top;
       const availableSpace = maskHeight - this.safeDistance;
-      const userMaxHeight = this.maxHeight.includes('vh') 
+      const userMaxHeight = this.maxHeight.includes('vh')
         ? parseFloat(this.maxHeight) * windowHeight / 100
         : parseFloat(this.maxHeight);
       calculatedMaxHeight = `${Math.min(availableSpace, userMaxHeight)}px`;
@@ -362,15 +364,15 @@ export class DropdownPanel {
   render() {
     // 打开或关闭动画过程中都需要渲染
     const shouldRender = this.visible || !!this.triggerRect;
-    
+
     const panelClasses = {
       'l-dropdown-panel__panel': true,
       'l-dropdown-panel__panel--visible': this.visible && this.isReady,
       [`l-dropdown-panel__panel--${this.actualPlacement}`]: true,
       [`l-dropdown-panel__panel--animation-${this.animationMode}`]: true,
     };
-    
-    
+
+
 
     const maskClasses = {
       'l-dropdown-panel__mask': true,

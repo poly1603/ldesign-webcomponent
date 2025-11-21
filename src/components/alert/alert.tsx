@@ -1,4 +1,6 @@
-import { Component, Prop, State, Event, EventEmitter, Method, Element, h, Host } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, h, Host, Element } from '@stencil/core';
+import { Size } from '../../types';
+import { ResourceManager } from '../../utils/resource-manager';
 
 export type AlertType = 'info' | 'success' | 'warning' | 'error' | 'custom';
 export type AlertVariant = 'filled' | 'outlined' | 'light' | 'gradient';
@@ -82,6 +84,7 @@ export class LdesignAlert {
   private marqueeHost?: HTMLElement;
   private marqueeTrack?: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  private resources = new ResourceManager();
 
   /** actions 是否有内容（避免空容器占位） */
   @State() private hasActions = false;
@@ -101,19 +104,16 @@ export class LdesignAlert {
   }
 
   disconnectedCallback() {
-    this.teardownMarquee();
-    if (this.mutationObserver) {
-      this.mutationObserver.disconnect();
-      this.mutationObserver = undefined;
-    }
+    this.cleanupMarquee();
+    this.resources.cleanup();
   }
 
   private setupMarquee() {
     const apply = () => this.measureMarquee();
     // 多次尝试，适配异步渲染的插槽内容
-    setTimeout(apply, 0);
-    setTimeout(apply, 60);
-    setTimeout(apply, 180);
+    this.resources.addSafeTimeout(apply, 0);
+    this.resources.addSafeTimeout(apply, 60);
+    this.resources.addSafeTimeout(apply, 180);
 
     // 监听尺寸变化
     // 使用 typeof 判断支持情况，避免某些 TS 环境下的窄化问题
@@ -122,17 +122,16 @@ export class LdesignAlert {
       if (this.marqueeHost) this.resizeObserver.observe(this.marqueeHost);
       if (this.marqueeTrack) this.resizeObserver.observe(this.marqueeTrack);
     } else {
-      window.addEventListener('resize', this.handleWindowResize as any, { passive: true } as any);
+      this.resources.addSafeEventListener(window, 'resize', this.handleWindowResize as EventListener, { passive: true });
     }
   }
 
-  private teardownMarquee() {
+  private cleanupMarquee() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
-    } else {
-      window.removeEventListener('resize', this.handleWindowResize as any);
     }
+    // window resize 会在cleanup时自动移除
   }
 
   private handleWindowResize = () => this.measureMarquee();
@@ -185,11 +184,10 @@ export class LdesignAlert {
 
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      root.removeEventListener('transitionend', onEnd);
       this.ldesignClose.emit();
       root.remove();
     };
-    root.addEventListener('transitionend', onEnd, { once: true } as any);
+    this.resources.addSafeEventListener(root, 'transitionend', onEnd as EventListener, { once: true });
   }
 
   private getIconName() {
@@ -197,7 +195,7 @@ export class LdesignAlert {
     if (this.iconName) {
       return this.iconName;
     }
-    
+
     switch (this.type) {
       case 'success':
         return 'check-circle';
@@ -233,10 +231,10 @@ export class LdesignAlert {
   render() {
     const marqueeVars: any = this.marquee
       ? {
-          '--track-width': `${this.trackWidth}px`,
-          '--marquee-gap': `${this.marqueeGap}px`,
-          '--marquee-duration': `${this.getMarqueeDurationSec()}s`,
-        }
+        '--track-width': `${this.trackWidth}px`,
+        '--marquee-gap': `${this.marqueeGap}px`,
+        '--marquee-duration': `${this.getMarqueeDurationSec()}s`,
+      }
       : undefined;
 
     const customStyles: any = {};
@@ -248,9 +246,9 @@ export class LdesignAlert {
     }
 
     return (
-      <Host 
-        role="alert" 
-        aria-live="polite" 
+      <Host
+        role="alert"
+        aria-live="polite"
         class={this.getHostClass()}
         style={{ ...customStyles }}
       >

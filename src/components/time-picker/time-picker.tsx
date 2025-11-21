@@ -1,4 +1,5 @@
-import { Component, Prop, State, Event, EventEmitter, h, Host, Element, Watch } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Watch, Method, h, Element, Fragment, Host } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 import type { Placement } from '@floating-ui/dom';
 
 export type TimePickerTrigger = 'click' | 'focus' | 'manual';
@@ -113,6 +114,7 @@ export class LdesignTimePicker {
   private minutePicker?: any;
   private secondPicker?: any;
   private meridiemPicker?: any;
+  private resources = new ResourceManager();
 
   // lifecycle
   @Watch('value') onValue(v?: string) {
@@ -122,7 +124,7 @@ export class LdesignTimePicker {
     this.meridiem = this.h >= 12 ? 'PM' : 'AM';
     // 若面板已打开，则让列以动画方式滚动到新的值
     if (this.panelOpen) {
-      requestAnimationFrame(() => this.animatePickersToCurrent());
+      this.resources.addSafeRAF(() => this.animatePickersToCurrent());
     }
   }
 
@@ -130,18 +132,18 @@ export class LdesignTimePicker {
     // 获取当前时间作为备选
     const now = new Date();
     const currentTime = { h: now.getHours(), m: now.getMinutes(), s: now.getSeconds() };
-    
+
     if (this.range) {
       // 范围选择模式
       // 优先使用 startValue/endValue，其次使用 defaultValue（可能是范围格式）
       let startT, endT;
-      
+
       if (this.startValue || this.endValue) {
         startT = this.parseTime(this.startValue) || currentTime;
         endT = this.parseTime(this.endValue) || { h: currentTime.h + 1, m: currentTime.m, s: currentTime.s };
       } else if (this.defaultValue) {
         // 尝试解析范围格式的 defaultValue: "09:00-18:00"
-        const parts = this.defaultValue.split(/[-~至]/); 
+        const parts = this.defaultValue.split(/[-~至]/);
         if (parts.length === 2) {
           startT = this.parseTime(parts[0].trim()) || currentTime;
           endT = this.parseTime(parts[1].trim()) || { h: currentTime.h + 1, m: currentTime.m, s: currentTime.s };
@@ -153,7 +155,7 @@ export class LdesignTimePicker {
         startT = currentTime;
         endT = { h: currentTime.h + 1, m: currentTime.m, s: currentTime.s };
       }
-      
+
       this.h = startT.h; this.m = startT.m; this.s = startT.s;
       this.endH = endT.h; this.endM = endT.m; this.endS = endT.s;
       this.meridiem = this.h >= 12 ? 'PM' : 'AM';
@@ -175,17 +177,20 @@ export class LdesignTimePicker {
   }
 
   componentDidLoad() {
-    window.addEventListener('resize', this.updateOverlayKind as any, { passive: true } as any);
+    this.resources.addSafeEventListener(window, 'resize', this.updateOverlayKind as any, { passive: true });
     // 当以内联面板使用时，打开时机即为挂载完成
     if (this.inline) {
       this.panelOpen = true;
-      requestAnimationFrame(() => {
+      this.resources.addSafeRAF(() => {
         this.animatePickersToCurrent();
-        requestAnimationFrame(() => this.recenterPickers());
+        this.resources.addSafeRAF(() => this.recenterPickers());
       });
     }
   }
-  disconnectedCallback() { window.removeEventListener('resize', this.updateOverlayKind as any); }
+
+  disconnectedCallback() {
+    this.resources.cleanup();
+  }
 
   // utils
   private pad2(n: number) { return String(n).padStart(2, '0'); }
@@ -322,7 +327,7 @@ export class LdesignTimePicker {
   @Watch('hourStep')
   onHourStepChanged() { this.recomputeOptions(); }
 
-  @Watch('minuteStep') 
+  @Watch('minuteStep')
   onMinuteStepChanged() { this.recomputeOptions(); }
 
   @Watch('secondStep')
@@ -337,7 +342,7 @@ export class LdesignTimePicker {
     // 根据当前24h值重新设置AM/PM
     this.meridiem = this.h >= 12 ? 'PM' : 'AM';
     if (this.panelOpen) {
-      requestAnimationFrame(() => this.animatePickersToCurrent());
+      this.resources.addSafeRAF(() => this.animatePickersToCurrent());
     }
   }
 
@@ -379,7 +384,7 @@ export class LdesignTimePicker {
       await Promise.all(pickers.map(async (pk: any, i: number) => {
         const v = values[i];
         if (!pk) return;
-        await new Promise(r => setTimeout(r, i * stagger));
+        await new Promise(r => this.resources.addSafeTimeout(() => r(undefined), i * stagger));
         if (typeof pk.scrollToValue === 'function') {
           try { await pk.scrollToValue(v, { trigger: 'program', animate: true, silent: true }); } catch { }
         } else {
@@ -392,7 +397,7 @@ export class LdesignTimePicker {
   private async animatePickersToCurrent() {
     let vals;
     let h, m, s, meridiem;
-    
+
     // 确定要显示的值
     if (this.range && this.activePanel === 'end') {
       h = this.endH;
@@ -405,7 +410,7 @@ export class LdesignTimePicker {
       s = this.s;
       meridiem = this.meridiem;
     }
-    
+
     if (this.outputFormat === '12h') {
       const hour12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
       // AM/PM 放在最前面
@@ -450,9 +455,9 @@ export class LdesignTimePicker {
       this.panelOpen = true;
       this.ldesignOpen.emit();
       // 等待内容装载后先平滑滚动到当前值（动画），再对齐一次
-      requestAnimationFrame(() => {
+      this.resources.addSafeRAF(() => {
         this.animatePickersToCurrent();
-        requestAnimationFrame(() => this.recenterPickers());
+        this.resources.addSafeRAF(() => this.recenterPickers());
       });
     } else {
       this.panelOpen = false;
@@ -465,9 +470,9 @@ export class LdesignTimePicker {
     if (e.detail) {
       this.panelOpen = true;
       this.ldesignOpen.emit();
-      requestAnimationFrame(() => {
+      this.resources.addSafeRAF(() => {
         this.animatePickersToCurrent();
-        requestAnimationFrame(() => this.recenterPickers());
+        this.resources.addSafeRAF(() => this.recenterPickers());
       });
     } else {
       this.panelOpen = false;
@@ -476,15 +481,15 @@ export class LdesignTimePicker {
   };
 
   private rangeArray(n: number) { return Array.from({ length: n }, (_, i) => i); }
-  
+
   private toPickerOptions(list: number[], step: number, type?: 'hour' | 'minute' | 'second') {
     return list.filter(v => {
       // 检查是否能被步进整除
       if (v % step !== 0) return false;
-      
+
       // 检查是否被禁用
       if (type && this.isDisabled(v, type)) return false;
-      
+
       // 对于24小时制的小时，检查范围限制
       if (type === 'hour' && this.outputFormat !== '12h') {
         // 简单检查小时是否在范围内
@@ -497,15 +502,15 @@ export class LdesignTimePicker {
           if (max && v > max.h) return false;
         }
       }
-      
+
       return true;
-    }).map(v => ({ 
-      value: String(v), 
+    }).map(v => ({
+      value: String(v),
       label: this.pad2(v),
-      disabled: false 
+      disabled: false
     }));
   }
-  
+
   private to12HourPickerOptions(step: number) {
     // 12小时制：1-12
     const hours = [];
@@ -525,21 +530,21 @@ export class LdesignTimePicker {
     }
     return hours;
   }
-  
+
   // 新增：检查小时是否在范围内
   private isHourInRange(h: number): boolean {
     if (!this.minTime && !this.maxTime) return true;
-    
+
     if (this.minTime) {
       const min = this.parseTime(this.minTime);
       if (min && h < min.h) return false;
     }
-    
+
     if (this.maxTime) {
       const max = this.parseTime(this.maxTime);
       if (max && h > max.h) return false;
     }
-    
+
     return true;
   }
 
@@ -564,7 +569,7 @@ export class LdesignTimePicker {
     this.secondOpts = this.toPickerOptions(this.rangeArray(60), ss, 'second');
   }
 
-  private commitValue() { 
+  private commitValue() {
     if (this.range) {
       // 范围选择模式 - 确保两个时间都已设置
       const startTime = this.formatTime(this.h, this.m, this.s);
@@ -578,13 +583,13 @@ export class LdesignTimePicker {
         // 如果超出范围，调整到最近的有效时间
         this.adjustToValidTime();
       }
-      
-      const out = this.formatTime(this.h, this.m, this.s); 
+
+      const out = this.formatTime(this.h, this.m, this.s);
       this.value = out;
       this.ldesignChange.emit(out);
     }
   }
-  
+
   // 新增：调整时间到有效范围内
   private adjustToValidTime() {
     if (this.minTime) {
@@ -599,7 +604,7 @@ export class LdesignTimePicker {
         }
       }
     }
-    
+
     if (this.maxTime) {
       const max = this.parseTime(this.maxTime);
       if (max) {
@@ -649,7 +654,7 @@ export class LdesignTimePicker {
         this.startValue = this.formatTime(this.h, this.m, this.s);
         this.endValue = this.formatTime(this.endH, this.endM, this.endS);
         if (this.panelOpen) {
-          requestAnimationFrame(() => this.animatePickersToCurrent());
+          this.resources.addSafeRAF(() => this.animatePickersToCurrent());
         }
         if (!this.confirm) {
           this.commitValue();
@@ -663,7 +668,7 @@ export class LdesignTimePicker {
         this.h = t.h; this.m = t.m; this.s = t.s;
         this.meridiem = this.h >= 12 ? 'PM' : 'AM';
         if (this.panelOpen) {
-          requestAnimationFrame(() => this.animatePickersToCurrent());
+          this.resources.addSafeRAF(() => this.animatePickersToCurrent());
         }
         if (!this.confirm) this.commitValue();
         this.emitPick('preset');
@@ -699,9 +704,9 @@ export class LdesignTimePicker {
     const scrollMeridiem = () => { if (this.outputFormat === '12h') { try { this.meridiemPicker?.scrollToValue(this.meridiem, { animate: true, silent: true, trigger: 'program' }); } catch { } } };
     // 轻微错峰
     scrollHour();
-    window.setTimeout(scrollMinute, 60);
-    window.setTimeout(scrollSecond, 120);
-    window.setTimeout(scrollMeridiem, 180);
+    this.resources.addSafeTimeout(scrollMinute, 60);
+    this.resources.addSafeTimeout(scrollSecond, 120);
+    this.resources.addSafeTimeout(scrollMeridiem, 180);
 
     if (!this.confirm) this.commitValue();
     this.emitPick('now');
@@ -782,11 +787,11 @@ export class LdesignTimePicker {
     // 监听当前选择的是开始还是结束时间
     const onPick = (kind: 'hour' | 'minute' | 'second' | 'meridiem') => (e: CustomEvent<{ value: string | undefined; option?: any; context: { trigger: 'click' | 'scroll' | 'touch' | 'wheel' | 'keyboard' } }>) => {
       const isEditingEnd = this.range && this.activePanel === 'end';
-      
+
       if (kind === 'meridiem') {
         const newMeridiem = e.detail?.value as 'AM' | 'PM';
         if (!newMeridiem) return;
-        
+
         if (isEditingEnd) {
           // 编辑结束时间的 AM/PM
           const hour12 = this.endH === 0 ? 12 : (this.endH > 12 ? this.endH - 12 : this.endH);
@@ -800,7 +805,7 @@ export class LdesignTimePicker {
         }
       } else {
         const v = Math.max(0, parseInt(String(e.detail?.value ?? '0'), 10) || 0);
-        
+
         if (kind === 'hour') {
           if (this.outputFormat === '12h') {
             // 12小时制：将选择的小时（1-12）转换为24小时制
@@ -831,11 +836,11 @@ export class LdesignTimePicker {
           }
         }
       }
-      
+
       // 立即提交值（如果不需要确认）
       if (!this.confirm) {
         // 使用setTimeout确保值更新后再提交，解决即时生效问题
-        setTimeout(() => {
+        this.resources.addSafeTimeout(() => {
           this.commitValue();
         }, 0);
       } else if (this.range) {
@@ -846,7 +851,7 @@ export class LdesignTimePicker {
           this.endValue = this.formatTime(this.endH, this.endM, this.endS);
         }
       }
-      
+
       const trig = e.detail?.context?.trigger === 'touch' ? 'click' : (e.detail?.context?.trigger as any) || 'click';
       this.emitPick(trig);
     };
@@ -864,9 +869,9 @@ export class LdesignTimePicker {
       displayS = this.s;
       displayMeridiem = this.meridiem;
     }
-    
-    const hourValue = this.outputFormat === '12h' ? 
-      String(displayH === 0 ? 12 : (displayH > 12 ? displayH - 12 : displayH)) : 
+
+    const hourValue = this.outputFormat === '12h' ?
+      String(displayH === 0 ? 12 : (displayH > 12 ? displayH - 12 : displayH)) :
       String(displayH);
 
     return (
@@ -874,14 +879,14 @@ export class LdesignTimePicker {
         {/* 范围选择模式的标签页 */}
         {this.range && (
           <div class="ldesign-time-picker__tabs">
-            <button 
+            <button
               class={{
                 'ldesign-time-picker__tab': true,
                 'ldesign-time-picker__tab--active': this.activePanel === 'start'
               }}
               type="button"
-              onClick={() => { 
-                this.activePanel = 'start'; 
+              onClick={() => {
+                this.activePanel = 'start';
                 requestAnimationFrame(() => {
                   this.animatePickersToCurrent();
                   requestAnimationFrame(() => this.recenterPickers());
@@ -893,14 +898,14 @@ export class LdesignTimePicker {
                 <span class="ldesign-time-picker__tab-value">{this.startValue}</span>
               )}
             </button>
-            <button 
+            <button
               class={{
                 'ldesign-time-picker__tab': true,
                 'ldesign-time-picker__tab--active': this.activePanel === 'end'
               }}
               type="button"
-              onClick={() => { 
-                this.activePanel = 'end'; 
+              onClick={() => {
+                this.activePanel = 'end';
                 requestAnimationFrame(() => {
                   this.animatePickersToCurrent();
                   requestAnimationFrame(() => this.recenterPickers());
@@ -914,47 +919,47 @@ export class LdesignTimePicker {
             </button>
           </div>
         )}
-        
+
         <div class="ldesign-time-picker__columns">
           {/* 12小时制时，AM/PM 放在最前面 */}
           {this.outputFormat === '12h' && (
-            <ldesign-picker 
-              ref={(el) => { this.meridiemPicker = el as any; }} 
-              options={meridiemOpts as any} 
-              value={displayMeridiem} 
-              size={this.size as any} 
-              panelHeight={this.panelHeight} 
-              visibleItems={this.visibleItems} 
-              onLdesignPick={onPick('meridiem') as any} 
+            <ldesign-picker
+              ref={(el) => { this.meridiemPicker = el as any; }}
+              options={meridiemOpts as any}
+              value={displayMeridiem}
+              size={this.size as any}
+              panelHeight={this.panelHeight}
+              visibleItems={this.visibleItems}
+              onLdesignPick={onPick('meridiem') as any}
             />
           )}
-          <ldesign-picker 
-            ref={(el) => { this.hourPicker = el as any; }} 
-            options={hourOpts as any} 
-            value={hourValue} 
-            size={this.size as any} 
-            panelHeight={this.panelHeight} 
-            visibleItems={this.visibleItems} 
-            onLdesignPick={onPick('hour') as any} 
+          <ldesign-picker
+            ref={(el) => { this.hourPicker = el as any; }}
+            options={hourOpts as any}
+            value={hourValue}
+            size={this.size as any}
+            panelHeight={this.panelHeight}
+            visibleItems={this.visibleItems}
+            onLdesignPick={onPick('hour') as any}
           />
-          <ldesign-picker 
-            ref={(el) => { this.minutePicker = el as any; }} 
-            options={minuteOpts as any} 
-            value={String(displayM)} 
-            size={this.size as any} 
-            panelHeight={this.panelHeight} 
-            visibleItems={this.visibleItems} 
-            onLdesignPick={onPick('minute') as any} 
+          <ldesign-picker
+            ref={(el) => { this.minutePicker = el as any; }}
+            options={minuteOpts as any}
+            value={String(displayM)}
+            size={this.size as any}
+            panelHeight={this.panelHeight}
+            visibleItems={this.visibleItems}
+            onLdesignPick={onPick('minute') as any}
           />
           {this.showSeconds && (
-            <ldesign-picker 
-              ref={(el) => { this.secondPicker = el as any; }} 
-              options={secondOpts as any} 
-              value={String(displayS)} 
-              size={this.size as any} 
-              panelHeight={this.panelHeight} 
-              visibleItems={this.visibleItems} 
-              onLdesignPick={onPick('second') as any} 
+            <ldesign-picker
+              ref={(el) => { this.secondPicker = el as any; }}
+              options={secondOpts as any}
+              value={String(displayS)}
+              size={this.size as any}
+              panelHeight={this.panelHeight}
+              visibleItems={this.visibleItems}
+              onLdesignPick={onPick('second') as any}
             />
           )}
         </div>
@@ -988,11 +993,11 @@ export class LdesignTimePicker {
             )}
           </div>
           {this.confirm ? (
-            <ldesign-button 
-              type="primary" 
-              size="small" 
-              onClick={() => { 
-                this.commitValue(); 
+            <ldesign-button
+              type="primary"
+              size="small"
+              onClick={() => {
+                this.commitValue();
                 this.hideOverlay();
               }}>
               {this.getLocaleText('confirm')}

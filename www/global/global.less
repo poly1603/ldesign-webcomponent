@@ -3,6 +3,12 @@
  * 导入设计系统变量和基础样式
  */
 
+/* 导入新主题系统 */
+@import '../styles/theme.less';
+
+/* 导入旧的样式变量（向后兼容） */
+@import '../styles/var.less';
+
 /* 导入图标按钮样式优化 */
 @import '../styles/icon-button.less';
 
@@ -205,12 +211,12 @@ html {
   .ldesign-button__content {
     flex-direction: row-reverse !important;
   }
-  
+
   .ldesign-button__icon {
     margin-left: 8px;
     margin-right: 0;
   }
-  
+
   .ldesign-button__text {
     margin-left: 0;
     margin-right: 0;
@@ -222,12 +228,13 @@ html {
   width: 100% !important;
   display: flex !important;
   justify-content: center !important;
-  
+
   .ldesign-button__content {
     width: 100%;
     justify-content: center !important;
   }
 }
+
 .ldesign-button {
   position: relative;
   display: inline-flex;

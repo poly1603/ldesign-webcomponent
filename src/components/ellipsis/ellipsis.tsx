@@ -1,4 +1,5 @@
-import { Component, Prop, State, Element, h, Host, Watch, Method, Event, EventEmitter } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, h, Host, Element } from '@stencil/core';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * ldesign-ellipsis 文本省略/展开组件
@@ -86,7 +87,7 @@ export class LdesignEllipsis {
   @State() private isAnimating: boolean = false;
   private animationFrame?: number;
   private animationTimeout?: number;
-  private debounceTimer?: number;
+  private debounceTimer?: any;
   private lastRefreshTime: number = 0;
   private autoCollapseTimer?: number;
 
@@ -99,6 +100,8 @@ export class LdesignEllipsis {
   private measureClamp?: HTMLDivElement;
   private measureInline?: HTMLDivElement;
   private measureAction?: HTMLSpanElement;
+
+  private resources = new ResourceManager();
 
   @Watch('content')
   @Watch('lines')
@@ -126,22 +129,16 @@ export class LdesignEllipsis {
     try {
       this.ro = new ResizeObserver(() => this.debouncedRefresh());
       if (this.host) this.ro.observe(this.host);
-    } catch {}
-    window.addEventListener('resize', this.onWindowResize, { passive: true });
-    window.addEventListener('keydown', this.onKeyDown as any);
+    } catch { }
+    this.resources.addSafeEventListener(window, 'resize', this.onWindowResize as EventListener, { passive: true });
+    this.resources.addSafeEventListener(window, 'keydown', this.onKeyDown as EventListener);
     this.ensureMeasureNodes();
     this.refreshAll();
   }
 
   disconnectedCallback() {
-    try { this.ro?.disconnect(); } catch {}
-    this.ro = undefined;
-    window.removeEventListener('resize', this.onWindowResize as any);
-    window.removeEventListener('keydown', this.onKeyDown as any);
-    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
-    if (this.animationTimeout) clearTimeout(this.animationTimeout);
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
-    if (this.autoCollapseTimer) clearTimeout(this.autoCollapseTimer);
+    if (this.ro) { this.ro.disconnect(); this.ro = undefined; }
+    this.resources.cleanup();
   }
 
   private computeText(): string {
@@ -174,12 +171,12 @@ export class LdesignEllipsis {
       while (this.host?.firstChild) {
         this.host.removeChild(this.host.firstChild);
       }
-    } catch {}
+    } catch { }
   }
 
   private debouncedRefresh = () => {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
-    this.debounceTimer = setTimeout(() => {
+    this.debounceTimer = this.resources.addSafeTimeout(() => {
       this.refreshAll();
     }, 16) as any;
   };
@@ -232,7 +229,7 @@ export class LdesignEllipsis {
 
     if (this.prevOverflowed !== overflowed) {
       this.prevOverflowed = overflowed;
-      try { this.ldesignTruncateChange?.emit?.({ overflowed }); } catch {}
+      try { this.ldesignTruncateChange?.emit?.({ overflowed }); } catch { }
     }
     this.isOverflowed = overflowed;
 
@@ -254,7 +251,7 @@ export class LdesignEllipsis {
     const target = (this.isExpanded && !this.isCollapsing) ? fullH : clampH;
     this.targetMaxHeight = Math.max(0, Math.ceil(target));
     this.actualHeight = target;
-    
+
     if (!this.isAnimating) {
       this.fadeOpacity = (this.isExpanded && !this.isCollapsing) ? 0 : 1;
     }
@@ -298,19 +295,19 @@ export class LdesignEllipsis {
     } else {
       this.isAnimating = true;
       this.fadeOpacity = 0;
-      
+
       this.animationFrame = requestAnimationFrame(() => {
         this.isExpanded = next;
         this.dispatchToggle(next);
         this.refreshAll();
-        
-        this.animationTimeout = setTimeout(() => {
+
+        this.animationTimeout = this.resources.addSafeTimeout(() => {
           this.isAnimating = false;
-          
+
           if (this.scrollIntoViewOnExpand) {
             this.scrollToView();
           }
-          
+
           this.setAutoCollapseTimer();
         }, this.transitionDuration) as any;
       });
@@ -319,25 +316,25 @@ export class LdesignEllipsis {
 
   private onCollapse = () => {
     const next = false;
-    
+
     if (this.autoCollapseTimer) {
       clearTimeout(this.autoCollapseTimer);
       this.autoCollapseTimer = undefined;
     }
-    
+
     if (typeof this.expanded === 'boolean') {
       this.dispatchToggle(next);
     } else {
       this.isAnimating = true;
       this.isCollapsing = true;
       this.fadeOpacity = 1;
-      
+
       this.animationFrame = requestAnimationFrame(() => {
         this.dispatchToggle(next);
         this.refreshAll();
-        
+
         if (this.scrollIntoViewOnCollapse) {
-          setTimeout(() => this.scrollToView(), this.transitionDuration);
+          this.resources.addSafeTimeout(() => this.scrollToView(), this.transitionDuration);
         }
       });
     }
@@ -347,13 +344,13 @@ export class LdesignEllipsis {
     try {
       const ev = new CustomEvent('ldesignToggle', { detail: { expanded: val }, bubbles: true, cancelable: true });
       this.host?.dispatchEvent(ev);
-    } catch {}
+    } catch { }
   }
 
   private scrollToView() {
     try {
       this.host?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } catch {}
+    } catch { }
   }
 
   private setAutoCollapseTimer() {
@@ -361,9 +358,9 @@ export class LdesignEllipsis {
       clearTimeout(this.autoCollapseTimer);
       this.autoCollapseTimer = undefined;
     }
-    
+
     if (this.autoCollapseDelay > 0 && this.isExpanded) {
-      this.autoCollapseTimer = setTimeout(() => {
+      this.autoCollapseTimer = this.resources.addSafeTimeout(() => {
         if (this.isExpanded) {
           this.onCollapse();
         }
@@ -373,7 +370,7 @@ export class LdesignEllipsis {
 
   private onDoubleClick = () => {
     if (!this.doubleClickToggle || !this.isOverflowed) return;
-    
+
     if (this.isExpanded) {
       this.onCollapse();
     } else {
@@ -389,11 +386,11 @@ export class LdesignEllipsis {
       overflow: 'hidden',
       willChange: this.isAnimating ? 'max-height, opacity' : 'auto',
     };
-    
+
     const defaultFadeColors = 'rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 40%, rgba(255, 255, 255, 0.8) 60%, var(--ld-ellipsis-bg, var(--ldesign-bg-color, #fff)) 80%';
     const fadeBackground = this.fadeColors ? `linear-gradient(90deg, ${this.fadeColors})` : `linear-gradient(90deg, ${defaultFadeColors})`;
-    
-    const fadeStyle: any = { 
+
+    const fadeStyle: any = {
       width: typeof this.fadeWidth === 'number' ? `${this.fadeWidth}px` : this.fadeWidth,
       opacity: this.fadeOpacity,
       background: fadeBackground,
@@ -450,7 +447,7 @@ export class LdesignEllipsis {
       overflow: 'hidden',
       willChange: this.isAnimating ? 'max-height, opacity' : 'auto',
     };
-    
+
     const actionExtraClass = this.enhancedHover ? 'ldesign-ellipsis__action--enhanced' : '';
 
     return (

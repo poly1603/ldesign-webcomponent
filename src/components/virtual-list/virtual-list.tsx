@@ -1,5 +1,6 @@
 import { Component, Prop, State, Element, h, Host, Watch } from '@stencil/core';
 import { createVirtualScroll, VirtualScrollRange } from '../../utils/virtual-scroll';
+import { ResourceManager } from '../../utils/resource-manager';
 
 /**
  * VirtualList 虚拟列表组件
@@ -67,17 +68,20 @@ export class LdesignVirtualList {
   private virtualScroll: ReturnType<typeof createVirtualScroll> | null = null;
   private containerRef?: HTMLDivElement;
   private scrollHandler?: () => void;
+  private resizeObserver?: ResizeObserver;
+  private resources = new ResourceManager();
 
   componentWillLoad(): void {
     this.initVirtualScroll();
   }
 
-  componentDidLoad(): void {
-    this.attachScrollListener();
+  disconnectedCallback() {
+    this.resizeObserver?.disconnect();
+    this.resources.cleanup();
   }
 
-  disconnectedCallback(): void {
-    this.detachScrollListener();
+  componentDidLoad(): void {
+    this.attachScrollListener();
   }
 
   @Watch('items')
@@ -127,21 +131,12 @@ export class LdesignVirtualList {
     if (!this.containerRef) return;
 
     this.scrollHandler = () => {
-      requestAnimationFrame(() => {
+      this.resources.addSafeRAF(() => {
         this.updateVisibleRange();
       });
     };
 
-    this.containerRef.addEventListener('scroll', this.scrollHandler, { passive: true });
-  }
-
-  /**
-   * 移除滚动监听
-   */
-  private detachScrollListener(): void {
-    if (this.containerRef && this.scrollHandler) {
-      this.containerRef.removeEventListener('scroll', this.scrollHandler);
-    }
+    this.resources.addSafeEventListener(this.containerRef, 'scroll', this.scrollHandler, { passive: true });
   }
 
   /**
@@ -198,9 +193,9 @@ export class LdesignVirtualList {
     const contentStyle = {
       transform: `translateY(${this.visibleRange.offset}px)`,
       position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      right: 0,
+      top: '0',
+      left: '0',
+      right: '0',
     };
 
     return (
