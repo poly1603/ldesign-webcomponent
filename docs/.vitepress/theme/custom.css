@@ -70,6 +70,14 @@
   padding: 24px;
   margin: 16px 0;
   background-color: var(--vp-c-bg);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.demo-container > * {
+  margin: 0;
 }
 
 .demo-row {

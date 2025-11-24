@@ -1,179 +1,216 @@
-# Form 表单
+﻿# Form 表单
 
-表单容器组件，提供统一的数据收集、验证和提交功能。
+具有数据收集、校验和提交功能的表单，包含复选框、单选框、输入框、下拉选择框等元素。
 
 ## 何时使用
 
-- 需要收集用户输入
-- 需要统一的表单验证
-- 需要规范的表单布局
+- 用于创建一个实体或收集信息。
+- 需要对输入的数据类型进行校验时。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础表单
+
+基本的表单数据域包括输入框、选择器、日期、时间选择器等。
+
+<div class="demo-container">
+  <ldesign-form id="basic-form" layout="vertical">
+    <ldesign-form-item label="用户名" name="username">
+      <ldesign-input placeholder="请输入用户名"></ldesign-input>
+    </ldesign-form-item>
+    
+    <ldesign-form-item label="密码" name="password">
+      <ldesign-input type="password" placeholder="请输入密码"></ldesign-input>
+    </ldesign-form-item>
+    
+    <ldesign-form-item>
+      <ldesign-button type="primary">提交</ldesign-button>
+    </ldesign-form-item>
+  </ldesign-form>
+</div>
 
 ```html
-<ldesign-form id="basicForm" layout="horizontal" label-width="100">
-  <ldesign-form-item label="用户名" name="username" required>
+<ldesign-form id="my-form">
+  <ldesign-form-item label="用户名" name="username">
     <ldesign-input placeholder="请输入用户名"></ldesign-input>
   </ldesign-form-item>
   
-  <ldesign-form-item label="密码" name="password" required>
-    <ldesign-input type="password" placeholder="请输入密码"></ldesign-input>
+  <ldesign-form-item label="密码" name="password">
+    <ldesign-input type="password"></ldesign-input>
   </ldesign-form-item>
   
   <ldesign-form-item>
-    <ldesign-button type="primary" html-type="submit">提交</ldesign-button>
-    <ldesign-button html-type="reset">重置</ldesign-button>
-  </ldesign-form-item>
-</ldesign-form>
-
-<script>
-const form = document.getElementById('basicForm');
-
-form.addEventListener('ldesignSubmit', (e) => {
-  console.log('表单提交:', e.detail);
-  alert('提交成功！\n' + JSON.stringify(e.detail, null, 2));
-});
-</script>
-```
-
-:::
-
-## 表单布局
-
-### 水平布局
-
-```html
-<ldesign-form layout="horizontal" label-width="120">
-  <ldesign-form-item label="用户名">
-    <ldesign-input />
+    <ldesign-button type="primary">提交</ldesign-button>
   </ldesign-form-item>
 </ldesign-form>
 ```
 
-### 垂直布局
+### 表单布局
+
+提供三种布局：horizontal（水平）、vertical（垂直）、inline（行内）。
+
+<div class="demo-container">
+  <ldesign-form layout="horizontal" label-width="100">
+    <ldesign-form-item label="用户名">
+      <ldesign-input placeholder="水平布局"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+  
+  <ldesign-form layout="vertical">
+    <ldesign-form-item label="用户名">
+      <ldesign-input placeholder="垂直布局"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+  
+  <ldesign-form layout="inline">
+    <ldesign-form-item label="用户名">
+      <ldesign-input placeholder="行内布局"></ldesign-input>
+    </ldesign-form-item>
+    <ldesign-form-item label="密码">
+      <ldesign-input type="password"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+</div>
 
 ```html
+<!-- 水平布局 -->
+<ldesign-form layout="horizontal" label-width="100">
+  ...
+</ldesign-form>
+
+<!-- 垂直布局 -->
 <ldesign-form layout="vertical">
-  <ldesign-form-item label="用户名">
-    <ldesign-input />
-  </ldesign-form-item>
+  ...
 </ldesign-form>
-```
 
-### 内联布局
-
-```html
+<!-- 行内布局 -->
 <ldesign-form layout="inline">
-  <ldesign-form-item label="用户名">
-    <ldesign-input />
-  </ldesign-form-item>
-  <ldesign-form-item label="密码">
-    <ldesign-input type="password" />
-  </ldesign-form-item>
-  <ldesign-form-item>
-    <ldesign-button type="primary">搜索</ldesign-button>
-  </ldesign-form-item>
+  ...
 </ldesign-form>
 ```
 
-## 表单验证
+### 表单尺寸
 
-:::demo
+设置 `size` 属性统一控制表单项尺寸。
+
+<div class="demo-container">
+  <ldesign-form layout="vertical" size="small">
+    <ldesign-form-item label="小尺寸">
+      <ldesign-input placeholder="Small"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+  
+  <ldesign-form layout="vertical" size="medium">
+    <ldesign-form-item label="中尺寸">
+      <ldesign-input placeholder="Medium"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+  
+  <ldesign-form layout="vertical" size="large">
+    <ldesign-form-item label="大尺寸">
+      <ldesign-input placeholder="Large"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+</div>
 
 ```html
-<ldesign-form id="validateForm" layout="vertical">
-  <ldesign-form-item label="邮箱" name="email" required>
-    <ldesign-input type="email" placeholder="请输入邮箱"></ldesign-input>
-  </ldesign-form-item>
-  
-  <ldesign-form-item label="年龄" name="age" required>
-    <ldesign-input-number min="1" max="120"></ldesign-input-number>
-  </ldesign-form-item>
-  
-  <ldesign-form-item>
-    <ldesign-button type="primary" html-type="submit">提交</ldesign-button>
-  </ldesign-form-item>
-</ldesign-form>
-
-<script>
-const form = document.getElementById('validateForm');
-
-form.addEventListener('ldesignSubmit', async (e) => {
-  const { valid, errors } = await form.validate();
-  
-  if (valid) {
-    alert('验证通过！');
-  } else {
-    alert('验证失败：' + JSON.stringify(errors));
-  }
-});
-
-form.addEventListener('ldesignValidateError', (e) => {
-  console.error('验证错误:', e.detail);
-});
-</script>
+<ldesign-form size="small">...</ldesign-form>
+<ldesign-form size="medium">...</ldesign-form>
+<ldesign-form size="large">...</ldesign-form>
 ```
 
-:::
+### 表单验证
 
-## Vue 3 使用
+通过 `required`、`rules` 等属性配置验证规则。
+
+<div class="demo-container">
+  <ldesign-form id="validate-form" layout="vertical">
+    <ldesign-form-item label="用户名" name="username" required>
+      <ldesign-input placeholder="必填项"></ldesign-input>
+    </ldesign-form-item>
+    
+    <ldesign-form-item label="邮箱" name="email">
+      <ldesign-input type="email" placeholder="请输入邮箱"></ldesign-input>
+    </ldesign-form-item>
+    
+    <ldesign-form-item>
+      <ldesign-button type="primary">验证</ldesign-button>
+    </ldesign-form-item>
+  </ldesign-form>
+</div>
+
+```html
+<ldesign-form-item label="用户名" required>
+  <ldesign-input></ldesign-input>
+</ldesign-form-item>
+```
+
+### 禁用状态
+
+设置 `disabled` 属性禁用整个表单。
+
+<div class="demo-container">
+  <ldesign-form layout="vertical" disabled>
+    <ldesign-form-item label="用户名">
+      <ldesign-input value="禁用状态"></ldesign-input>
+    </ldesign-form-item>
+    
+    <ldesign-form-item label="密码">
+      <ldesign-input type="password" value="password"></ldesign-input>
+    </ldesign-form-item>
+  </ldesign-form>
+</div>
+
+```html
+<ldesign-form disabled>
+  ...
+</ldesign-form>
+```
+
+## 框架集成
+
+### Vue 3
 
 ```vue
-<script setup lang="ts">
-import { ref } from 'vue';
-import '@ldesign/webcomponent/form';
-import '@ldesign/webcomponent/input';
-import '@ldesign/webcomponent/button';
+<script setup>
+import { ref, reactive } from 'vue';
 
-const formRef = ref<any>(null);
-const formData = ref({
+const formData = reactive({
   username: '',
-  email: '',
-  password: ''
+  password: '',
+  email: ''
 });
 
-const handleSubmit = async (e: CustomEvent) => {
-  const values = e.detail;
-  console.log('提交:', values);
+const handleSubmit = async () => {
+  const form = document.querySelector('ldesign-form');
+  const valid = await form.validate();
   
-  try {
-    await submitToAPI(values);
-    alert('提交成功！');
-  } catch (error) {
-    alert('提交失败');
-  }
-};
-
-const validateManually = async () => {
-  if (formRef.value) {
-    const { valid, errors } = await formRef.value.validate();
-    console.log({ valid, errors });
+  if (valid) {
+    console.log('提交:', formData);
   }
 };
 </script>
 
 <template>
-  <ldesign-form 
-    ref="formRef"
-    layout="vertical"
-    @ldesignSubmit="handleSubmit"
-  >
+  <ldesign-form layout="vertical" @ldesignSubmit="handleSubmit">
     <ldesign-form-item label="用户名" name="username" required>
       <ldesign-input 
-        :value="formData.username"
-        @ldesignChange="(e) => formData.username = e.detail"
+        v-model="formData.username"
         placeholder="请输入用户名"
       />
     </ldesign-form-item>
     
-    <ldesign-form-item label="邮箱" name="email" required>
+    <ldesign-form-item label="密码" name="password" required>
       <ldesign-input 
-        :value="formData.email"
-        @ldesignChange="(e) => formData.email = e.detail"
+        v-model="formData.password"
+        type="password"
+      />
+    </ldesign-form-item>
+    
+    <ldesign-form-item label="邮箱" name="email">
+      <ldesign-input 
+        v-model="formData.email"
         type="email"
-        placeholder="请输入邮箱"
       />
     </ldesign-form-item>
     
@@ -181,44 +218,61 @@ const validateManually = async () => {
       <ldesign-button type="primary" html-type="submit">
         提交
       </ldesign-button>
-      <ldesign-button @ldesignClick="validateManually">
-        手动验证
-      </ldesign-button>
+      <ldesign-button>取消</ldesign-button>
     </ldesign-form-item>
   </ldesign-form>
 </template>
 ```
 
-## React 使用
+### React
 
 ```tsx
-import { useRef } from 'react';
-import { Form, Button } from '@ldesign/webcomponent-react';
+import { useState } from 'react';
 
-function MyForm() {
-  const formRef = useRef<any>(null);
-
-  const handleSubmit = (e: CustomEvent) => {
-    console.log('提交:', e.detail);
-  };
-
-  const validateForm = async () => {
-    if (formRef.current) {
-      const result = await formRef.current.validate();
-      console.log(result);
+function App() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    email: ''
+  });
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = document.querySelector('ldesign-form');
+    const valid = await form.validate();
+    
+    if (valid) {
+      console.log('提交:', formData);
     }
   };
-
+  
   return (
-    <Form ref={formRef} layout="vertical" onSubmit={handleSubmit}>
+    <ldesign-form layout="vertical" onLdesignSubmit={handleSubmit}>
       <ldesign-form-item label="用户名" name="username" required>
-        <ldesign-input placeholder="请输入用户名" />
+        <ldesign-input 
+          value={formData.username}
+          onLdesignInput={(e) => 
+            setFormData({...formData, username: e.detail})
+          }
+        />
+      </ldesign-form-item>
+      
+      <ldesign-form-item label="密码" name="password" required>
+        <ldesign-input 
+          type="password"
+          value={formData.password}
+          onLdesignInput={(e) => 
+            setFormData({...formData, password: e.detail})
+          }
+        />
       </ldesign-form-item>
       
       <ldesign-form-item>
-        <Button type="primary" htmlType="submit">提交</Button>
+        <ldesign-button type="primary" html-type="submit">
+          提交
+        </ldesign-button>
       </ldesign-form-item>
-    </Form>
+    </ldesign-form>
   );
 }
 ```
@@ -227,44 +281,59 @@ function MyForm() {
 
 ### Form Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| layout | `'horizontal' \| 'vertical' \| 'inline'` | `'horizontal'` | 表单布局 |
-| labelWidth | `string \| number` | - | 标签宽度 |
-| labelAlign | `'left' \| 'right'` | `'right'` | 标签对齐 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 表单尺寸 |
-| disabled | `boolean` | `false` | 是否禁用 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `layout` | 表单布局 | `'horizontal' \| 'vertical' \| 'inline'` | `'horizontal'` |
+| `label-width` | 标签宽度 | `string \| number` | - |
+| `label-align` | 标签对齐 | `'left' \| 'right'` | `'right'` |
+| `size` | 表单尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+
+### Form Methods
+
+| 方法名 | 说明 | 参数 | 返回值 |
+|--------|------|------|--------|
+| `validate` | 验证整个表单 | - | `Promise<boolean>` |
+| `validateField` | 验证指定字段 | `name: string` | `Promise<boolean>` |
+| `resetFields` | 重置表单 | - | `void` |
+| `getFieldsValue` | 获取表单值 | - | `Promise<Record<string, any>>` |
+| `setFieldValue` | 设置字段值 | `name: string, value: any` | `Promise<void>` |
+
+### Form Events
+
+| 事件名 | 说明 | 回调参数 |
+|--------|------|----------|
+| `ldesignSubmit` | 提交表单时触发 | `(event: CustomEvent<Record<string, any>>) => void` |
+| `ldesignReset` | 重置表单时触发 | `() => void` |
+| `ldesignValidateError` | 验证失败时触发 | `(event: CustomEvent<Record<string, string>>) => void` |
 
 ### FormItem Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| label | `string` | - | 标签文字 |
-| name | `string` | - | 字段名称（必需） |
-| required | `boolean` | `false` | 是否必填 |
-| error | `string` | - | 错误提示 |
-| help | `string` | - | 帮助文本 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `label` | 标签文本 | `string` | - |
+| `name` | 字段名 | `string` | - |
+| `required` | 是否必填 | `boolean` | `false` |
+| `rules` | 验证规则 | `FormRule[]` | - |
+| `error` | 错误提示 | `string` | - |
 
-### Events
+### FormRule
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| ldesignSubmit | `values: Record<string, any>` | 表单提交 |
-| ldesignReset | - | 表单重置 |
-| ldesignValidateError | `errors: Record<string, string>` | 验证失败 |
-
-### Methods
-
-| 方法 | 参数 | 返回值 | 说明 |
-|------|------|--------|------|
-| validate | - | `Promise<{ valid: boolean, errors: Record<string, string> }>` | 验证表单 |
-| getFieldsValue | - | `Promise<Record<string, any>>` | 获取表单值 |
-| setFieldValue | `(name, value)` | `Promise<void>` | 设置字段值 |
-| reset | - | `Promise<void>` | 重置表单 |
+```typescript
+interface FormRule {
+  required?: boolean;
+  pattern?: RegExp | string;
+  min?: number;
+  max?: number;
+  validator?: (value: any) => boolean | string | Promise<boolean | string>;
+  message?: string;
+}
+```
 
 ## 相关组件
 
-- [Input](/components/input) - 输入框
-- [Upload](/components/upload) - 文件上传
-- [Button](/components/button) - 按钮
-
+- [Input 输入框](./input.md)
+- [Select 选择器](./select.md)
+- [Checkbox 多选框](./checkbox.md)
+- [Radio 单选框](./radio.md)
+- [Switch 开关](./switch.md)

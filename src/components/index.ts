@@ -14,6 +14,7 @@ export { LdesignRadio } from './radio/radio';
 export { LdesignRadioGroup } from './radio-group/radio-group';
 export { LdesignSwitch } from './switch/switch';
 export { LdesignPopup } from './popup/popup';
+export { LdesignPopover } from './popover/popover';
 export { LdesignTooltip } from './tooltip/tooltip';
 export { LdesignModal } from './modal/modal';
 export { LdesignMessage } from './message/message';
@@ -73,9 +74,12 @@ export { alertModal, confirmModal, promptModal, promptPassword, promptForm } fro
 export { LdesignVirtualList } from './virtual-list/virtual-list';
 export { LdesignTable } from './table/table';
 export { LdesignEmpty } from './empty/empty';
-export { LdesignTimeline, LdesignTimelineItem } from './timeline/timeline';
-export { LdesignSteps, LdesignStepItem } from './steps/steps';
-export { LdesignDescriptions, LdesignDescriptionsItem } from './descriptions/descriptions';
+export { LdesignTimeline } from './timeline/timeline';
+export { LdesignTimelineItem } from './timeline/timeline-item';
+export { LdesignSteps } from './steps/steps';
+export { LdesignStepItem } from './steps/step-item';
+export { LdesignDescriptions } from './descriptions/descriptions';
+export { LdesignDescriptionsItem } from './descriptions/descriptions-item';
 export { LdesignStatistic } from './statistic/statistic';
 export { LdesignResult } from './result/result';
 
@@ -86,15 +90,27 @@ export { LdesignSpin } from './spin/spin';
 // New Layout Components
 export { LdesignCard } from './card/card';
 export { LdesignDivider } from './divider/divider';
-export { LdesignLayout, LdesignLayoutHeader, LdesignLayoutSider, LdesignLayoutContent, LdesignLayoutFooter } from './layout/layout';
+export { LdesignLayout } from './layout/layout';
+export { LdesignLayoutHeader } from './layout/layout-header';
+export { LdesignLayoutSider } from './layout/layout-sider';
+export { LdesignLayoutContent } from './layout/layout-content';
+export { LdesignLayoutFooter } from './layout/layout-footer';
 
 // New Navigation Components
-export { LdesignBreadcrumb, LdesignBreadcrumbItem } from './breadcrumb/breadcrumb';
-export { LdesignAnchor, LdesignAnchorLink } from './anchor/anchor';
+export { LdesignBreadcrumb } from './breadcrumb/breadcrumb';
+export { LdesignBreadcrumbItem } from './breadcrumb/breadcrumb-item';
+export { LdesignAnchor } from './anchor/anchor';
+export { LdesignAnchorLink } from './anchor/anchor-link';
 
 // New Form Components
-export { LdesignForm, LdesignFormItem } from './form/form';
+export { LdesignForm } from './form/form';
+export { LdesignFormItem } from './form/form-item';
+export { LdesignFormList } from './form/form-list';
 export { LdesignUpload } from './upload/upload';
+export { LdesignAutoComplete } from './auto-complete/auto-complete';
+export { LdesignInputGroup } from './input-group/input-group';
+export { LdesignInputGroupAddon } from './input-group/input-group-addon';
+export { LdesignTreeSelect } from './tree-select/tree-select';
 
 // New Other Components
 export { LdesignWatermark } from './watermark/watermark';

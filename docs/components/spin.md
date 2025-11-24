@@ -1,84 +1,174 @@
-# Spin 加载指示器
+﻿# Spin 加载中
 
 用于页面和区块的加载中状态。
 
 ## 何时使用
 
-- 页面局部处于等待异步数据或正在渲染过程时
-- 需要一个简洁的加载动画
+页面局部处于等待异步数据或正在渲染过程时，合适的加载动效会有效缓解用户的焦虑。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+一个简单的 loading 状态。
+
+<div class="demo-container">
+  <ldesign-spin></ldesign-spin>
+</div>
 
 ```html
 <ldesign-spin></ldesign-spin>
 ```
 
-:::
+### 不同尺寸
 
-## 不同尺寸
+小的用于文本加载，默认用于卡片容器级加载，大的用于页面级加载。
 
-:::demo
-
-```html
-<div style="display: flex; gap: 32px; align-items: center;">
+<div class="demo-container">
   <ldesign-spin size="small"></ldesign-spin>
   <ldesign-spin size="medium"></ldesign-spin>
   <ldesign-spin size="large"></ldesign-spin>
 </div>
-```
-
-:::
-
-## 带提示文字
-
-:::demo
 
 ```html
-<ldesign-spin tip="加载中..." size="large"></ldesign-spin>
+<ldesign-spin size="small"></ldesign-spin>
+<ldesign-spin size="medium"></ldesign-spin>
+<ldesign-spin size="large"></ldesign-spin>
 ```
 
-:::
+### 自定义描述文案
 
-## 包裹内容
+自定义描述文案。
 
-:::demo
+<div class="demo-container">
+  <ldesign-spin tip="加载中..."></ldesign-spin>
+</div>
 
 ```html
-<div id="spinDemo">
-  <ldesign-button id="toggleSpin" type="primary">切换加载状态</ldesign-button>
-  <br><br>
-  
-  <ldesign-spin id="contentSpin" spinning="false" tip="加载中...">
-    <ldesign-card title="内容区域">
-      <p>这是一些内容</p>
-      <p>更多内容...</p>
-    </ldesign-card>
+<ldesign-spin tip="加载中..."></ldesign-spin>
+```
+
+### 容器
+
+放入一个容器中。
+
+<div class="demo-container">
+  <ldesign-spin spinning>
+    <div style="padding: 50px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+      <p>这里是内容区域</p>
+      <p>数据加载中...</p>
+    </div>
   </ldesign-spin>
 </div>
 
-<script>
-const btn = document.getElementById('toggleSpin');
-const spin = document.getElementById('contentSpin');
-
-btn.addEventListener('ldesignClick', () => {
-  spin.spinning = !spin.spinning;
-});
-</script>
+```html
+<ldesign-spin spinning>
+  <div class="content">
+    内容区域
+  </div>
+</ldesign-spin>
 ```
 
-:::
+### 延迟显示
+
+延迟显示 loading 效果。当 spinning 状态在 delay 时间内结束，则不显示 loading 状态。
+
+<div class="demo-container">
+  <ldesign-spin spinning delay="500">
+    <div style="padding: 50px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+      <p>延迟500ms显示</p>
+    </div>
+  </ldesign-spin>
+</div>
+
+```html
+<ldesign-spin spinning delay="500">
+  <div>内容</div>
+</ldesign-spin>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const spinning = ref(false);
+
+const load = () => {
+  spinning.value = true;
+  
+  setTimeout(() => {
+    spinning.value = false;
+  }, 3000);
+};
+</script>
+
+<template>
+  <ldesign-button @ldesignClick="load">
+    加载数据
+  </ldesign-button>
+  
+  <ldesign-spin :spinning="spinning" tip="加载中...">
+    <div class="content">
+      数据内容
+    </div>
+  </ldesign-spin>
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [spinning, setSpinning] = useState(false);
+  
+  const load = () => {
+    setSpinning(true);
+    
+    setTimeout(() => {
+      setSpinning(false);
+    }, 3000);
+  };
+  
+  return (
+    <>
+      <ldesign-button onLdesignClick={load}>
+        加载数据
+      </ldesign-button>
+      
+      <ldesign-spin spinning={spinning} tip="加载中...">
+        <div className="content">
+          数据内容
+        </div>
+      </ldesign-spin>
+    </>
+  );
+}
+```
 
 ## API
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| spinning | `boolean` | `true` | 是否旋转 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 尺寸 |
-| tip | `string` | - | 提示文字 |
-| delay | `number` | `0` | 延迟显示（毫秒） |
-| icon | `string` | - | 自定义图标 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `spinning` | 是否为加载中状态 | `boolean` | `true` |
+| `size` | 组件大小 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `tip` | 自定义描述文案 | `string` | - |
+| `delay` | 延迟显示加载效果的时间（ms） | `number` | - |
 
+### Slots
+
+| 插槽名 | 说明 |
+|--------|------|
+| `default` | 包裹的内容 |
+
+## 相关组件
+
+- [Progress 进度条](./progress.md)
+- [Skeleton 骨架屏](./skeleton.md)

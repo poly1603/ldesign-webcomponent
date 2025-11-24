@@ -1,135 +1,206 @@
-# Slider 滑块
+﻿# Slider 滑动输入条
 
-通过拖动滑块在一定数值区间内进行选择。
+滑动型输入器，展示当前值和可选范围。
 
-## 基础用法
+## 何时使用
+
+当用户需要在数值区间/自定义区间内进行选择时，可为连续或离散值。
+
+## 代码演示
+
+### 基础用法
+
+基本滑动条。
 
 <div class="demo-container">
   <ldesign-slider></ldesign-slider>
-  <ldesign-slider value="30"></ldesign-slider>
 </div>
 
 ```html
 <ldesign-slider></ldesign-slider>
-<ldesign-slider value="30"></ldesign-slider>
-```
-
-## 范围与步长
-
-通过 `min`、`max`、`step` 控制取值范围与步长，值会自动对齐到最接近的步长。
-
-<div class="demo-container">
-  <ldesign-slider min="-50" max="50" step="5" value="5"></ldesign-slider>
-  <ldesign-slider min="0" max="1" step="0.1" value="0.3" show-tooltip></ldesign-slider>
-</div>
-
-```html
-<ldesign-slider min="-50" max="50" step="5" value="5"></ldesign-slider>
-<ldesign-slider min="0" max="1" step="0.1" value="0.3" show-tooltip></ldesign-slider>
-```
-
-## 禁用
-
-<div class="demo-container">
-  <ldesign-slider disabled value="40"></ldesign-slider>
-</div>
-
-```html
-<ldesign-slider disabled value="40"></ldesign-slider>
-```
-
-## 尺寸
-
-使用 `size` 改变拇指与轨道尺寸。
-
-<div class="demo-container">
-  <ldesign-slider size="large" value="70"></ldesign-slider>
-  <ldesign-slider size="medium" value="50"></ldesign-slider>
-  <ldesign-slider size="small" value="30"></ldesign-slider>
-</div>
-
-```html
-<ldesign-slider size="large" value="70"></ldesign-slider>
-<ldesign-slider size="medium" value="50"></ldesign-slider>
-<ldesign-slider size="small" value="30"></ldesign-slider>
-```
-
-## 垂直方向
-
-设置 `vertical` 以启用垂直模式。可通过样式控制高度。
-
-<div class="demo-container" style="display: flex; gap: 40px; align-items: flex-end;">
-  <ldesign-slider vertical style="height: 200px;"></ldesign-slider>
-  <ldesign-slider vertical style="height: 200px;" value="70" show-tooltip></ldesign-slider>
-</div>
-
-```html
-<ldesign-slider vertical style="height: 200px;"></ldesign-slider>
-<ldesign-slider vertical style="height: 200px;" value="70" show-tooltip></ldesign-slider>
-```
-
-## 显示数值提示
-
-设置 `show-tooltip` 在拇指上方显示当前数值。
-
-<div class="demo-container">
-  <ldesign-slider value="80" show-tooltip></ldesign-slider>
-</div>
-
-```html
-<ldesign-slider value="80" show-tooltip></ldesign-slider>
-```
-
-## 事件
-
-- `ldesignInput`: 拖动过程中实时触发，参数为 `number`
-- `ldesignChange`: 释放拖动/键盘/点击轨道完成变更后触发，参数为 `number`
-
-简单演示：
-
-<div class="demo-container" style="flex-direction: column; align-items: stretch; gap: 8px;">
-  <ldesign-slider id="slider-live" value="20"></ldesign-slider>
-  <div>input: <span id="slider-oninput">20</span></div>
-  <div>change: <span id="slider-onchange">-</span></div>
-</div>
-
-```html
-<ldesign-slider id="slider-live" value="20"></ldesign-slider>
-<div>input: <span id="slider-oninput">20</span></div>
-<div>change: <span id="slider-onchange">-</span></div>
 
 <script>
-  const s = document.getElementById('slider-live');
-  const i = document.getElementById('slider-oninput');
-  const c = document.getElementById('slider-onchange');
-  s?.addEventListener('ldesignInput', (e) => i && (i.textContent = String(e.detail)) );
-  s?.addEventListener('ldesignChange', (e) => c && (c.textContent = String(e.detail)) );
+  const slider = document.querySelector('ldesign-slider');
+  slider.addEventListener('ldesignChange', (e) => {
+    console.log('值:', e.detail);
+  });
 </script>
+```
+
+### 带输入框
+
+和数字输入框组件保持同步。
+
+<div class="demo-container">
+  <ldesign-slider show-input></ldesign-slider>
+</div>
+
+```html
+<ldesign-slider show-input></ldesign-slider>
+```
+
+### 离散值
+
+可以设置step属性来设置步长。
+
+<div class="demo-container">
+  <ldesign-slider step="10"></ldesign-slider>
+  <ldesign-slider step="20" show-stops></ldesign-slider>
+</div>
+
+```html
+<ldesign-slider step="10"></ldesign-slider>
+<ldesign-slider step="20" show-stops></ldesign-slider>
+```
+
+### 带标记
+
+使用marks属性标注分段式滑块。
+
+<div class="demo-container">
+  <ldesign-slider id="marks-slider"></ldesign-slider>
+</div>
+
+
+```html
+<ldesign-slider id="slider"></ldesign-slider>
+
+<script>
+  const slider = document.getElementById('slider');
+  slider.marks = {
+    0: '0°C',
+    26: '26°C',
+    37: '37°C',
+    100: '100°C'
+  };
+</script>
+```
+
+### 范围选择
+
+支持选择范围。
+
+<div class="demo-container">
+  <ldesign-slider range></ldesign-slider>
+</div>
+
+```html
+<ldesign-slider range></ldesign-slider>
+```
+
+### 垂直方向
+
+垂直方向的 Slider。
+
+<div class="demo-container" style="height: 300px;">
+  <ldesign-slider vertical></ldesign-slider>
+</div>
+
+```html
+<ldesign-slider vertical></ldesign-slider>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const value = ref(30);
+
+const handleChange = (e) => {
+  value.value = e.detail;
+  console.log('当前值:', value.value);
+};
+</script>
+
+<template>
+  <ldesign-slider
+    :value="value"
+    :min="0"
+    :max="100"
+    @ldesignChange="handleChange"
+  />
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [value, setValue] = useState(30);
+  
+  const handleChange = (e) => {
+    setValue(e.detail);
+    console.log('当前值:', e.detail);
+  };
+  
+  return (
+    <ldesign-slider
+      value={value}
+      min={0}
+      max={100}
+      onLdesignChange={handleChange}
+    />
+  );
+}
 ```
 
 ## API
 
-### 属性
+### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `value` | `number` | `0` | 当前值（将对齐到步长并限制在范围内） |
-| `min` | `number` | `0` | 最小值 |
-| `max` | `number` | `100` | 最大值 |
-| `step` | `number` | `1` | 步长，需大于 0，支持小数 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `size` | `'small' \| 'medium' \| 'large'` | `medium` | 尺寸 |
-| `vertical` | `boolean` | `false` | 是否垂直方向 |
-| `show-tooltip` | `boolean` | `false` | 是否显示数值提示 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `value` | 当前值 | `number \| number[]` | `0` |
+| `default-value` | 默认值 | `number \| number[]` | `0` |
+| `min` | 最小值 | `number` | `0` |
+| `max` | 最大值 | `number` | `100` |
+| `step` | 步长 | `number` | `1` |
+| `range` | 是否为范围选择 | `boolean` | `false` |
+| `vertical` | 是否竖向模式 | `boolean` | `false` |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+| `show-input` | 是否显示输入框 | `boolean` | `false` |
+| `show-stops` | 是否显示间断点 | `boolean` | `false` |
+| `show-tooltip` | 是否显示 tooltip | `boolean` | `true` |
+| `marks` | 刻度标记 | `Record<number, string>` | - |
 
-### 事件
+### Events
 
 | 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| `ldesignInput` | 拖动过程中持续触发 | `(event: CustomEvent<number>) => void` |
-| `ldesignChange` | 值变更完成后触发 | `(event: CustomEvent<number>) => void` |
+|--------|------|----------|
+| `ldesignChange` | 值改变时触发 | `(event: CustomEvent<number \| number[]>) => void` |
+| `ldesignInput` | 拖动时触发 | `(event: CustomEvent<number \| number[]>) => void` |
 
-## 无障碍
+## 相关组件
 
-- 支持键盘：←/→/↑/↓ 调整步长，PageUp/PageDown 调整 10 倍步长，Home/End 移动到最小/最大
-- ARIA：role="slider"，并提供 `aria-valuemin` / `aria-valuemax` / `aria-valuenow` 与 `aria-orientation`，禁用时含 `aria-disabled`
+- [InputNumber 数字输入框](./input-number.md)
+- [Rate 评分](./rate.md)
+
+<script>
+if (typeof window !== 'undefined') {
+  const initSlider = () => {
+    // 带标记
+    const marksSlider = document.getElementById('marks-slider');
+    if (marksSlider) {
+      marksSlider.marks = {
+        0: '0°C',
+        26: '26°C',
+        37: '37°C',
+        100: '100°C'
+      };
+    }
+  };
+  
+  // 初次加载
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlider);
+  } else {
+    initSlider();
+  }
+}
+</script>

@@ -1,177 +1,207 @@
-# Message 全局提示
+﻿# Message 全局提示
 
-用于页面操作反馈的轻量级提示，常用于顶部居中的信息展示，数秒后自动消失。
+全局展示操作反馈信息。
 
+## 何时使用
+
+- 可提供成功、警告和错误等反馈信息。
+- 顶部居中显示并自动消失，是一种不打断用户操作的轻量级提示方式。
+
+## 代码演示
+
+### 基础用法
+
+信息提醒。
+
+<div class="demo-container">
+  <ldesign-button id="info-msg-btn">显示信息</ldesign-button>
+</div>
+
+
+```html
+<ldesign-button id="btn">显示消息</ldesign-button>
+
+<script>
+  const btn = document.getElementById('btn');
+  btn.addEventListener('click', () => {
+    const message = document.createElement('ldesign-message');
+    message.type = 'info';
+    message.content = '这是一条消息';
+    document.body.appendChild(message);
+  });
+</script>
+```
+
+### 不同类型
+
+包括成功、失败、警告。
+
+<div class="demo-container">
+  <ldesign-button id="success-msg-btn">成功</ldesign-button>
+  <ldesign-button id="error-msg-btn">错误</ldesign-button>
+  <ldesign-button id="warning-msg-btn">警告</ldesign-button>
+</div>
+
+
+```html
+<!-- 成功 -->
+<script>
+  const message = document.createElement('ldesign-message');
+  message.type = 'success';
+  message.content = '操作成功！';
+  document.body.appendChild(message);
+</script>
+
+<!-- 错误 -->
+<script>
+  const message = document.createElement('ldesign-message');
+  message.type = 'error';
+  message.content = '操作失败！';
+  document.body.appendChild(message);
+</script>
+```
+
+### 自定义时长
+
+自定义时长，默认 3 秒。
+
+```html
+<script>
+  const message = document.createElement('ldesign-message');
+  message.content = '10秒后关闭';
+  message.duration = 10000;
+  document.body.appendChild(message);
+</script>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+const showSuccess = () => {
+  const message = document.createElement('ldesign-message');
+  message.type = 'success';
+  message.content = '操作成功！';
+  document.body.appendChild(message);
+};
 
-let listeners = []
-
-function addListener(el, event, handler) {
-  if (el) {
-    el.addEventListener(event, handler)
-    listeners.push({ el, event, handler })
-  }
-}
-
-function cleanup() {
-  listeners.forEach(({ el, event, handler }) => el.removeEventListener(event, handler))
-  listeners = []
-}
-
-function openMessage({ type = 'info', message, duration = 3000, closable = false, showIcon = true, placement = 'top' } = {}) {
-  const el = document.createElement('ldesign-message')
-  el.type = type
-  el.duration = duration
-  el.message = message
-  el.closable = closable
-  el.showIcon = showIcon
-  el.placement = placement
-  document.body.appendChild(el)
-  return el
-}
-
-onMounted(() => {
-  cleanup()
-  // 基础用法
-  addListener(document.getElementById('msg-info'), 'click', () => openMessage({ type: 'info', message: '这是一条普通消息' }))
-  addListener(document.getElementById('msg-success'), 'click', () => openMessage({ type: 'success', message: '操作成功！' }))
-  addListener(document.getElementById('msg-warning'), 'click', () => openMessage({ type: 'warning', message: '请注意当前操作' }))
-  addListener(document.getElementById('msg-error'), 'click', () => openMessage({ type: 'error', message: '操作失败，请重试' }))
-
-  // 可关闭
-  addListener(document.getElementById('msg-closable'), 'click', () => openMessage({ type: 'info', message: '这条消息可以手动关闭', closable: true, duration: 0 }))
-
-  // 时长与位置
-  addListener(document.getElementById('msg-duration-short'), 'click', () => openMessage({ message: '1 秒后关闭', duration: 1000 }))
-  addListener(document.getElementById('msg-duration-long'), 'click', () => openMessage({ message: '5 秒后关闭', duration: 5000 }))
-  addListener(document.getElementById('msg-bottom'), 'click', () => openMessage({ message: '出现在底部', placement: 'bottom' }))
-
-  // 无图标
-  addListener(document.getElementById('msg-no-icon'), 'click', () => openMessage({ message: '纯文本消息', showIcon: false }))
-})
-
-onUnmounted(() => cleanup())
+const showError = () => {
+  const message = document.createElement('ldesign-message');
+  message.type = 'error';
+  message.content = '操作失败！';
+  document.body.appendChild(message);
+};
 </script>
 
-## 基础用法
+<template>
+  <ldesign-button @ldesignClick="showSuccess">成功</ldesign-button>
+  <ldesign-button @ldesignClick="showError">错误</ldesign-button>
+</template>
+```
 
-点击按钮在页面顶部居中显示一条消息。
+### React
 
-<div class="demo-container">
-  <div class="demo-row">
-    <ldesign-button id="msg-info">Info</ldesign-button>
-    <ldesign-button id="msg-success" type="primary">Success</ldesign-button>
-    <ldesign-button id="msg-warning" type="outline">Warning</ldesign-button>
-    <ldesign-button id="msg-error" type="danger">Error</ldesign-button>
-  </div>
-</div>
-
-```html
-<!-- 通过脚本动态创建（示例） -->
-<ldesign-button id="msg-info">Info</ldesign-button>
-<ldesign-button id="msg-success" type="primary">Success</ldesign-button>
-<ldesign-button id="msg-warning" type="outline">Warning</ldesign-button>
-<ldesign-button id="msg-error" type="danger">Error</ldesign-button>
-
-<script>
-function openMessage({ type = 'info', message, duration = 3000, closable = false }) {
-  const el = document.createElement('ldesign-message')
-  el.type = type
-  el.duration = duration
-  el.message = message
-  el.closable = closable
-  document.body.appendChild(el)
-  return el
+```tsx
+function App() {
+  const showSuccess = () => {
+    const message = document.createElement('ldesign-message');
+    message.type = 'success';
+    message.content = '操作成功！';
+    document.body.appendChild(message);
+  };
+  
+  const showError = () => {
+    const message = document.createElement('ldesign-message');
+    message.type = 'error';
+    message.content = '操作失败！';
+    document.body.appendChild(message);
+  };
+  
+  return (
+    <>
+      <ldesign-button onLdesignClick={showSuccess}>成功</ldesign-button>
+      <ldesign-button onLdesignClick={showError}>错误</ldesign-button>
+    </>
+  );
 }
-</script>
 ```
-
-## 可关闭
-
-设置 `closable` 显示关闭按钮。
-
-<div class="demo-container">
-  <ldesign-button id="msg-closable" type="secondary">可关闭消息</ldesign-button>
-</div>
-
-```html
-<ldesign-button id="msg-closable" type="secondary">可关闭消息</ldesign-button>
-<script>
-openMessage({ type: 'info', message: '这条消息可以手动关闭', closable: true, duration: 0 })
-</script>
-```
-
-## 自定义时长与位置
-
-- `duration` 控制自动关闭时间（毫秒），设为 0 不自动关闭。
-- `placement` 支持 `top`（默认）与 `bottom`。
-
-<div class="demo-container">
-  <div class="demo-row">
-    <ldesign-button id="msg-duration-short">1 秒自动关闭</ldesign-button>
-    <ldesign-button id="msg-duration-long">5 秒自动关闭</ldesign-button>
-    <ldesign-button id="msg-bottom">底部提示</ldesign-button>
-  </div>
-</div>
-
-```html
-<ldesign-button id="msg-duration-short">1 秒自动关闭</ldesign-button>
-<ldesign-button id="msg-duration-long">5 秒自动关闭</ldesign-button>
-<ldesign-button id="msg-bottom">底部提示</ldesign-button>
-```
-
-## 隐藏图标
-
-通过 `showIcon=false` 隐藏图标。
-
-<div class="demo-container">
-  <ldesign-button id="msg-no-icon">无图标消息</ldesign-button>
-</div>
-
-```html
-<ldesign-button id="msg-no-icon">无图标消息</ldesign-button>
-```
-
-## 无障碍
-
-- 默认设置 `role="alert"` 与 `aria-live="polite"`，确保读屏器能及时播报。
-- 键盘可聚焦关闭按钮，按下回车即可关闭。
 
 ## API
 
-### 属性
+### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `type` | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | 提示类型 |
-| `duration` | `number` | `3000` | 自动关闭时长（毫秒），`0` 表示不自动关闭 |
-| `closable` | `boolean` | `false` | 是否显示关闭按钮 |
-| `showIcon` | `boolean` | `true` | 是否显示图标 |
-| `message` | `string` | - | 简单文本内容（也可用 slot） |
-| `pauseOnHover` | `boolean` | `true` | 鼠标悬浮时是否暂停倒计时 |
-| `placement` | `'top' \| 'bottom'` | `'top'` | 出现位置 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `type` | 提示类型 | `'success' \| 'error' \| 'warning' \| 'info'` | `'info'` |
+| `content` | 提示内容 | `string` | - |
+| `duration` | 自动关闭的延时（ms），设为 0 时不自动关闭 | `number` | `3000` |
+| `closable` | 是否显示关闭按钮 | `boolean` | `false` |
 
-### 方法
-
-| 方法名 | 说明 | 签名 |
-|---|---|---|
-| `close()` | 手动关闭消息 | `() => Promise<void>` |
-
-### 事件
+### Events
 
 | 事件名 | 说明 | 回调参数 |
-|---|---|---|
-| `ldesignClose` | 关闭后触发 | `() => void` |
+|--------|------|----------|
+| `ldesignClose` | 关闭时触发 | `() => void` |
 
-### 样式变量
+## 相关组件
 
-| 变量名 | 默认值 | 说明 |
-|---|---|---|
-| `--ls-border-radius-base` | `6px` | 圆角 |
-| `--ldesign-border-color` | `#e5e5e5` | 边框色 |
-| `--ldesign-shadow-1` | `0 1px 10px rgba(0,0,0,5%)` | 阴影 |
-| `--ldesign-brand-color` | - | 信息色（info）左侧色条 |
-| `--ldesign-success-color` | - | 成功色左侧色条 |
-| `--ldesign-warning-color` | - | 警告色左侧色条 |
-| `--ldesign-error-color` | - | 失败色左侧色条 |
+- [Notification 通知](./notification.md)
+- [Alert 警告提示](./alert.md)
+
+<script>
+if (typeof window !== 'undefined') {
+  const initMessages = () => {
+    // 基础用法
+    const infoBtn = document.getElementById('info-msg-btn');
+    if (infoBtn) {
+      infoBtn.addEventListener('ldesignClick', () => {
+        const message = document.createElement('ldesign-message');
+        message.type = 'info';
+        message.content = '这是一条信息提示';
+        document.body.appendChild(message);
+      });
+    }
+    
+    // 不同类型
+    const successBtn = document.getElementById('success-msg-btn');
+    const errorBtn = document.getElementById('error-msg-btn');
+    const warningBtn = document.getElementById('warning-msg-btn');
+    
+    if (successBtn) {
+      successBtn.addEventListener('ldesignClick', () => {
+        const message = document.createElement('ldesign-message');
+        message.type = 'success';
+        message.content = '操作成功！';
+        document.body.appendChild(message);
+      });
+    }
+    
+    if (errorBtn) {
+      errorBtn.addEventListener('ldesignClick', () => {
+        const message = document.createElement('ldesign-message');
+        message.type = 'error';
+        message.content = '操作失败！';
+        document.body.appendChild(message);
+      });
+    }
+    
+    if (warningBtn) {
+      warningBtn.addEventListener('ldesignClick', () => {
+        const message = document.createElement('ldesign-message');
+        message.type = 'warning';
+        message.content = '警告信息';
+        document.body.appendChild(message);
+      });
+    }
+  };
+  
+  // 初次加载
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMessages);
+  } else {
+    initMessages();
+  }
+}
+</script>

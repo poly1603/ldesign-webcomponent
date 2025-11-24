@@ -62,7 +62,7 @@ export const config: Config = {
     openBrowser: false,
   },
   testing: {
-    browserHeadless: "new",
+    browserHeadless: "shell",
     collectCoverageFrom: [
       'src/**/*.{ts,tsx}',
       '!src/**/*.d.ts',
@@ -85,11 +85,6 @@ export const config: Config = {
     transform: {
       '^.+\\.(ts|tsx)$': '@stencil/core/testing/jest-preprocessor.js'
     },
-    testEnvironment: 'jsdom',
-    testMatch: [
-      '**/__tests__/**/*.{ts,tsx}',
-      '**/*.{spec,test}.{ts,tsx}'
-    ],
   },
   extras: {
     enableImportInjection: true,

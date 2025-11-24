@@ -1,61 +1,144 @@
-# Descriptions 描述列表
+﻿# Descriptions 描述列表
 
 成组展示多个只读字段。
 
 ## 何时使用
 
-- 详情页面展示数据
-- 信息展示卡片
+常见于详情页的信息展示。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+简单的展示。
+
+<div class="demo-container">
+  <ldesign-descriptions title="用户信息">
+    <ldesign-descriptions-item label="姓名">张三</ldesign-descriptions-item>
+    <ldesign-descriptions-item label="手机号">1810000000</ldesign-descriptions-item>
+    <ldesign-descriptions-item label="居住地">浙江杭州</ldesign-descriptions-item>
+    <ldesign-descriptions-item label="备注">无</ldesign-descriptions-item>
+  </ldesign-descriptions>
+</div>
 
 ```html
 <ldesign-descriptions title="用户信息">
   <ldesign-descriptions-item label="姓名">张三</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="手机号">1234567890</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="居住地">北京市朝阳区</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="备注" span="2">
-    这是一段很长的备注信息，可以跨越多列显示。
-  </ldesign-descriptions-item>
-  <ldesign-descriptions-item label="邮箱">zhangsan@example.com</ldesign-descriptions-item>
+  <ldesign-descriptions-item label="手机号">1810000000</ldesign-descriptions-item>
+  <ldesign-descriptions-item label="地址">杭州</ldesign-descriptions-item>
 </ldesign-descriptions>
 ```
 
-:::
+### 带边框
 
-## 带边框
+带边框和背景颜色。
 
-:::demo
+<div class="demo-container">
+  <ldesign-descriptions title="用户信息" bordered>
+    <ldesign-descriptions-item label="姓名">张三</ldesign-descriptions-item>
+    <ldesign-descriptions-item label="手机号">1810000000</ldesign-descriptions-item>
+    <ldesign-descriptions-item label="居住地">浙江杭州</ldesign-descriptions-item>
+  </ldesign-descriptions>
+</div>
 
 ```html
-<ldesign-descriptions title="用户信息" bordered column="2">
-  <ldesign-descriptions-item label="姓名">张三</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="年龄">28</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="邮箱" span="2">zhangsan@example.com</ldesign-descriptions-item>
-  <ldesign-descriptions-item label="地址" span="2">北京市朝阳区某某街道</ldesign-descriptions-item>
+<ldesign-descriptions bordered>
+  ...
 </ldesign-descriptions>
 ```
 
-:::
+### 响应式
+
+通过 `column` 属性设置一行展示的列数。
+
+```html
+<ldesign-descriptions column="3">
+  <ldesign-descriptions-item label="姓名">张三</ldesign-descriptions-item>
+  <ldesign-descriptions-item label="手机号">1810000000</ldesign-descriptions-item>
+  <ldesign-descriptions-item label="地址">杭州</ldesign-descriptions-item>
+</ldesign-descriptions>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+const userInfo = {
+  name: '张三',
+  phone: '1810000000',
+  address: '浙江杭州',
+  remark: '无'
+};
+</script>
+
+<template>
+  <ldesign-descriptions title="用户信息" bordered>
+    <ldesign-descriptions-item label="姓名">
+      {{ userInfo.name }}
+    </ldesign-descriptions-item>
+    <ldesign-descriptions-item label="手机号">
+      {{ userInfo.phone }}
+    </ldesign-descriptions-item>
+    <ldesign-descriptions-item label="地址">
+      {{ userInfo.address }}
+    </ldesign-descriptions-item>
+  </ldesign-descriptions>
+</template>
+```
+
+### React
+
+```tsx
+function App() {
+  const userInfo = {
+    name: '张三',
+    phone: '1810000000',
+    address: '浙江杭州'
+  };
+  
+  return (
+    <ldesign-descriptions title="用户信息" bordered>
+      <ldesign-descriptions-item label="姓名">
+        {userInfo.name}
+      </ldesign-descriptions-item>
+      <ldesign-descriptions-item label="手机号">
+        {userInfo.phone}
+      </ldesign-descriptions-item>
+      <ldesign-descriptions-item label="地址">
+        {userInfo.address}
+      </ldesign-descriptions-item>
+    </ldesign-descriptions>
+  );
+}
+```
 
 ## API
 
 ### Descriptions Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| title | `string` | - | 标题 |
-| column | `number` | `3` | 列数 |
-| bordered | `boolean` | `false` | 是否显示边框 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 尺寸 |
-| layout | `'horizontal' \| 'vertical'` | `'horizontal'` | 布局 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `title` | 描述列表的标题 | `string` | - |
+| `bordered` | 是否展示边框 | `boolean` | `false` |
+| `column` | 一行的 DescriptionItems 数量 | `number` | `3` |
+| `size` | 设置列表的大小 | `'default' \| 'middle' \| 'small'` | `'default'` |
 
 ### DescriptionsItem Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| label | `string` | - | 标签 |
-| span | `number` | `1` | 跨列数 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `label` | 内容的描述 | `string` | - |
+| `span` | 包含列的数量 | `number` | `1` |
 
+### DescriptionsItem Slots
+
+| 插槽名 | 说明 |
+|--------|------|
+| `default` | 内容 |
+
+## 相关组件
+
+- [Card 卡片](./card.md)
+- [List 列表](./list.md)

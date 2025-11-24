@@ -1,0 +1,280 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run unit tests
+        run: npm run test:unit
+      
+      - name: Generate coverage report
+        run: npm run test:coverage
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-${{ matrix.os }}-node-${{ matrix.node-version }}
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+      - name: Run E2E tests
+        run: npm run test:e2e -- --project=${{ matrix.browser }}
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-results-${{ matrix.browser }}
+          path: e2e-report/
+          retention-days: 30
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install chromium
+      
+      - name: Run performance tests
+        run: npm run test:performance
+      
+      - name: Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: performance-results/
+          retention-days: 30
+      
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const results = fs.readFileSync('performance-results/summary.json', 'utf8');
+            const data = JSON.parse(results);
+            
+            const comment = `## Performance Test Results
+            
+            | Metric | Value | Status |
+            |--------|-------|--------|
+            | AutoComplete (10K items) | ${data.autoComplete}ms | ${data.autoComplete < 1000 ? '✅' : '❌'} |
+            | Select (Virtual Scroll) | ${data.selectVirtual}ms | ${data.selectVirtual < 500 ? '✅' : '❌'} |
+            | Table (1K rows) | ${data.tableRender}ms | ${data.tableRender < 2000 ? '✅' : '❌'} |
+            | Form Validation | ${data.formValidation}ms | ${data.formValidation < 1000 ? '✅' : '❌'} |
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install chromium
+      
+      - name: Run accessibility tests
+        run: npm run test:a11y
+      
+      - name: Upload accessibility report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-report
+          path: a11y-report/
+          retention-days: 30
+
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install chromium
+      
+      - name: Run visual tests
+        run: npm run test:visual
+      
+      - name: Upload visual diff
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: visual-diff
+          path: visual-diff/
+          retention-days: 30
+
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Run TypeScript check
+        run: npm run type-check
+      
+      - name: Run Prettier check
+        run: npm run format:check
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [unit-tests, lint]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Check bundle size
+        run: npm run size-check
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, e2e-tests, performance-tests, accessibility-tests]
+    if: always()
+    
+    steps:
+      - name: Generate test summary
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const summary = `## Test Results Summary
+            
+            | Test Suite | Status |
+            |------------|--------|
+            | Unit Tests | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |
+            | E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |
+            | Performance Tests | ${{ needs.performance-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |
+            | Accessibility Tests | ${{ needs.accessibility-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |
+            
+            ---
+            
+            **Overall Status:** ${{ needs.unit-tests.result == 'success' && needs.e2e-tests.result == 'success' && needs.performance-tests.result == 'success' && needs.accessibility-tests.result == 'success' && '✅ All tests passed!' || '❌ Some tests failed' }}
+            `;
+            
+            core.summary.addRaw(summary).write();

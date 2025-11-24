@@ -1,261 +1,160 @@
-# Grid 栅格布局
+﻿# Grid 栅格
 
-父组件负责定义一行包含多少列（cols）和横向/纵向间距（x-gap/y-gap 或 gap），子组件 `ldesign-grid-item` 通过 `span` 指定自身跨越的列数。Grid 会在内部自动计算每个子项所在的行、列起点和跨越列数，并将它们正确排布。
+24 栅格系统。
 
-> 特性概览：
-> - 使用结构：`<ldesign-grid> -> <ldesign-grid-item>`
-> - Grid 根据 `cols` 与每个子项的 `span` 自动计算“第几行”和“第几列”
-> - 支持 `gap`、`x-gap`、`y-gap` 设置横纵间距
-> - 支持运行时修改 `cols` 或某个子项 `span` 并自动重排
+## 设计理念
 
-## 快速预览：折叠/收起
+在多数业务情况下，我们需要基于 24 栅格来划分设计区域，通过栅格的数值来控制布局的比例。
+
+## 代码演示
+
+### 基础用法
+
+使用单一的一组 `Row` 和 `Col` 栅格组件，就可以创建一个基本的栅格系统。
 
 <div class="demo-container">
-  <ldesign-grid min-col-width="240" x-gap="16" y-gap="12" default-rows="2" toggle-span="2">
-    <ldesign-grid-item><div class="demo-box">1</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">2</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">3</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">4</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">5</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">6</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">7</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">8</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">9</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">10</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">11</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">12</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">13</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">14</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">15</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">16</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">17</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">18</div></ldesign-grid-item>
-  </ldesign-grid>
+  <ldesign-row>
+    <ldesign-col span="24"><div style="background: #0092ff; padding: 16px; color: white;">col-24</div></ldesign-col>
+  </ldesign-row>
+  <ldesign-row>
+    <ldesign-col span="12"><div style="background: #0092ff; padding: 16px; color: white;">col-12</div></ldesign-col>
+    <ldesign-col span="12"><div style="background: #3db0ff; padding: 16px; color: white;">col-12</div></ldesign-col>
+  </ldesign-row>
+  <ldesign-row>
+    <ldesign-col span="8"><div style="background: #0092ff; padding: 16px; color: white;">col-8</div></ldesign-col>
+    <ldesign-col span="8"><div style="background: #3db0ff; padding: 16px; color: white;">col-8</div></ldesign-col>
+    <ldesign-col span="8"><div style="background: #0092ff; padding: 16px; color: white;">col-8</div></ldesign-col>
+  </ldesign-row>
 </div>
 
 ```html
-<ldesign-grid min-col-width="240" x-gap="16" y-gap="12" default-rows="2" toggle-span="2">
-  <!-- 多个 grid-item，默认占 1 列，偶尔设置 span="2" -->
-</ldesign-grid>
+<ldesign-row>
+  <ldesign-col span="12">col-12</ldesign-col>
+  <ldesign-col span="12">col-12</ldesign-col>
+</ldesign-row>
 ```
 
-## 基础用法
+### 区块间隔
 
-自适应列数（默认每列最小宽度 240px），横向和纵向间距分别为 16px/16px。
+栅格常常需要和间隔进行配合，通过 `gutter` 属性设置间隔。
 
 <div class="demo-container">
-  <ldesign-grid min-col-width="240" x-gap="16" y-gap="16">
-    <ldesign-grid-item><div class="demo-box">1</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">2</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">占 2 列</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">3</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">4</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">5</div></ldesign-grid-item>
-  </ldesign-grid>
+  <ldesign-row gutter="16">
+    <ldesign-col span="6"><div style="background: #0092ff; padding: 16px; color: white;">col-6</div></ldesign-col>
+    <ldesign-col span="6"><div style="background: #0092ff; padding: 16px; color: white;">col-6</div></ldesign-col>
+    <ldesign-col span="6"><div style="background: #0092ff; padding: 16px; color: white;">col-6</div></ldesign-col>
+    <ldesign-col span="6"><div style="background: #0092ff; padding: 16px; color: white;">col-6</div></ldesign-col>
+  </ldesign-row>
 </div>
 
 ```html
-<ldesign-grid min-col-width="240" x-gap="16" y-gap="16">
-  <ldesign-grid-item>1</ldesign-grid-item>
-  <ldesign-grid-item>2</ldesign-grid-item>
-  <ldesign-grid-item span="2">占 2 列</ldesign-grid-item>
-  <ldesign-grid-item>3</ldesign-grid-item>
-  <ldesign-grid-item>4</ldesign-grid-item>
-  <ldesign-grid-item>5</ldesign-grid-item>
-</ldesign-grid>
+<ldesign-row gutter="16">
+  <ldesign-col span="6">col-6</ldesign-col>
+  <ldesign-col span="6">col-6</ldesign-col>
+</ldesign-row>
 ```
 
-## 子项跨列（span）
+### 左右偏移
 
-默认每个 grid-item 占 1 列；当需要更宽时设置 `span="2"`。
+列偏移，通过 `offset` 设置偏移的格数。
 
 <div class="demo-container">
-  <ldesign-grid min-col-width="240" gap="12">
-    <ldesign-grid-item><div class="demo-box">1</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">2</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">占 2 列</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">3</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">4</div></ldesign-grid-item>
-  </ldesign-grid>
+  <ldesign-row>
+    <ldesign-col span="8"><div style="background: #0092ff; padding: 16px; color: white;">col-8</div></ldesign-col>
+    <ldesign-col span="8" offset="8"><div style="background: #0092ff; padding: 16px; color: white;">col-8 offset-8</div></ldesign-col>
+  </ldesign-row>
 </div>
 
 ```html
-<ldesign-grid min-col-width="240" gap="12">
-  <ldesign-grid-item>1</ldesign-grid-item>
-  <ldesign-grid-item>2</ldesign-grid-item>
-  <ldesign-grid-item span="2">占 2 列</ldesign-grid-item>
-  <ldesign-grid-item>3</ldesign-grid-item>
-  <ldesign-grid-item>4</ldesign-grid-item>
-</ldesign-grid>
+<ldesign-row>
+  <ldesign-col span="8">col-8</ldesign-col>
+  <ldesign-col span="8" offset="8">col-8 offset-8</ldesign-col>
+</ldesign-row>
 ```
 
-> 说明：每个子项的 `span` 会被自动限制在 `[1, cols]` 之内，避免越界。
+### 对齐方式
 
-## 间距：gap 与 x-gap / y-gap
-
-- `gap` 同时设置横向与纵向间距
-- `x-gap` 仅设置横向列间距；`y-gap` 仅设置纵向行间距；优先级高于 `gap`
+布局基础，子元素根据不同的值 `start`、`center`、`end`、`space-around`、`space-between` 来定义其在父节点里面的排版方式。
 
 <div class="demo-container">
-  <div class="demo-row">
-    <div class="demo-label">gap=12</div>
-    <ldesign-grid cols="12" gap="12">
-      <ldesign-grid-item span="4"><div class="demo-box">A</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">B</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">C</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">D</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">E</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">F</div></ldesign-grid-item>
-    </ldesign-grid>
-  </div>
-  <div class="demo-row">
-    <div class="demo-label">x-gap=16, y-gap=8</div>
-    <ldesign-grid cols="12" x-gap="16" y-gap="8">
-      <ldesign-grid-item span="4"><div class="demo-box">A</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">B</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">C</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">D</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">E</div></ldesign-grid-item>
-      <ldesign-grid-item span="4"><div class="demo-box">F</div></ldesign-grid-item>
-    </ldesign-grid>
-  </div>
+  <ldesign-row justify="start">
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+  </ldesign-row>
+  
+  <ldesign-row justify="center">
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+  </ldesign-row>
+  
+  <ldesign-row justify="end">
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+    <ldesign-col span="4"><div style="background: #0092ff; padding: 16px; color: white;">col-4</div></ldesign-col>
+  </ldesign-row>
 </div>
 
 ```html
-<ldesign-grid cols="12" gap="12">...</ldesign-grid>
-<ldesign-grid cols="12" x-gap="16" y-gap="8">...</ldesign-grid>
+<ldesign-row justify="start">...</ldesign-row>
+<ldesign-row justify="center">...</ldesign-row>
+<ldesign-row justify="end">...</ldesign-row>
+<ldesign-row justify="space-between">...</ldesign-row>
+<ldesign-row justify="space-around">...</ldesign-row>
 ```
 
-## 折叠 / 展开（default-rows + toggle-span）
+## 框架集成
 
-当 grid-item 较多时，可以设置 `default-rows` 指定初始展示的行数。组件会在最后一个位置自动追加一列作为“展开/收起”按钮。
+### Vue 3
 
-<div class="demo-container">
-  <ldesign-grid min-col-width="240" gap="16" default-rows="2" toggle-span="2">
-    <ldesign-grid-item><div class="demo-box">1</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">2</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">3</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">4</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">5</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">6</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">7</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">8</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">9</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">10</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">11</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">12</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">13</div></ldesign-grid-item>
-    <ldesign-grid-item span="2"><div class="demo-box">14</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">15</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">16</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">17</div></ldesign-grid-item>
-    <ldesign-grid-item><div class="demo-box">18</div></ldesign-grid-item>
-  </ldesign-grid>
-</div>
-
-```html
-<ldesign-grid min-col-width="240" gap="16" default-rows="2" toggle-span="2">
-  <!-- 多个 grid-item，默认占 1 列，偶尔设置 span="2" -->
-</ldesign-grid>
+```vue
+<template>
+  <ldesign-row :gutter="16">
+    <ldesign-col :span="6">
+      <div class="grid-content">col-6</div>
+    </ldesign-col>
+    <ldesign-col :span="6">
+      <div class="grid-content">col-6</div>
+    </ldesign-col>
+  </ldesign-row>
+</template>
 ```
 
-> 折叠时：只显示 `default-rows` 行，并在该行末尾添加“展开更多”按钮；
-> 展开后：显示全部 grid-item，并在最后一个位置追加“收起”按钮，点击可回到折叠状态。
+### React
 
-## 动态变更（运行时重排）
-
-父级 `min-col-width/cols` 或某个子项的 `span` 发生变化时，Grid 会自动重新计算并更新每个子项的行与列位置。
-
-```html
-<ldesign-grid id="g" min-col-width="240" gap="12">
-  <ldesign-grid-item>1</ldesign-grid-item>
-  <ldesign-grid-item>2</ldesign-grid-item>
-</ldesign-grid>
-
-<script>
-  // 调整列最小宽度，触发重排
-  document.getElementById('g').setAttribute('min-col-width', '200')
-</script>
-```
-
-## 嵌套栅格
-
-可以在某个 `ldesign-grid-item` 内部再放一个 `ldesign-grid`，构建更复杂的布局。
-
-<div class="demo-container">
-  <ldesign-grid cols="12" gap="12">
-    <ldesign-grid-item span="8">
-      <div class="demo-box">
-        <div style="margin-bottom:8px; font-weight:600;">主区域（8/12）</div>
-        <ldesign-grid cols="12" gap="8">
-          <ldesign-grid-item span="6"><div class="demo-box">6</div></ldesign-grid-item>
-          <ldesign-grid-item span="6"><div class="demo-box">6</div></ldesign-grid-item>
-          <ldesign-grid-item span="4"><div class="demo-box">4</div></ldesign-grid-item>
-          <ldesign-grid-item span="8"><div class="demo-box">8</div></ldesign-grid-item>
-        </ldesign-grid>
-      </div>
-    </ldesign-grid-item>
-    <ldesign-grid-item span="4"><div class="demo-box">侧边栏（4/12）</div></ldesign-grid-item>
-  </ldesign-grid>
-</div>
-
-```html
-<ldesign-grid cols="12" gap="12">
-  <ldesign-grid-item span="8">
-    <ldesign-grid cols="12" gap="8">
-      <ldesign-grid-item span="6">6</ldesign-grid-item>
-      <ldesign-grid-item span="6">6</ldesign-grid-item>
-      <ldesign-grid-item span="4">4</ldesign-grid-item>
-      <ldesign-grid-item span="8">8</ldesign-grid-item>
-    </ldesign-grid>
-  </ldesign-grid-item>
-  <ldesign-grid-item span="4">侧边栏</ldesign-grid-item>
-</ldesign-grid>
+```tsx
+function App() {
+  return (
+    <ldesign-row gutter={16}>
+      <ldesign-col span={6}>
+        <div className="grid-content">col-6</div>
+      </ldesign-col>
+      <ldesign-col span={6}>
+        <div className="grid-content">col-6</div>
+      </ldesign-col>
+    </ldesign-row>
+  );
+}
 ```
 
 ## API
 
-### ldesign-grid
+### Row Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `cols` | `number` | `24` | 一行的总列数 |
-| `gap` | `number | string` | `-` | 同时设置横纵间距；数字默认为 px，也支持 `'1rem'` |
-| `x-gap` | `number | string` | `-` | 列间距（优先级高于 `gap`） |
-| `y-gap` | `number | string` | `-` | 行间距（优先级高于 `gap`） |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `gutter` | 栅格间隔 | `number \| [number, number]` | `0` |
+| `justify` | 水平排列方式 | `'start' \| 'end' \| 'center' \| 'space-around' \| 'space-between'` | `'start'` |
+| `align` | 垂直对齐方式 | `'top' \| 'middle' \| 'bottom'` | `'top'` |
 
-### ldesign-grid-item
+### Col Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `span` | `number` | `1` | 子项占用的列数，Grid 会根据 `cols` 与 `span` 自动计算其行、列位置 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `span` | 栅格占位格数 | `number` | - |
+| `offset` | 栅格左侧的间隔格数 | `number` | `0` |
+| `push` | 栅格向右移动格数 | `number` | `0` |
+| `pull` | 栅格向左移动格数 | `number` | `0` |
 
-### 行列信息（调试）
+## 相关组件
 
-计算完成后，Grid 会为每个 `ldesign-grid-item` 添加以下属性，便于调试：
-- `data-row`: 所在行（从 1 开始）
-- `data-col-start`: 列起始位置（从 1 开始）
-- `data-span`: 实际跨越列数（已按 `cols` 限制）
-
-<style>
-.demo-container { display: grid; gap: 16px; }
-.demo-row { display: grid; gap: 8px; }
-.demo-label { font-size: 12px; color: var(--vp-c-text-2); }
-.demo-box { background: var(--vp-c-bg-soft); border: 1px dashed var(--vp-c-divider); border-radius: 6px; padding: 12px; text-align: center; }
-</style>
-### ldesign-col（列/子项）
-
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `span` | `number` | `1` | 跨越的列数，自动限制在当前行/全局列数范围内 |
-
-## 兼容说明
-
-- 仍保留 `ldesign-grid-item` 用于直接在 Grid 内布局的简写方式，但推荐优先使用 `Row/Col` 结构，语义更清晰、可扩展性更好。
-
-<style>
-.demo-container { display: grid; gap: 16px; }
-.demo-row { display: grid; gap: 8px; }
-.demo-label { font-size: 12px; color: var(--vp-c-text-2); }
-.demo-box { background: var(--vp-c-bg-soft); border: 1px dashed var(--vp-c-divider); border-radius: 6px; padding: 12px; text-align: center; }
-</style>
+- [Layout 布局](./layout.md)
+- [Space 间距](./space.md)

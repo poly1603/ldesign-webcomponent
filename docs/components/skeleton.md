@@ -1,132 +1,194 @@
-# Skeleton 骨架屏
+﻿# Skeleton 骨架屏
 
-在内容加载时显示占位图形，提升用户体验。
+在需要等待加载内容的位置提供一个占位图形组合。
 
 ## 何时使用
 
-- 网络较慢时，优化加载体验
-- 数据获取需要时间
-- 避免页面闪烁
+- 网络较慢，需要长时间等待加载处理的情况下。
+- 图文信息内容较多的列表/卡片中。
+- 只在第一次加载数据的时候使用。
+- 可以被 Spin 完全代替，但是在可用的场景下可以比 Spin 提供更好的视觉效果和用户体验。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+最简单的占位效果。
+
+<div class="demo-container">
+  <ldesign-skeleton></ldesign-skeleton>
+</div>
 
 ```html
+<ldesign-skeleton></ldesign-skeleton>
+```
+
+### 复杂组合
+
+更复杂的组合。
+
+<div class="demo-container">
+  <ldesign-skeleton avatar rows="4"></ldesign-skeleton>
+</div>
+
+```html
+<ldesign-skeleton avatar rows="4"></ldesign-skeleton>
+```
+
+### 动画效果
+
+显示动画效果。
+
+<div class="demo-container">
+  <ldesign-skeleton animated></ldesign-skeleton>
+  <ldesign-skeleton avatar rows="3" animated></ldesign-skeleton>
+</div>
+
+```html
+<ldesign-skeleton animated></ldesign-skeleton>
 <ldesign-skeleton avatar rows="3" animated></ldesign-skeleton>
 ```
 
-:::
+### 包含子组件
 
-## 加载完成显示内容
+加载完成后，显示子组件。
 
-:::demo
-
-```html
-<div>
-  <ldesign-button id="toggleLoading" type="primary">切换加载状态</ldesign-button>
-  <br><br>
-  
-  <ldesign-skeleton id="skeleton1" loading avatar rows="3" animated>
-    <div style="display: flex; gap: 16px;">
-      <img src="https://via.placeholder.com/40" style="border-radius: 50%;">
-      <div>
-        <h4 style="margin: 0 0 8px;">张三</h4>
-        <p style="margin: 0; color: #666;">这是加载完成后显示的真实内容。</p>
-      </div>
+<div class="demo-container">
+  <ldesign-skeleton id="skeleton-demo" loading rows="3">
+    <div style="padding: 20px; background: #f5f5f5; border-radius: 4px;">
+      <h3>真实内容标题</h3>
+      <p>这是加载完成后显示的真实内容。</p>
+      <p>骨架屏已隐藏。</p>
     </div>
   </ldesign-skeleton>
+  
+  <ldesign-button id="toggle-btn" style="margin-top: 16px;">切换加载状态</ldesign-button>
 </div>
 
 <script>
-const btn = document.getElementById('toggleLoading');
-const skeleton = document.getElementById('skeleton1');
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+  const skeleton = document.getElementById('skeleton-demo')
+  const btn = document.getElementById('toggle-btn')
+  
+  if (skeleton && btn) {
+    btn.addEventListener('ldesignClick', () => {
+      skeleton.loading = !skeleton.loading
+    })
+  }
+  })
+}
+</script>
 
-btn.addEventListener('ldesignClick', () => {
-  skeleton.loading = !skeleton.loading;
-});
+```html
+<ldesign-skeleton loading>
+  <div class="content">
+    真实内容
+  </div>
+</ldesign-skeleton>
+
+<script>
+  const skeleton = document.querySelector('ldesign-skeleton');
+  
+  // 数据加载完成后
+  setTimeout(() => {
+    skeleton.loading = false;
+  }, 3000);
 </script>
 ```
 
-:::
+### 自定义行数
 
-## 不同类型
+可以自定义骨架屏的行数。
 
-:::demo
+<div class="demo-container">
+  <ldesign-skeleton rows="2"></ldesign-skeleton>
+  <ldesign-skeleton rows="5"></ldesign-skeleton>
+</div>
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-  <div>
-    <h4>文本骨架</h4>
-    <ldesign-skeleton type="text" rows="4" animated></ldesign-skeleton>
-  </div>
-  
-  <div>
-    <h4>矩形骨架</h4>
-    <ldesign-skeleton type="rect" width="200" height="150" animated></ldesign-skeleton>
-  </div>
-  
-  <div>
-    <h4>圆形骨架</h4>
-    <ldesign-skeleton type="circle" width="100" height="100" animated></ldesign-skeleton>
-  </div>
-</div>
+<ldesign-skeleton rows="2"></ldesign-skeleton>
+<ldesign-skeleton rows="5"></ldesign-skeleton>
 ```
 
-:::
+## 框架集成
 
-## Vue 3 使用
+### Vue 3
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue';
-import '@ldesign/webcomponent/skeleton';
 
 const loading = ref(true);
+const data = ref(null);
 
 onMounted(() => {
   // 模拟数据加载
   setTimeout(() => {
+    data.value = { title: '标题', content: '内容' };
     loading.value = false;
-  }, 2000);
+  }, 3000);
 });
 </script>
 
 <template>
-  <ldesign-skeleton :loading="loading" avatar rows="3" animated>
-    <div class="user-info">
-      <img src="avatar.jpg" />
-      <div>
-        <h4>用户名</h4>
-        <p>用户简介</p>
-      </div>
+  <ldesign-skeleton :loading="loading" avatar rows="4">
+    <div v-if="data" class="content">
+      <h3>{{ data.title }}</h3>
+      <p>{{ data.content }}</p>
     </div>
   </ldesign-skeleton>
 </template>
+```
+
+### React
+
+```tsx
+import { useState, useEffect } from 'react';
+
+function App() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    // 模拟数据加载
+    setTimeout(() => {
+      setData({ title: '标题', content: '内容' });
+      setLoading(false);
+    }, 3000);
+  }, []);
+  
+  return (
+    <ldesign-skeleton loading={loading} avatar rows={4}>
+      {data && (
+        <div className="content">
+          <h3>{data.title}</h3>
+          <p>{data.content}</p>
+        </div>
+      )}
+    </ldesign-skeleton>
+  );
+}
 ```
 
 ## API
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| loading | `boolean` | `true` | 是否显示骨架屏 |
-| animated | `boolean` | `true` | 是否显示动画 |
-| rows | `number` | `3` | 段落行数 |
-| avatar | `boolean` | `false` | 是否显示头像 |
-| avatarShape | `'circle' \| 'square'` | `'circle'` | 头像形状 |
-| avatarSize | `'small' \| 'medium' \| 'large'` | `'medium'` | 头像大小 |
-| title | `boolean` | `true` | 是否显示标题 |
-| paragraph | `boolean` | `true` | 是否显示段落 |
-| type | `'text' \| 'rect' \| 'circle' \| 'image'` | `'text'` | 骨架屏类型 |
-| width | `string \| number` | - | 宽度 |
-| height | `string \| number` | - | 高度 |
-| borderRadius | `string \| number` | - | 圆角 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `loading` | 是否显示骨架屏 | `boolean` | `true` |
+| `animated` | 是否展示动画效果 | `boolean` | `false` |
+| `avatar` | 是否显示头像占位 | `boolean` | `false` |
+| `rows` | 段落占位行数 | `number` | `3` |
+
+### Slots
+
+| 插槽名 | 说明 |
+|--------|------|
+| `default` | 真实内容 |
 
 ## 相关组件
 
-- [Spin](/components/spin) - 加载指示器
-- [Loading](/components/loading) - 加载中
-- [Empty](/components/empty) - 空状态
-
+- [Spin 加载中](./spin.md)
+- [Progress 进度条](./progress.md)

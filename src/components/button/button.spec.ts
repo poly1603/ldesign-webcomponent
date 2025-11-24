@@ -29,7 +29,8 @@ describe('ldesign-button', () => {
     });
 
     const button = page.root?.querySelector('button');
-    expect(button?.disabled).toBe(true);
+    expect(button?.hasAttribute('disabled')).toBe(true);
+    expect(button?.getAttribute('aria-disabled')).toBe('true');
   });
 
   it('should emit click event', async () => {

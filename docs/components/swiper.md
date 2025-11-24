@@ -1,202 +1,202 @@
----
-outline: deep
----
+﻿# Swiper 轮播图
 
-# Swiper 轮播图
+轮播图组件。
 
-功能强大的轮播图组件，支持自动播放、循环、导航按钮、分页圆点、拖拽切换、键盘控制、垂直方向以及多列显示等能力。
+## 何时使用
 
-- 受控/非受控两种用法（value / default-value）
-- 自动播放、悬浮暂停、交互后是否停止
-- 循环播放
-- 导航按钮与分页圆点
-- 触摸与鼠标拖拽
-- 键盘控制（左右或上下方向键）
-- 水平/垂直方向
-- 每屏多项显示（slides-per-view）与间距（space-between）
+- 当有一组平级的内容。
+- 当内容空间不足时，可以用走马灯的形式进行收纳，进行轮播展现。
+- 常用于一组图片或卡片轮播。
 
-## 基础用法
+## 代码演示
 
-<div class="demo-container" style="height: 220px">
-  <ldesign-swiper style="width:100%;height:100%" default-value="0">
-    <ldesign-swiper-slide>Slide 1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Slide 2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Slide 3</ldesign-swiper-slide>
+### 基础用法
+
+最简单的用法。
+
+<div class="demo-container">
+  <ldesign-swiper style="height: 300px;">
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">1</div>
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">2</div>
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">3</div>
+    </ldesign-swiper-item>
   </ldesign-swiper>
 </div>
 
 ```html
-<!-- 固定高度用于展示 -->
-<div style="height:220px">
-  <ldesign-swiper style="width:100%;height:100%" default-value="0">
-    <ldesign-swiper-slide>Slide 1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Slide 2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Slide 3</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+<ldesign-swiper>
+  <ldesign-swiper-item>
+    <img src="image1.jpg" />
+  </ldesign-swiper-item>
+  <ldesign-swiper-item>
+    <img src="image2.jpg" />
+  </ldesign-swiper-item>
+  <ldesign-swiper-item>
+    <img src="image3.jpg" />
+  </ldesign-swiper-item>
+</ldesign-swiper>
 ```
 
-## 自动播放 + 悬浮暂停
+### 自动播放
 
-<div class="demo-container" style="height: 180px">
-  <ldesign-swiper style="width:100%;height:100%" autoplay autoplay-delay="1500" pause-on-hover>
-    <ldesign-swiper-slide>Auto 1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Auto 2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Auto 3</ldesign-swiper-slide>
+设置 `autoplay` 属性可以自动切换。
+
+<div class="demo-container">
+  <ldesign-swiper autoplay style="height: 300px;">
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">1</div>
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">2</div>
+    </ldesign-swiper-item>
   </ldesign-swiper>
 </div>
 
 ```html
-<div style="height:180px">
-  <ldesign-swiper style="width:100%;height:100%" autoplay autoplay-delay="1500" pause-on-hover>
-    <ldesign-swiper-slide>Auto 1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Auto 2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Auto 3</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+<ldesign-swiper autoplay>
+  ...
+</ldesign-swiper>
 ```
 
-> 说明：设置 disable-on-interaction 时，用户交互后将停止自动播放。
+### 指示器位置
 
-## 循环、导航、分页
+可以将指示器的位置设置为外部。
 
-<div class="demo-container" style="height: 180px">
-  <ldesign-swiper style="width:100%;height:100%" loop navigation pagination>
-    <ldesign-swiper-slide>A</ldesign-swiper-slide>
-    <ldesign-swiper-slide>B</ldesign-swiper-slide>
-    <ldesign-swiper-slide>C</ldesign-swiper-slide>
-    <ldesign-swiper-slide>D</ldesign-swiper-slide>
+<div class="demo-container">
+  <ldesign-swiper indicator-position="outside" style="height: 300px;">
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">1</div>
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">2</div>
+    </ldesign-swiper-item>
   </ldesign-swiper>
 </div>
 
 ```html
-<div style="height:180px">
-  <ldesign-swiper style="width:100%;height:100%" loop navigation pagination>
-    <ldesign-swiper-slide>A</ldesign-swiper-slide>
-    <ldesign-swiper-slide>B</ldesign-swiper-slide>
-    <ldesign-swiper-slide>C</ldesign-swiper-slide>
-    <ldesign-swiper-slide>D</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+<ldesign-swiper indicator-position="outside">
+  ...
+</ldesign-swiper>
 ```
 
-## 垂直方向
+### 切换箭头
 
-<div class="demo-container" style="height: 240px">
-  <ldesign-swiper style="width:100%;height:100%" direction="vertical" pagination>
-    <ldesign-swiper-slide>Top</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Middle</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Bottom</ldesign-swiper-slide>
+设置切换箭头的显示时机。
+
+<div class="demo-container">
+  <ldesign-swiper arrow="always" style="height: 300px;">
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">1</div>
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <div style="height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">2</div>
+    </ldesign-swiper-item>
   </ldesign-swiper>
 </div>
 
 ```html
-<div style="height:240px">
-  <ldesign-swiper style="width:100%;height:100%" direction="vertical" pagination>
-    <ldesign-swiper-slide>Top</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Middle</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Bottom</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+<ldesign-swiper arrow="always">
+  ...
+</ldesign-swiper>
 ```
 
-## 多列显示与间距（slides-per-view + space-between）
+## 框架集成
 
-<div class="demo-container" style="height: 180px">
-  <ldesign-swiper style="width:100%;height:100%" slides-per-view="3" space-between="12" pagination>
-    <ldesign-swiper-slide>1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>3</ldesign-swiper-slide>
-    <ldesign-swiper-slide>4</ldesign-swiper-slide>
-    <ldesign-swiper-slide>5</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+### Vue 3
 
-```html
-<div style="height:180px">
-  <ldesign-swiper style="width:100%;height:100%" slides-per-view="3" space-between="12" pagination>
-    <ldesign-swiper-slide>1</ldesign-swiper-slide>
-    <ldesign-swiper-slide>2</ldesign-swiper-slide>
-    <ldesign-swiper-slide>3</ldesign-swiper-slide>
-    <ldesign-swiper-slide>4</ldesign-swiper-slide>
-    <ldesign-swiper-slide>5</ldesign-swiper-slide>
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const currentIndex = ref(0);
+
+const handleChange = (index) => {
+  currentIndex.value = index;
+  console.log('当前索引:', index);
+};
+</script>
+
+<template>
+  <ldesign-swiper
+    :initial-index="currentIndex"
+    autoplay
+    @ldesignChange="handleChange"
+  >
+    <ldesign-swiper-item>
+      <img src="image1.jpg" />
+    </ldesign-swiper-item>
+    <ldesign-swiper-item>
+      <img src="image2.jpg" />
+    </ldesign-swiper-item>
   </ldesign-swiper>
-</div>
+</template>
 ```
 
-## 受控用法（value + 事件）
+### React
 
-<div class="demo-container" id="swiper-ctrl-box" style="height: 200px">
-  <div class="demo-row" style="margin-bottom: 8px; align-items:center">
-    <ldesign-button id="swiper-prev">上一页</ldesign-button>
-    <ldesign-button id="swiper-next" type="secondary">下一页</ldesign-button>
-    <div>当前：<strong id="swiper-cur">0</strong></div>
-  </div>
-  <ldesign-swiper id="swiper-ctrl" style="width:100%;height:140px" value="0" pagination navigation>
-    <ldesign-swiper-slide>X</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Y</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Z</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+```tsx
+import { useState } from 'react';
 
-```html
-<div>
-  <button id="prev">上一页</button>
-  <button id="next">下一页</button>
-  <span>当前：<strong id="cur">0</strong></span>
-</div>
-<div style="height:160px">
-  <ldesign-swiper id="sw" value="0" pagination navigation>
-    <ldesign-swiper-slide>X</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Y</ldesign-swiper-slide>
-    <ldesign-swiper-slide>Z</ldesign-swiper-slide>
-  </ldesign-swiper>
-</div>
+function App() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const handleChange = (e) => {
+    setCurrentIndex(e.detail);
+    console.log('当前索引:', e.detail);
+  };
+  
+  return (
+    <ldesign-swiper
+      initial-index={currentIndex}
+      autoplay
+      onLdesignChange={handleChange}
+    >
+      <ldesign-swiper-item>
+        <img src="image1.jpg" />
+      </ldesign-swiper-item>
+      <ldesign-swiper-item>
+        <img src="image2.jpg" />
+      </ldesign-swiper-item>
+    </ldesign-swiper>
+  );
+}
 ```
 
-```js
-const sw = document.getElementById('sw');
-document.getElementById('prev').addEventListener('click', () => sw?.prev?.());
-document.getElementById('next').addEventListener('click', () => sw?.next?.());
-sw?.addEventListener?.('ldesignChange', (e) => {
-  const n = e.detail;
-  if (sw) sw.value = n; // 回写受控值
-  const cur = document.getElementById('cur');
-  if (cur) cur.textContent = String(n);
-});
-```
+## API
 
-## API 一览
+### Swiper Props
 
-```text
-[Props]
-- value?: number 当前索引（受控）
-- default-value?: number 默认索引（非受控）
-- loop?: boolean = false 是否循环
-- autoplay?: boolean = false 是否自动播放
-- autoplay-delay?: number = 3000 自动播放间隔（毫秒）
-- pause-on-hover?: boolean = true 悬浮暂停
-- disable-on-interaction?: boolean = true 用户交互后停止自动播放
-- speed?: number = 300 过渡时长（毫秒）
-- direction?: 'horizontal' | 'vertical' = 'horizontal' 方向
-- slides-per-view?: number = 1 每屏显示数量
-- space-between?: number = 0 每项之间的像素间距
-- navigation?: boolean = true 是否显示前进/后退按钮
-- pagination?: boolean = true 是否显示分页圆点
-- keyboard?: boolean = false 是否启用键盘控制
-- allow-touch-move?: boolean = true 是否允许触摸/鼠标拖拽
-- draggable?: boolean = true 是否允许鼠标拖拽（PC）
-- threshold?: number = 50 触发切换的拖拽阈值
-- grab-cursor?: boolean = true 拖拽时光标样式
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `initial-index` | 初始状态激活的幻灯片索引 | `number` | `0` |
+| `height` | 走马灯的高度 | `string` | - |
+| `autoplay` | 是否自动切换 | `boolean` | `false` |
+| `interval` | 自动切换的时间间隔（ms） | `number` | `3000` |
+| `indicator-position` | 指示器的位置 | `'inside' \| 'outside' \| 'none'` | `'inside'` |
+| `arrow` | 切换箭头的显示时机 | `'always' \| 'hover' \| 'never'` | `'hover'` |
+| `loop` | 是否循环显示 | `boolean` | `true` |
+| `direction` | 轮播方向 | `'horizontal' \| 'vertical'` | `'horizontal'` |
 
-[Events]
-- ldesignChange(detail: number) 当前索引变化事件
+### Swiper Events
 
-[Methods]
-- next(): Promise<void> 切到下一页
-- prev(): Promise<void> 切到上一页
-- slideTo(index: number, opts?: { immediate?: boolean }): Promise<void> 跳到指定页
-- update(): Promise<void> 手动强制更新尺寸与布局（容器尺寸变化、slot 变化后可调用）
+| 事件名 | 说明 | 回调参数 |
+|--------|------|----------|
+| `ldesignChange` | 幻灯片切换时触发 | `(event: CustomEvent<number>) => void` |
 
-Tips: 组件高度由外层容器决定，通常给 Swiper 或其容器设置一个固定高度即可看到效果。
-```
+### Swiper Methods
+
+| 方法名 | 说明 | 参数 |
+|--------|------|------|
+| `setActiveItem` | 手动切换幻灯片 | `index: number` |
+| `prev` | 切换至上一张幻灯片 | - |
+| `next` | 切换至下一张幻灯片 | - |
+
+## 相关组件
+
+- [Image 图片](./image.md)
+- [Tabs 标签页](./tabs.md)

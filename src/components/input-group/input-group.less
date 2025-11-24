@@ -1,0 +1,142 @@
+// InputGroup 输入框组合样式
+:host {
+  display: inline-flex;
+  width: 100%;
+}
+
+.input-group {
+  display: inline-flex;
+  align-items: stretch;
+  width: 100%;
+  position: relative;
+
+  // 子元素默认样式
+  ::slotted(*) {
+    position: relative;
+    z-index: 1;
+  }
+
+  // 聚焦时提升层级
+  ::slotted(*:focus),
+  ::slotted(*:focus-within) {
+    z-index: 2;
+  }
+
+  // 基础模式（有间隙）
+  &:not(&--compact) {
+    gap: 8px;
+
+    ::slotted(*) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    // 第一个和最后一个元素可以不flex
+    ::slotted(:first-child:not(:only-child)) {
+      flex: 0 0 auto;
+    }
+
+    ::slotted(:last-child:not(:only-child)) {
+      flex: 0 0 auto;
+    }
+  }
+
+  // 紧凑模式（无间隙）
+  &--compact {
+    ::slotted(*) {
+      flex: 1;
+      min-width: 0;
+      margin: 0 !important;
+    }
+
+    // 移除中间元素的圆角
+    ::slotted(*:not(:first-child):not(:last-child)) {
+      border-radius: 0 !important;
+    }
+
+    // 第一个元素
+    ::slotted(*:first-child:not(:only-child)) {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      flex: 0 0 auto;
+    }
+
+    // 最后一个元素
+    ::slotted(*:last-child:not(:only-child)) {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      flex: 0 0 auto;
+    }
+
+    // 处理相邻元素的边框重叠
+    ::slotted(*:not(:first-child)) {
+      margin-left: -1px !important;
+    }
+
+    // hover 时提升层级
+    ::slotted(*:hover) {
+      z-index: 2;
+    }
+
+    // 聚焦时提升层级
+    ::slotted(*:focus),
+    ::slotted(*:focus-within) {
+      z-index: 3;
+    }
+  }
+
+  // 尺寸变体预留
+  // small 和 large 的特定样式由子元素继承
+}
+
+// InputGroupAddon 样式
+.input-group__addon {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: var(--ldesign-font-size-base, 14px);
+  line-height: 1.5;
+  color: var(--ldesign-text-color, #000000d9);
+  background-color: var(--ldesign-bg-color-secondary, #fafafa);
+  border: 1px solid var(--ldesign-border-color, #d9d9d9);
+  border-radius: var(--ls-border-radius-base, 6px);
+  white-space: nowrap;
+  transition: all 0.3s;
+
+  // 在紧凑模式的 input-group 中
+  :host-context(.input-group--compact) & {
+
+    // 第一个 addon
+    &:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: 0;
+    }
+
+    // 最后一个 addon
+    &:last-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+    }
+
+    // 中间的 addon
+    &:not(:first-child):not(:last-child) {
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+  }
+}
+
+// 小尺寸 addon
+:host-context(.input-group--small) .input-group__addon {
+  padding: 0 8px;
+  font-size: var(--ldesign-font-size-sm, 12px);
+}
+
+// 大尺寸 addon
+:host-context(.input-group--large) .input-group__addon {
+  padding: 0 16px;
+  font-size: var(--ldesign-font-size-lg, 16px);
+}

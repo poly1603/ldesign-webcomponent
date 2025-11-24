@@ -1,87 +1,162 @@
-# Statistic 统计数值
+﻿# Statistic 统计数值
 
-展示统计数值，支持数字动画效果。
+展示统计数值。
 
 ## 何时使用
 
-- 展示关键指标
-- 数据看板
-- 实时数据展示
+- 当需要突出某个或某组数字时。
+- 当需要展示带描述的统计类数据时使用。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+简单的展示。
+
+<div class="demo-container">
+  <ldesign-statistic title="活跃用户" value="112893"></ldesign-statistic>
+</div>
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-  <ldesign-statistic title="用户数" value="93123" animated></ldesign-statistic>
-  <ldesign-statistic title="增长率" value="12.8" suffix="%" animated></ldesign-statistic>
-  <ldesign-statistic title="销售额" prefix="¥" value="125690" animated></ldesign-statistic>
-</div>
+<ldesign-statistic 
+  title="活跃用户" 
+  value="112893">
+</ldesign-statistic>
 ```
 
-:::
+### 带前缀和后缀
 
-## 带颜色
+在数字前后添加前缀和后缀。
 
-:::demo
+<div class="demo-container">
+  <ldesign-statistic 
+    title="账户余额" 
+    value="112893"
+    prefix="¥">
+  </ldesign-statistic>
+  
+  <ldesign-statistic 
+    title="增长率" 
+    value="93"
+    suffix="%">
+  </ldesign-statistic>
+</div>
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-  <ldesign-card size="small">
-    <ldesign-statistic 
-      title="成功" 
-      value="256" 
-      value-color="var(--ld-color-success)"
-      animated
-    ></ldesign-statistic>
-  </ldesign-card>
-  
-  <ldesign-card size="small">
-    <ldesign-statistic 
-      title="警告" 
-      value="48" 
-      value-color="var(--ld-color-warning)"
-      animated
-    ></ldesign-statistic>
-  </ldesign-card>
-  
-  <ldesign-card size="small">
-    <ldesign-statistic 
-      title="错误" 
-      value="12" 
-      value-color="var(--ld-color-error)"
-      animated
-    ></ldesign-statistic>
-  </ldesign-card>
-  
-  <ldesign-card size="small">
-    <ldesign-statistic 
-      title="总计" 
-      value="316" 
-      value-color="var(--ld-color-primary)"
-      animated
-    ></ldesign-statistic>
-  </ldesign-card>
-</div>
+<ldesign-statistic 
+  title="账户余额" 
+  value="112893"
+  prefix="¥">
+</ldesign-statistic>
+
+<ldesign-statistic 
+  title="增长率" 
+  value="93"
+  suffix="%">
+</ldesign-statistic>
 ```
 
-:::
+### 设置数值精度
+
+通过 `precision` 设置数值精度。
+
+<div class="demo-container">
+  <ldesign-statistic 
+    title="准确率" 
+    value="98.765"
+    precision="2"
+    suffix="%">
+  </ldesign-statistic>
+</div>
+
+```html
+<ldesign-statistic 
+  value="98.765"
+  precision="2"
+  suffix="%">
+</ldesign-statistic>
+```
+
+### 不同颜色
+
+设置数值的颜色。
+
+<div class="demo-container">
+  <ldesign-statistic 
+    title="增长" 
+    value="11.28"
+    value-style="color: #52c41a;"
+    suffix="%">
+  </ldesign-statistic>
+  
+  <ldesign-statistic 
+    title="下降" 
+    value="9.3"
+    value-style="color: #cf1322;"
+    suffix="%">
+  </ldesign-statistic>
+</div>
+
+```html
+<ldesign-statistic 
+  value="11.28"
+  value-style="color: #52c41a;"
+  suffix="%">
+</ldesign-statistic>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const value = ref(112893);
+</script>
+
+<template>
+  <ldesign-statistic
+    title="活跃用户"
+    :value="value"
+    prefix="👤"
+  />
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [value] = useState(112893);
+  
+  return (
+    <ldesign-statistic
+      title="活跃用户"
+      value={value}
+      prefix="👤"
+    />
+  );
+}
+```
 
 ## API
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| value | `number` | - | 数值（必需） |
-| title | `string` | - | 标题 |
-| prefix | `string` | - | 前缀 |
-| suffix | `string` | - | 后缀 |
-| precision | `number` | `0` | 小数位数 |
-| separator | `string` | `','` | 千分位分隔符 |
-| decimalSeparator | `string` | `'.'` | 小数点符号 |
-| animated | `boolean` | `false` | 是否启用动画 |
-| duration | `number` | `1000` | 动画时长（毫秒） |
-| valueColor | `string` | - | 数值颜色 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `title` | 数值的标题 | `string` | - |
+| `value` | 数值内容 | `string \| number` | - |
+| `precision` | 数值精度 | `number` | - |
+| `prefix` | 设置数值的前缀 | `string` | - |
+| `suffix` | 设置数值的后缀 | `string` | - |
+| `value-style` | 设置数值的样式 | `string` | - |
 
+## 相关组件
+
+- [Progress 进度条](./progress.md)
+- [Countdown 倒计时](./countdown.md)

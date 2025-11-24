@@ -18,6 +18,36 @@ export interface TableColumn {
   align?: 'left' | 'center' | 'right';
   /** 自定义渲染函数 */
   render?: (value: any, row: any, index: number) => any;
+  /** 是否可编辑 */
+  editable?: boolean;
+  /** 编辑器类型 */
+  editorType?: 'input' | 'select' | 'date' | 'number';
+  /** 编辑器选项（select 类型） */
+  editorOptions?: any[];
+}
+
+export interface TableRowSelection {
+  /** 选择类型 */
+  type?: 'checkbox' | 'radio';
+  /** 已选中的行键 */
+  selectedRowKeys?: string[];
+  /** 选择变化回调 */
+  onChange?: (selectedRowKeys: string[], selectedRows: any[]) => void;
+  /** 是否可选择 */
+  getCheckboxProps?: (row: any) => { disabled?: boolean };
+}
+
+export interface TableExpandable {
+  /** 展开的行键 */
+  expandedRowKeys?: string[];
+  /** 默认展开所有行 */
+  defaultExpandAllRows?: boolean;
+  /** 展开行渲染 */
+  expandedRowRender?: (row: any, index: number) => any;
+  /** 展开变化回调 */
+  onExpand?: (expanded: boolean, row: any) => void;
+  /** 展开图标列宽度 */
+  expandIconColumnWidth?: number;
 }
 
 export interface TableSort {
@@ -103,6 +133,36 @@ export class LdesignTable {
   @Prop() emptyText: string = '暂无数据';
 
   /**
+   * 行选择配置
+   */
+  @Prop() rowSelection?: TableRowSelection;
+
+  /**
+   * 展开行配置
+   */
+  @Prop() expandable?: TableExpandable;
+
+  /**
+   * 是否为树形数据
+   */
+  @Prop() treeData: boolean = false;
+
+  /**
+   * 树形数据子节点字段名
+   */
+  @Prop() childrenColumnName: string = 'children';
+
+  /**
+   * 树形数据缩进距离（px）
+   */
+  @Prop() indentSize: number = 16;
+
+  /**
+   * 是否可编辑表格
+   */
+  @Prop() editable: boolean = false;
+
+  /**
    * 当前排序
    */
   @State() currentSort?: TableSort;
@@ -117,6 +177,21 @@ export class LdesignTable {
   };
 
   /**
+   * 已选中的行键
+   */
+  @State() internalSelectedRowKeys: string[] = [];
+
+  /**
+   * 已展开的行键
+   */
+  @State() internalExpandedRowKeys: string[] = [];
+
+  /**
+   * 编辑中的单元格
+   */
+  @State() editingCell?: { rowKey: string; columnKey: string };
+
+  /**
    * 排序变化事件
    */
   @Event() ldesignSort!: EventEmitter<TableSort>;
@@ -125,6 +200,21 @@ export class LdesignTable {
    * 行点击事件
    */
   @Event() ldesignRowClick!: EventEmitter<{ row: any; index: number }>;
+
+  /**
+   * 行选择变化事件
+   */
+  @Event() ldesignSelectionChange!: EventEmitter<{ selectedRowKeys: string[]; selectedRows: any[] }>;
+
+  /**
+   * 展开行变化事件
+   */
+  @Event() ldesignExpand!: EventEmitter<{ expanded: boolean; row: any; expandedKeys: string[] }>;
+
+  /**
+   * 单元格编辑事件
+   */
+  @Event() ldesignCellEdit!: EventEmitter<{ row: any; column: TableColumn; value: any }>;
 
   private virtualScroll: ReturnType<typeof createVirtualScroll> | null = null;
   private scrollContainerRef?: HTMLDivElement;

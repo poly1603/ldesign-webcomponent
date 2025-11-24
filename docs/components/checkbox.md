@@ -1,194 +1,214 @@
-# Checkbox 复选框
+﻿# Checkbox 多选框
 
-在一组备选项中进行多选。
+在一组可选项中进行多项选择。
 
-## 基础用法
+## 何时使用
 
-单独使用可以表示两种状态之间的切换，写在标签中的内容为 checkbox 按钮后的介绍。
+- 在一组可选项中进行多项选择时。
+- 单独使用可以表示两种状态之间的切换，和 switch 类似。区别在于切换 switch 会直接触发状态改变，而 checkbox 一般用于状态标记，需要和提交操作配合。
+
+## 代码演示
+
+### 基础用法
+
+简单的 checkbox。
 
 <div class="demo-container">
-  <ldesign-checkbox>备选项</ldesign-checkbox>
+  <ldesign-checkbox>Checkbox</ldesign-checkbox>
 </div>
 
 ```html
-<ldesign-checkbox>备选项</ldesign-checkbox>
+<ldesign-checkbox>Checkbox</ldesign-checkbox>
+
+<script>
+  const checkbox = document.querySelector('ldesign-checkbox');
+  checkbox.addEventListener('ldesignChange', (e) => {
+    console.log('checked:', e.detail);
+  });
+</script>
 ```
 
-## 禁用状态
+### 禁用状态
 
-多选框不可用状态。
+checkbox 不可用。
 
 <div class="demo-container">
-  <ldesign-checkbox disabled>备选项1</ldesign-checkbox>
-  <ldesign-checkbox checked disabled>备选项2</ldesign-checkbox>
+  <ldesign-checkbox disabled>禁用</ldesign-checkbox>
+  <ldesign-checkbox checked disabled>禁用且选中</ldesign-checkbox>
 </div>
 
 ```html
-<ldesign-checkbox disabled>备选项1</ldesign-checkbox>
-<ldesign-checkbox checked disabled>备选项2</ldesign-checkbox>
+<ldesign-checkbox disabled>禁用</ldesign-checkbox>
+<ldesign-checkbox checked disabled>禁用且选中</ldesign-checkbox>
 ```
 
-## 多选框组
+### 半选状态
 
-适用于多个勾选框绑定到同一个数组的情景，通过是否勾选来表示这一组选项中选中的项。
+indeterminate 属性用以表示 checkbox 的不确定状态，一般用于实现全选的效果。
 
 <div class="demo-container">
-  <ldesign-checkbox-group>
-    <ldesign-checkbox value="apple">苹果</ldesign-checkbox>
-    <ldesign-checkbox value="orange">橙子</ldesign-checkbox>
-    <ldesign-checkbox value="banana">香蕉</ldesign-checkbox>
+  <ldesign-checkbox indeterminate>半选状态</ldesign-checkbox>
+</div>
+
+```html
+<ldesign-checkbox indeterminate>半选状态</ldesign-checkbox>
+```
+
+### 多选框组
+
+适用于多个勾选框绑定到同一个数组的情形，通过是否勾选来表示这一组选项中选中的项。
+
+<div class="demo-container">
+  <ldesign-checkbox-group id="checkbox-group">
+    <ldesign-checkbox value="1">选项1</ldesign-checkbox>
+    <ldesign-checkbox value="2">选项2</ldesign-checkbox>
+    <ldesign-checkbox value="3">选项3</ldesign-checkbox>
   </ldesign-checkbox-group>
 </div>
 
 ```html
-<ldesign-checkbox-group>
-  <ldesign-checkbox value="apple">苹果</ldesign-checkbox>
-  <ldesign-checkbox value="orange">橙子</ldesign-checkbox>
-  <ldesign-checkbox value="banana">香蕉</ldesign-checkbox>
+<ldesign-checkbox-group id="group">
+  <ldesign-checkbox value="1">选项1</ldesign-checkbox>
+  <ldesign-checkbox value="2">选项2</ldesign-checkbox>
+  <ldesign-checkbox value="3">选项3</ldesign-checkbox>
 </ldesign-checkbox-group>
+
+<script>
+  const group = document.getElementById('group');
+  group.addEventListener('ldesignChange', (e) => {
+    console.log('选中值:', e.detail); // ['1', '2']
+  });
+</script>
 ```
 
-## 半选状态
-
-`indeterminate` 属性用以表示 checkbox 的不确定状态，一般用于实现全选的效果。
-
-<div class="demo-container">
-  <ldesign-checkbox indeterminate>全选</ldesign-checkbox>
-  <div style="margin: 15px 0;"></div>
-  <ldesign-checkbox-group>
-    <ldesign-checkbox value="option1">选项1</ldesign-checkbox>
-    <ldesign-checkbox value="option2">选项2</ldesign-checkbox>
-    <ldesign-checkbox value="option3">选项3</ldesign-checkbox>
-  </ldesign-checkbox-group>
-</div>
-
-```html
-<ldesign-checkbox indeterminate>全选</ldesign-checkbox>
-<ldesign-checkbox-group>
-  <ldesign-checkbox value="option1">选项1</ldesign-checkbox>
-  <ldesign-checkbox value="option2">选项2</ldesign-checkbox>
-  <ldesign-checkbox value="option3">选项3</ldesign-checkbox>
-</ldesign-checkbox-group>
-```
-
-## 可选项目数量的限制
-
-使用 `min` 和 `max` 属性能够限制可以被勾选的项目的数量。
-
-<div class="demo-container">
-  <ldesign-checkbox-group min="1" max="2">
-    <ldesign-checkbox value="shanghai">上海</ldesign-checkbox>
-    <ldesign-checkbox value="beijing">北京</ldesign-checkbox>
-    <ldesign-checkbox value="guangzhou">广州</ldesign-checkbox>
-    <ldesign-checkbox value="shenzhen">深圳</ldesign-checkbox>
-  </ldesign-checkbox-group>
-</div>
-
-```html
-<ldesign-checkbox-group min="1" max="2">
-  <ldesign-checkbox value="shanghai">上海</ldesign-checkbox>
-  <ldesign-checkbox value="beijing">北京</ldesign-checkbox>
-  <ldesign-checkbox value="guangzhou">广州</ldesign-checkbox>
-  <ldesign-checkbox value="shenzhen">深圳</ldesign-checkbox>
-</ldesign-checkbox-group>
-```
-
-## 按钮样式
+### 按钮样式
 
 按钮样式的多选组合。
 
 <div class="demo-container">
-  <ldesign-checkbox-group>
-    <ldesign-checkbox value="shanghai" button>上海</ldesign-checkbox>
-    <ldesign-checkbox value="beijing" button>北京</ldesign-checkbox>
-    <ldesign-checkbox value="guangzhou" button>广州</ldesign-checkbox>
-    <ldesign-checkbox value="shenzhen" button>深圳</ldesign-checkbox>
-  </ldesign-checkbox-group>
+  <ldesign-checkbox variant="button">Button 1</ldesign-checkbox>
+  <ldesign-checkbox variant="button">Button 2</ldesign-checkbox>
+  <ldesign-checkbox variant="button">Button 3</ldesign-checkbox>
 </div>
 
 ```html
-<ldesign-checkbox-group>
-  <ldesign-checkbox value="shanghai" button>上海</ldesign-checkbox>
-  <ldesign-checkbox value="beijing" button>北京</ldesign-checkbox>
-  <ldesign-checkbox value="guangzhou" button>广州</ldesign-checkbox>
-  <ldesign-checkbox value="shenzhen" button>深圳</ldesign-checkbox>
-</ldesign-checkbox-group>
+<ldesign-checkbox variant="button">Button</ldesign-checkbox>
 ```
 
-## 带有边框
+### 不同尺寸
 
-设置 `border` 属性可以渲染为带有边框的多选框。
+提供三种尺寸。
 
 <div class="demo-container">
-  <ldesign-checkbox border>选项1</ldesign-checkbox>
-  <ldesign-checkbox border checked>选项2</ldesign-checkbox>
+  <ldesign-checkbox size="small">Small</ldesign-checkbox>
+  <ldesign-checkbox size="medium">Medium</ldesign-checkbox>
+  <ldesign-checkbox size="large">Large</ldesign-checkbox>
 </div>
 
 ```html
-<ldesign-checkbox border>选项1</ldesign-checkbox>
-<ldesign-checkbox border checked>选项2</ldesign-checkbox>
+<ldesign-checkbox size="small">Small</ldesign-checkbox>
+<ldesign-checkbox size="medium">Medium</ldesign-checkbox>
+<ldesign-checkbox size="large">Large</ldesign-checkbox>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const checked = ref(false);
+const checkList = ref(['1']);
+
+const handleChange = (e) => {
+  console.log('checked:', e.detail);
+};
+</script>
+
+<template>
+  <ldesign-checkbox 
+    :checked="checked"
+    @ldesignChange="handleChange"
+  >
+    单个复选框
+  </ldesign-checkbox>
+  
+  <ldesign-checkbox-group :value="checkList">
+    <ldesign-checkbox value="1">选项1</ldesign-checkbox>
+    <ldesign-checkbox value="2">选项2</ldesign-checkbox>
+    <ldesign-checkbox value="3">选项3</ldesign-checkbox>
+  </ldesign-checkbox-group>
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [checked, setChecked] = useState(false);
+  const [checkList, setCheckList] = useState(['1']);
+  
+  return (
+    <>
+      <ldesign-checkbox
+        checked={checked}
+        onLdesignChange={(e) => setChecked(e.detail)}
+      >
+        单个复选框
+      </ldesign-checkbox>
+      
+      <ldesign-checkbox-group
+        value={checkList}
+        onLdesignChange={(e) => setCheckList(e.detail)}
+      >
+        <ldesign-checkbox value="1">选项1</ldesign-checkbox>
+        <ldesign-checkbox value="2">选项2</ldesign-checkbox>
+      </ldesign-checkbox-group>
+    </>
+  );
+}
 ```
 
 ## API
 
-### Checkbox 属性
+### Checkbox Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| `checked` | `boolean` | `false` | 是否选中 |
-| `value` | `string \| number` | `-` | 选中状态的值 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `indeterminate` | `boolean` | `false` | 设置半选状态，只负责样式控制 |
-| `border` | `boolean` | `false` | 是否显示边框 |
-| `button` | `boolean` | `false` | 是否为按钮样式 |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | 多选框的尺寸 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `checked` | 是否选中 | `boolean` | `false` |
+| `value` | 选中状态的值 | `string \| number` | - |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+| `indeterminate` | 半选状态 | `boolean` | `false` |
+| `size` | 尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `variant` | 外观变体 | `'default' \| 'outline' \| 'filled' \| 'button'` | `'default'` |
+| `shape` | 形状 | `'square' \| 'round'` | `'square'` |
+| `label-placement` | 标签位置 | `'left' \| 'right'` | `'right'` |
 
-### CheckboxGroup 属性
-
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| `value` | `Array<string \| number>` | `[]` | 绑定值 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `min` | `number` | `-` | 可被勾选的 checkbox 的最小数量 |
-| `max` | `number` | `-` | 可被勾选的 checkbox 的最大数量 |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | 多选框组尺寸 |
-
-### Checkbox 事件
+### Checkbox Events
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|----------|
-| `ldesignChange` | 当绑定值变化时触发的事件 | `(event: CustomEvent<boolean>) => void` |
+| `ldesignChange` | 状态改变时触发 | `(event: CustomEvent<boolean>) => void` |
 
-### CheckboxGroup 事件
+### CheckboxGroup Props
+
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `value` | 选中项的值 | `string[] \| number[]` | `[]` |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+
+### CheckboxGroup Events
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|----------|
-| `ldesignChange` | 当绑定值变化时触发的事件 | `(event: CustomEvent<Array<string \| number>>) => void` |
+| `ldesignChange` | 选中值改变时触发 | `(event: CustomEvent<(string \| number)[]>) => void` |
 
-## 无障碍
+## 相关组件
 
-Checkbox 组件遵循 WAI-ARIA 规范：
-
-- 支持键盘导航（Space 键切换选中状态）
-- 提供 `aria-checked` 属性表示选中状态
-- 提供 `aria-disabled` 属性表示禁用状态
-- 支持屏幕阅读器
-- 提供适当的焦点管理
-
-## 设计指南
-
-### 何时使用
-
-- 在一组可选项中进行多项选择时
-- 单独使用用于标记切换是与否
-
-### 何时不使用
-
-- 当选项之间是互斥的时候，请使用单选框
-
-### 最佳实践
-
-- 复选框的标签应该清晰地描述选项
-- 使用复选框组时，应该提供清晰的组标题
-- 对于必选项，应该有明确的标识
-- 避免使用过多的复选框选项，考虑使用其他组件如下拉选择器
+- [Radio 单选框](./radio.md)
+- [Switch 开关](./switch.md)
+- [Form 表单](./form.md)

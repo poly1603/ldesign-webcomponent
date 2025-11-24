@@ -1,117 +1,184 @@
-# Card 卡片
+﻿# Card 卡片
 
-通用卡片容器，用于内容分组展示。
+通用卡片容器。
 
 ## 何时使用
 
-- 需要将信息分组展示
-- 需要突出显示某块内容
-- 构建数据看板
+- 最基础的卡片容器，可承载文字、列表、图片、段落，常用于后台概览页面。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+包含标题和内容。
+
+<div class="demo-container">
+  <ldesign-card title="卡片标题">
+    <p>卡片内容</p>
+    <p>卡片内容</p>
+    <p>卡片内容</p>
+  </ldesign-card>
+</div>
 
 ```html
-<ldesign-card title="卡片标题" bordered>
+<ldesign-card title="卡片标题">
   <p>卡片内容</p>
-  <p>更多内容...</p>
 </ldesign-card>
 ```
 
-:::
+### 无边框
 
-## 带额外操作
+去掉边框。
 
-:::demo
+<div class="demo-container" style="background: #f5f5f5; padding: 20px;">
+  <ldesign-card title="无边框" bordered="false">
+    <p>卡片内容</p>
+  </ldesign-card>
+</div>
 
 ```html
-<ldesign-card title="用户信息" bordered>
+<ldesign-card title="无边框" bordered="false">
+  <p>卡片内容</p>
+</ldesign-card>
+```
+
+### 阴影效果
+
+配置不同的阴影显示时机。
+
+<div class="demo-container">
+  <ldesign-card title="总是显示" shadow="always">
+    <p>shadow="always"</p>
+  </ldesign-card>
+  
+  <ldesign-card title="悬浮时显示" shadow="hover">
+    <p>shadow="hover"</p>
+  </ldesign-card>
+  
+  <ldesign-card title="从不显示" shadow="never">
+    <p>shadow="never"</p>
+  </ldesign-card>
+</div>
+
+```html
+<ldesign-card shadow="always">总是显示</ldesign-card>
+<ldesign-card shadow="hover">悬浮时显示</ldesign-card>
+<ldesign-card shadow="never">从不显示</ldesign-card>
+```
+
+### 可悬浮
+
+鼠标悬浮时卡片可浮起。
+
+<div class="demo-container">
+  <ldesign-card title="可悬浮卡片" hoverable>
+    <p>鼠标悬浮试试</p>
+  </ldesign-card>
+</div>
+
+```html
+<ldesign-card hoverable>
+  可悬浮卡片
+</ldesign-card>
+```
+
+### 不同尺寸
+
+提供三种尺寸。
+
+<div class="demo-container">
+  <ldesign-card title="小卡片" size="small">
+    <p>Small</p>
+  </ldesign-card>
+  
+  <ldesign-card title="中卡片" size="medium">
+    <p>Medium</p>
+  </ldesign-card>
+  
+  <ldesign-card title="大卡片" size="large">
+    <p>Large</p>
+  </ldesign-card>
+</div>
+
+```html
+<ldesign-card size="small">Small</ldesign-card>
+<ldesign-card size="medium">Medium</ldesign-card>
+<ldesign-card size="large">Large</ldesign-card>
+```
+
+### 加载中
+
+数据读入前会显示骨架屏占位。
+
+<div class="demo-container">
+  <ldesign-card title="加载中" loading>
+    <p>这段内容不会显示</p>
+  </ldesign-card>
+</div>
+
+```html
+<ldesign-card loading>
+  <p>加载中...</p>
+</ldesign-card>
+```
+
+### 自定义头部
+
+可以自定义卡片头部的额外操作区域。
+
+<div class="demo-container">
+  <ldesign-card title="卡片标题">
+    <div slot="extra">
+      <ldesign-button type="text" size="small">更多</ldesign-button>
+    </div>
+    <p>卡片内容</p>
+  </ldesign-card>
+</div>
+
+```html
+<ldesign-card title="卡片标题">
   <div slot="extra">
-    <ldesign-button size="small" type="text">编辑</ldesign-button>
-    <ldesign-button size="small" type="text">删除</ldesign-button>
+    <ldesign-button type="text">更多</ldesign-button>
   </div>
-  
-  <p>姓名：张三</p>
-  <p>年龄：28岁</p>
-  <p>邮箱：zhangsan@example.com</p>
-  
-  <div slot="footer">
-    <ldesign-button type="primary">保存</ldesign-button>
-    <ldesign-button>取消</ldesign-button>
-  </div>
+  <p>卡片内容</p>
 </ldesign-card>
 ```
 
-:::
+### 完全自定义标题
 
-## 不同尺寸
+使用 title 插槽完全自定义标题区域。
 
-:::demo
-
-```html
-<div style="display: grid; gap: 16px;">
-  <ldesign-card title="小卡片" size="small" bordered>
-    <p>小尺寸卡片内容</p>
-  </ldesign-card>
-  
-  <ldesign-card title="中卡片" size="medium" bordered>
-    <p>中等尺寸卡片内容</p>
-  </ldesign-card>
-  
-  <ldesign-card title="大卡片" size="large" bordered>
-    <p>大尺寸卡片内容</p>
+<div class="demo-container">
+  <ldesign-card>
+    <div slot="title" style="display: flex; align-items: center; gap: 8px;">
+      <ldesign-icon name="star"></ldesign-icon>
+      <strong>自定义标题</strong>
+    </div>
+    <p>卡片内容</p>
   </ldesign-card>
 </div>
-```
-
-:::
-
-## 悬浮效果
-
-:::demo
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-  <ldesign-card title="悬浮卡片" hoverable shadow="hover">
-    <p>鼠标悬停试试</p>
-  </ldesign-card>
-  
-  <ldesign-card title="一直有阴影" shadow="always">
-    <p>始终显示阴影</p>
-  </ldesign-card>
-  
-  <ldesign-card title="无阴影" shadow="never">
-    <p>从不显示阴影</p>
-  </ldesign-card>
-</div>
-```
-
-:::
-
-## 加载状态
-
-:::demo
-
-```html
-<ldesign-card title="加载中的卡片" loading bordered>
-  <p>真实内容（被骨架屏替代）</p>
+<ldesign-card>
+  <div slot="title">
+    <ldesign-icon name="star"></ldesign-icon>
+    自定义标题
+  </div>
+  <p>卡片内容</p>
 </ldesign-card>
 ```
 
-:::
+## 框架集成
 
-## Vue 3 使用
+### Vue 3
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
-import '@ldesign/webcomponent/card';
-import '@ldesign/webcomponent/button';
 
 const loading = ref(false);
 
-const handleRefresh = () => {
+const loadData = () => {
   loading.value = true;
   setTimeout(() => {
     loading.value = false;
@@ -120,40 +187,57 @@ const handleRefresh = () => {
 </script>
 
 <template>
-  <ldesign-card title="数据卡片" :loading="loading" bordered>
-    <template #extra>
-      <ldesign-button size="small" @ldesignClick="handleRefresh">
+  <ldesign-card 
+    title="数据卡片"
+    :loading="loading"
+    hoverable
+  >
+    <div slot="extra">
+      <ldesign-button 
+        size="small" 
+        @ldesignClick="loadData"
+      >
         刷新
       </ldesign-button>
-    </template>
+    </div>
     
-    <p>卡片内容...</p>
+    <p>卡片内容</p>
   </ldesign-card>
 </template>
 ```
 
-## React 使用
+### React
 
 ```tsx
 import { useState } from 'react';
-import { Card, Button } from '@ldesign/webcomponent-react';
 
-function MyCard() {
+function App() {
   const [loading, setLoading] = useState(false);
-
-  const handleRefresh = () => {
+  
+  const loadData = () => {
     setLoading(true);
-    setTimeout(() => setLoading(false), 2000);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
-
+  
   return (
-    <Card title="数据卡片" loading={loading} bordered>
-      <ldesign-button size="small" onClick={handleRefresh}>
-        刷新
-      </ldesign-button>
+    <ldesign-card 
+      title="数据卡片"
+      loading={loading}
+      hoverable
+    >
+      <div slot="extra">
+        <ldesign-button 
+          size="small"
+          onLdesignClick={loadData}
+        >
+          刷新
+        </ldesign-button>
+      </div>
       
-      <p>卡片内容...</p>
-    </Card>
+      <p>卡片内容</p>
+    </ldesign-card>
   );
 }
 ```
@@ -162,31 +246,25 @@ function MyCard() {
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| title | `string` | - | 卡片标题 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 卡片尺寸 |
-| bordered | `boolean` | `true` | 是否显示边框 |
-| hoverable | `boolean` | `false` | 鼠标悬停时是否浮起 |
-| loading | `boolean` | `false` | 是否加载中 |
-| shadow | `'never' \| 'hover' \| 'always'` | `'hover'` | 阴影显示时机 |
-| headerStyle | `string` | - | 头部样式 |
-| bodyStyle | `string` | - | 主体样式 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `title` | 卡片标题 | `string` | - |
+| `size` | 卡片尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `bordered` | 是否显示边框 | `boolean` | `true` |
+| `hoverable` | 是否可悬浮 | `boolean` | `false` |
+| `loading` | 是否加载中 | `boolean` | `false` |
+| `shadow` | 阴影显示时机 | `'never' \| 'hover' \| 'always'` | `'hover'` |
+| `header-style` | 头部样式 | `string` | - |
+| `body-style` | 内容样式 | `string` | - |
 
 ### Slots
 
 | 插槽名 | 说明 |
 |--------|------|
-| default | 卡片内容 |
-| title | 自定义标题 |
-| extra | 卡片右上角额外操作 |
-| footer | 卡片底部 |
+| `default` | 卡片内容 |
+| `title` | 自定义标题 |
+| `extra` | 卡片右上角的操作区域 |
 
-## CSS Variables
+## 相关组件
 
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `--ld-card-radius` | `var(--ld-radius-lg)` | 卡片圆角 |
-| `--ld-card-padding` | `var(--ld-spacing-6)` | 内边距 |
-| `--ld-card-shadow` | `var(--ld-shadow)` | 阴影 |
-
+- [Skeleton 骨架屏](./skeleton.md)

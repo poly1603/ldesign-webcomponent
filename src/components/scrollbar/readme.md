@@ -107,7 +107,7 @@ Type: `Promise<void>`
 | Name      | Type                                                                                                          | Description |
 | --------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
 | `target`  | `string \| Element`                                                                                           |             |
-| `options` | `{ behavior?: ScrollBehavior; block?: "center" \| "start" \| "end"; inline?: "center" \| "start" \| "end"; }` |             |
+| `options` | `{ behavior?: ScrollBehavior; block?: "start" \| "end" \| "center"; inline?: "start" \| "end" \| "center"; }` |             |
 
 #### Returns
 

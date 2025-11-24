@@ -1,186 +1,205 @@
-# Pagination 分页
+﻿# Pagination 分页
 
-用于数据集的分页展示，提供页码切换、快速跳转、每页条数切换等能力。
+采用分页的形式分隔长列表，每次只加载一个页面。
 
-> 组件标签：`<ldesign-pagination>`。
+## 何时使用
 
-## 基础用法
+- 当加载/渲染所有数据将花费很多时间时。
+- 可切换页码浏览数据。
+
+## 代码演示
+
+### 基础用法
+
+基础分页。
+
 <div class="demo-container">
-  <ldesign-pagination total="125"></ldesign-pagination>
+  <ldesign-pagination total="50"></ldesign-pagination>
 </div>
 
 ```html
-<ldesign-pagination total="125"></ldesign-pagination>
-```
+<ldesign-pagination total="50"></ldesign-pagination>
 
-## 受控与非受控
-- 非受控：通过 `default-current`、`default-page-size` 初始化，内部管理状态。
-- 受控：传入 `current`、`page-size`，配合事件 `ldesignChange` / `ldesignPageSizeChange` 同步外部状态。
-
-<div class="demo-container">
-  <ldesign-pagination id="pager-controlled" total="308" current="2" page-size="20" show-size-changer></ldesign-pagination>
-</div>
-
-```html
-<ldesign-pagination id="pager-controlled" total="308" current="2" page-size="20" show-size-changer></ldesign-pagination>
 <script>
-  const p = document.getElementById('pager-controlled')
-  p.addEventListener('ldesignChange', e => {
-    const { page } = e.detail
-    // 示例：把 page 写回属性，完成受控同步
-    p.setAttribute('current', String(page))
-  })
-  p.addEventListener('ldesignPageSizeChange', e => {
-    const { pageSize } = e.detail
-    p.setAttribute('page-size', String(pageSize))
-  })
+  const pagination = document.querySelector('ldesign-pagination');
+  pagination.addEventListener('ldesignChange', (e) => {
+    console.log('当前页:', e.detail.current);
+    console.log('每页条数:', e.detail.pageSize);
+  });
 </script>
 ```
 
-## 快速跳转
-<div class="demo-container">
-  <ldesign-pagination total="308" show-quick-jumper></ldesign-pagination>
-</div>
+### 更多分页
 
-```html
-<ldesign-pagination total="308" show-quick-jumper></ldesign-pagination>
-```
-
-## 切换每页条数
-<div class="demo-container">
-  <ldesign-pagination total="308" show-size-changer page-size-options="[10,20,50,100]"></ldesign-pagination>
-</div>
-
-```html
-<ldesign-pagination total="308" show-size-changer page-size-options='[10,20,50,100]'></ldesign-pagination>
-```
-
-## 简洁模式
-<div class="demo-container">
-  <ldesign-pagination total="308" simple></ldesign-pagination>
-</div>
-
-```html
-<ldesign-pagination total="308" simple></ldesign-pagination>
-```
-
-## 禁用与隐藏单页
-<div class="demo-container demo-row">
-  <ldesign-pagination total="25" disabled></ldesign-pagination>
-  <ldesign-pagination total="8" hide-on-single-page></ldesign-pagination>
-</div>
-
-```html
-<ldesign-pagination total="25" disabled></ldesign-pagination>
-<ldesign-pagination total="8" hide-on-single-page></ldesign-pagination>
-```
-
-## 显示总数/页信息 + 下拉式每页条数（参考样式）
-<div class="demo-container">
-  <div class="demo-row" style="align-items:center;">
-    <span class="demo-label" style="min-width:auto; margin-right:12px;">共 100 条数据</span>
-    <ldesign-pagination total="100" show-total total-text="共 {total} 条" show-size-changer size-changer-type="dropdown" page-size-options='[5,10,20,50]' page-size="5"></ldesign-pagination>
-  </div>
-  <div class="demo-row" style="align-items:center;">
-    <span class="demo-label" style="min-width:auto; margin-right:12px;">共 36 条数据</span>
-    <ldesign-pagination total="36" show-total total-text="共 {total} 条" show-size-changer size-changer-type="dropdown" page-size-options='[10,20,50]' page-size="10" show-first-last current="2"></ldesign-pagination>
-  </div>
-</div>
-
-```html
-<!-- 参考样式：总数 + 下拉式每页条数 + 首页/末页按钮 -->
-<div style="display:flex; align-items:center; gap:16px;">
-  <span>共 100 条数据</span>
-  <ldesign-pagination total="100" show-total show-size-changer size-changer-type="dropdown" page-size-options='[5,10,20,50]' page-size="5"></ldesign-pagination>
-</div>
-<div style="display:flex; align-items:center; gap:16px;">
-  <span>共 36 条数据</span>
-  <ldesign-pagination total="36" current="2" show-total show-size-changer size-changer-type="dropdown" page-size-options='[10,20,50]' page-size="10" show-first-last></ldesign-pagination>
-</div>
-```
-
-## 事件
-- `ldesignChange`：页码变化时触发，参数 `{ page, pageSize }`
-- `ldesignPageSizeChange`：每页条数变化时触发，参数 `{ pageSize, page }`
+更多分页。
 
 <div class="demo-container">
-  <ldesign-pagination id="pager-events" total="125"></ldesign-pagination>
-  <p id="pager-events-text">当前：1</p>
+  <ldesign-pagination total="500"></ldesign-pagination>
 </div>
 
 ```html
-<ldesign-pagination id="pager-events" total="125"></ldesign-pagination>
-<p id="pager-events-text">当前：1</p>
-<script>
-  const p = document.getElementById('pager-events')
-  const text = document.getElementById('pager-events-text')
-  p.addEventListener('ldesignChange', e => {
-    const { page, pageSize } = e.detail
-    text.textContent = `当前：${page}（每页 ${pageSize} 条）`
-  })
-</script>
+<ldesign-pagination total="500"></ldesign-pagination>
 ```
 
+### 改变每页显示条目数
+
+改变每页显示条目数。
+
+<div class="demo-container">
+  <ldesign-pagination 
+    total="500" 
+    show-size-changer
+    page-size-options="[10, 20, 50, 100]">
+  </ldesign-pagination>
+</div>
+
+```html
+<ldesign-pagination 
+  total="500"
+  show-size-changer
+  page-size-options="[10, 20, 50, 100]">
+</ldesign-pagination>
+```
+
+### 快速跳转
+
+快速跳转到某一页。
+
+<div class="demo-container">
+  <ldesign-pagination 
+    total="500" 
+    show-quick-jumper>
+  </ldesign-pagination>
+</div>
+
+```html
+<ldesign-pagination show-quick-jumper></ldesign-pagination>
+```
+
+### 简洁模式
+
+简单的翻页。
+
+<div class="demo-container">
+  <ldesign-pagination 
+    total="50" 
+    simple>
+  </ldesign-pagination>
+</div>
+
+```html
+<ldesign-pagination simple></ldesign-pagination>
+```
+
+### 迷你尺寸
+
+迷你尺寸分页。
+
+<div class="demo-container">
+  <ldesign-pagination 
+    total="50" 
+    size="small">
+  </ldesign-pagination>
+</div>
+
+```html
+<ldesign-pagination size="small"></ldesign-pagination>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
 <script setup>
-import { onMounted } from 'vue'
+import { ref } from 'vue';
 
-onMounted(() => {
-  const p = document.getElementById('pager-controlled')
-  if (p) {
-    p.addEventListener('ldesignChange', e => {
-      const { page } = e.detail
-      p.setAttribute('current', String(page))
-    })
-    p.addEventListener('ldesignPageSizeChange', e => {
-      const { pageSize } = e.detail
-      p.setAttribute('page-size', String(pageSize))
-    })
-  }
+const current = ref(1);
+const pageSize = ref(10);
+const total = ref(500);
 
-  const p2 = document.getElementById('pager-events')
-  const text = document.getElementById('pager-events-text')
-  if (p2 && text) {
-    p2.addEventListener('ldesignChange', e => {
-      const { page, pageSize } = e.detail
-      text.textContent = `当前：${page}（每页 ${pageSize} 条）`
-    })
-  }
-})
+const handleChange = (e) => {
+  current.value = e.detail.current;
+  pageSize.value = e.detail.pageSize;
+  
+  // 加载数据
+  loadData(current.value, pageSize.value);
+};
+
+const loadData = (page, size) => {
+  console.log(`加载第 ${page} 页，每页 ${size} 条`);
+};
 </script>
+
+<template>
+  <ldesign-pagination
+    :current="current"
+    :page-size="pageSize"
+    :total="total"
+    show-size-changer
+    show-quick-jumper
+    @ldesignChange="handleChange"
+  />
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const total = 500;
+  
+  const handleChange = (e) => {
+    setCurrent(e.detail.current);
+    setPageSize(e.detail.pageSize);
+    
+    // 加载数据
+    loadData(e.detail.current, e.detail.pageSize);
+  };
+  
+  const loadData = (page, size) => {
+    console.log(`加载第 ${page} 页，每页 ${size} 条`);
+  };
+  
+  return (
+    <ldesign-pagination
+      current={current}
+      page-size={pageSize}
+      total={total}
+      show-size-changer
+      show-quick-jumper
+      onLdesignChange={handleChange}
+    />
+  );
+}
+```
 
 ## API
 
-### 属性
+### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `total` | `number` | `0` | 总条目数 |
-| `current` | `number` | - | 当前页（受控） |
-| `default-current` | `number` | `1` | 默认当前页（非受控） |
-| `page-size` | `number` | - | 每页条数（受控） |
-| `default-page-size` | `number` | `10` | 默认每页条数（非受控） |
-| `show-size-changer` | `boolean` | `false` | 是否显示每页条数切换 |
-| `size-changer-type` | `'native' | 'dropdown'` | `'dropdown'` | 每页条数切换器类型 |
-| `page-size-options` | `number[] | string` | `[10,20,50,100]` | 页大小选项，数组或逗号分隔/JSON 字符串 |
-| `page-size-text` | `string` | `'{size} 条/页'` | dropdown 模式下的显示模板 |
-| `show-quick-jumper` | `boolean` | `false` | 是否显示快速跳转 |
-| `simple` | `boolean` | `false` | 简洁模式 |
-| `show-first-last` | `boolean` | `false` | 是否显示首页/末页按钮 |
-| `hide-on-single-page` | `boolean` | `false` | 仅一页时是否隐藏 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `size` | `'small' | 'medium' | 'large'` | `'medium'` | 尺寸 |
-| `show-total` | `boolean` | `false` | 是否显示总数文案 |
-| `total-text` | `string` | `'共 {total} 条'` | 总数文案模板，支持 `total/rangeStart/rangeEnd` |
-| `page-text` | `string` | `'{current}/{pageCount} 页'` | 简洁模式页信息模板 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `current` | 当前页数 | `number` | `1` |
+| `page-size` | 每页条数 | `number` | `10` |
+| `total` | 数据总数 | `number` | `0` |
+| `show-size-changer` | 是否显示每页条数选择器 | `boolean` | `false` |
+| `page-size-options` | 每页条数选项 | `number[]` | `[10, 20, 50, 100]` |
+| `show-quick-jumper` | 是否显示快速跳转 | `boolean` | `false` |
+| `simple` | 简洁模式 | `boolean` | `false` |
+| `size` | 尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `disabled` | 禁用分页 | `boolean` | `false` |
 
-### 事件
+### Events
 
 | 事件名 | 说明 | 回调参数 |
-|---|---|---|
-| `ldesignChange` | 页码变化时触发 | `{ page: number; pageSize: number }` |
-| `ldesignPageSizeChange` | 每页条数变化时触发 | `{ pageSize: number; page: number }` |
+|--------|------|----------|
+| `ldesignChange` | 页码或每页条数改变时触发 | `(event: CustomEvent<{ current: number, pageSize: number }>) => void` |
 
-### 无障碍
-- 容器 `role="navigation"`、`aria-label="分页导航"`
-- 当前页按钮带 `aria-current="page"`
-- 提供键盘操作：Left/Right 切换，Home/End 到首尾
+## 相关组件
+
+- [Table 表格](./table.md)

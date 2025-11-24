@@ -1,175 +1,199 @@
-# Notification 通知提醒
+﻿# Notification 通知提醒框
 
-用于页面角落的全局通知，常用于系统级提示。支持标题、描述、操作按钮和自动关闭。
+全局展示通知提醒信息。
 
-<script setup>
-import { onMounted, onUnmounted } from 'vue'
+## 何时使用
 
-let listeners = []
+- 在系统右上角显示通知提醒信息。经常用于以下情况：
+  - 较为复杂的通知内容。
+  - 带有交互的通知，给出用户下一步的行动点。
+  - 系统主动推送。
 
-function addListener(el, event, handler) {
-  if (el) {
-    el.addEventListener(event, handler)
-    listeners.push({ el, event, handler })
-  }
-}
+## 代码演示
 
-function cleanup() {
-  listeners.forEach(({ el, event, handler }) => el.removeEventListener(event, handler))
-  listeners = []
-}
+### 基础用法
 
-function openNotification({ type = 'info', title, description, duration = 4500, closable = true, showIcon = true, placement = 'top-right' } = {}) {
-  const el = document.createElement('ldesign-notification')
-  el.type = type
-  if (title) el.notificationTitle = title
-  if (description) el.description = description
-  el.duration = duration
-  el.closable = closable
-  el.showIcon = showIcon
-  el.placement = placement
-  document.body.appendChild(el)
-  return el
-}
-
-onMounted(() => {
-  cleanup()
-  // 基础用法
-  addListener(document.getElementById('ntf-info'), 'click', () => openNotification({ type: 'info', title: '通知', description: '这是一条信息通知。' }))
-  addListener(document.getElementById('ntf-success'), 'click', () => openNotification({ type: 'success', title: '操作成功', description: '您的操作已成功完成。' }))
-  addListener(document.getElementById('ntf-warning'), 'click', () => openNotification({ type: 'warning', title: '警告', description: '请注意当前操作可能带来风险。' }))
-  addListener(document.getElementById('ntf-error'), 'click', () => openNotification({ type: 'error', title: '错误', description: '操作失败，请重试或联系管理员。' }))
-
-  // 位置
-  addListener(document.getElementById('ntf-top-left'), 'click', () => openNotification({ placement: 'top-left', title: '左上角', description: '出现在左上角' }))
-  addListener(document.getElementById('ntf-top-right'), 'click', () => openNotification({ placement: 'top-right', title: '右上角', description: '出现在右上角' }))
-  addListener(document.getElementById('ntf-bottom-right'), 'click', () => openNotification({ placement: 'bottom-right', title: '右下角', description: '出现在右下角' }))
-  addListener(document.getElementById('ntf-bottom-left'), 'click', () => openNotification({ placement: 'bottom-left', title: '左下角', description: '出现在左下角' }))
-
-  // 可关闭 & 时长
-  addListener(document.getElementById('ntf-closable'), 'click', () => openNotification({ title: '手动关闭', description: '这条通知可以手动关闭', closable: true, duration: 0 }))
-  addListener(document.getElementById('ntf-duration-short'), 'click', () => openNotification({ title: '1 秒关闭', description: '1 秒后自动关闭', duration: 1000 }))
-  addListener(document.getElementById('ntf-duration-long'), 'click', () => openNotification({ title: '5 秒关闭', description: '5 秒后自动关闭', duration: 5000 }))
-
-  // 带操作
-  addListener(document.getElementById('ntf-actions'), 'click', () => {
-    const n = openNotification({ title: '网络异常', description: '请求超时，请检查网络连接。', type: 'warning' })
-    // 添加操作按钮
-    const btn = document.createElement('ldesign-button')
-    btn.setAttribute('type', 'primary')
-    btn.textContent = '重试'
-    btn.addEventListener('click', () => {
-      n.close()
-      openNotification({ type: 'info', title: '已重试', description: '正在重新发起请求…' })
-    })
-    btn.slot = 'actions'
-    n.appendChild(btn)
-  })
-})
-
-onUnmounted(() => cleanup())
-</script>
-
-## 基础用法
-
-点击按钮在页面右上角显示通知。
+最简单的用法。
 
 <div class="demo-container">
-  <div class="demo-row">
-    <ldesign-button id="ntf-info">Info</ldesign-button>
-    <ldesign-button id="ntf-success" type="primary">Success</ldesign-button>
-    <ldesign-button id="ntf-warning" type="outline">Warning</ldesign-button>
-    <ldesign-button id="ntf-error" type="danger">Error</ldesign-button>
-  </div>
+  <ldesign-button id="basic-notification-btn">打开通知</ldesign-button>
 </div>
+
 
 ```html
 <script>
-function openNotification({ type = 'info', title, description, duration = 4500, closable = true, placement = 'top-right' } = {}) {
-  const el = document.createElement('ldesign-notification')
-  el.type = type
-  el.notificationTitle = title
-  el.description = description
-  el.duration = duration
-  el.closable = closable
-  el.placement = placement
-  document.body.appendChild(el)
-  return el
-}
+  const notification = document.createElement('ldesign-notification');
+  notification.title = '通知标题';
+  notification.content = '通知内容';
+  document.body.appendChild(notification);
 </script>
 ```
 
-## 四个方向
+### 不同类型
 
-通过 `placement` 控制显示位置：`top-right`（默认）、`top-left`、`bottom-right`、`bottom-left`。
-
-<div class="demo-container">
-  <div class="demo-row">
-    <ldesign-button id="ntf-top-left">左上角</ldesign-button>
-    <ldesign-button id="ntf-top-right">右上角</ldesign-button>
-    <ldesign-button id="ntf-bottom-right">右下角</ldesign-button>
-    <ldesign-button id="ntf-bottom-left">左下角</ldesign-button>
-  </div>
-</div>
-
-## 可关闭与时长
-
-- `closable` 显示关闭按钮。
-- `duration` 控制自动关闭时间（毫秒），设为 0 不自动关闭。
+包括成功、信息、警告、错误四种类型。
 
 <div class="demo-container">
-  <div class="demo-row">
-    <ldesign-button id="ntf-closable" type="secondary">可手动关闭</ldesign-button>
-    <ldesign-button id="ntf-duration-short">1 秒自动关闭</ldesign-button>
-    <ldesign-button id="ntf-duration-long">5 秒自动关闭</ldesign-button>
-  </div>
+  <ldesign-button id="success-notification-btn">成功</ldesign-button>
+  <ldesign-button id="info-notification-btn">信息</ldesign-button>
+  <ldesign-button id="warning-notification-btn">警告</ldesign-button>
+  <ldesign-button id="error-notification-btn">错误</ldesign-button>
 </div>
 
-## 带操作区
-
-通过 `actions` 插槽放置按钮等交互元素。
 
 ```html
-<ldesign-notification notification-title="网络异常" description="请求超时，请检查网络连接。">
-  <ldesign-button type="primary" slot="actions">重试</ldesign-button>
-</ldesign-notification>
+<!-- 成功 -->
+<script>
+  const notification = document.createElement('ldesign-notification');
+  notification.type = 'success';
+  notification.title = '成功';
+  notification.content = '操作成功完成！';
+  document.body.appendChild(notification);
+</script>
 ```
 
-## 无障碍
+### 位置
 
-- 默认设置 `role="alert"` 与 `aria-live="polite"`，确保读屏器能及时播报。
-- 键盘可聚焦关闭按钮，按下回车即可关闭。
+可以设置通知从右上角、右下角、左上角、左下角弹出。
+
+<div class="demo-container">
+  <ldesign-button id="top-right-btn">右上角</ldesign-button>
+  <ldesign-button id="bottom-right-btn">右下角</ldesign-button>
+  <ldesign-button id="top-left-btn">左上角</ldesign-button>
+  <ldesign-button id="bottom-left-btn">左下角</ldesign-button>
+</div>
+
+
+```html
+<script>
+  const notification = document.createElement('ldesign-notification');
+  notification.placement = 'top-right';
+  document.body.appendChild(notification);
+</script>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+const openNotification = () => {
+  const notification = document.createElement('ldesign-notification');
+  notification.type = 'success';
+  notification.title = '操作成功';
+  notification.content = '您的操作已成功完成！';
+  document.body.appendChild(notification);
+};
+</script>
+
+<template>
+  <ldesign-button @ldesignClick="openNotification">
+    打开通知
+  </ldesign-button>
+</template>
+```
+
+### React
+
+```tsx
+function App() {
+  const openNotification = () => {
+    const notification = document.createElement('ldesign-notification');
+    notification.type = 'success';
+    notification.title = '操作成功';
+    notification.content = '您的操作已成功完成！';
+    document.body.appendChild(notification);
+  };
+  
+  return (
+    <ldesign-button onLdesignClick={openNotification}>
+      打开通知
+    </ldesign-button>
+  );
+}
+```
 
 ## API
 
-### 属性
+### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `type` | `'info' | 'success' | 'warning' | 'error'` | `'info'` | 通知类型 |
-| `notificationTitle` | `string` | - | 标题文本 |
-| `description` | `string` | - | 描述文本（也可用默认 slot） |
-| `duration` | `number` | `4500` | 自动关闭时长（毫秒），`0` 表示不自动关闭 |
-| `closable` | `boolean` | `true` | 是否显示关闭按钮 |
-| `showIcon` | `boolean` | `true` | 是否显示图标 |
-| `pauseOnHover` | `boolean` | `true` | 鼠标悬浮时是否暂停倒计时 |
-| `placement` | `'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'` | `'top-right'` | 出现位置 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `type` | 通知类型 | `'success' \| 'info' \| 'warning' \| 'error'` | `'info'` |
+| `title` | 通知标题 | `string` | - |
+| `content` | 通知内容 | `string` | - |
+| `duration` | 自动关闭的延时（ms），设为 0 时不自动关闭 | `number` | `4500` |
+| `placement` | 弹出位置 | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'` | `'top-right'` |
+| `closable` | 是否显示关闭按钮 | `boolean` | `true` |
 
-### 方法
-
-| 方法名 | 说明 | 签名 |
-|---|---|---|
-| `close()` | 手动关闭通知 | `() => Promise<void>` |
-
-### 事件
+### Events
 
 | 事件名 | 说明 | 回调参数 |
-|---|---|---|
-| `ldesignClose` | 关闭后触发 | `() => void` |
+|--------|------|----------|
+| `ldesignClose` | 关闭时触发 | `() => void` |
 
-### 插槽
+## 相关组件
 
-| 插槽名 | 说明 |
-|---|---|
-| 默认 | 描述区域自定义内容 |
-| `actions` | 操作区（放置按钮等） |
+- [Message 全局提示](./message.md)
+- [Alert 警告提示](./alert.md)
+
+<script>
+if (typeof window !== 'undefined') {
+  const initNotifications = () => {
+    // 基础用法
+    const basicBtn = document.getElementById('basic-notification-btn');
+    if (basicBtn) {
+      basicBtn.addEventListener('ldesignClick', () => {
+        const notification = document.createElement('ldesign-notification');
+        notification.title = '通知标题';
+        notification.content = '这是通知的详细内容，可以是较长的文字描述。';
+        document.body.appendChild(notification);
+      });
+    }
+    
+    // 不同类型
+    const types = ['success', 'info', 'warning', 'error'];
+    types.forEach(type => {
+      const btn = document.getElementById(`${type}-notification-btn`);
+      if (btn) {
+        btn.addEventListener('ldesignClick', () => {
+          const notification = document.createElement('ldesign-notification');
+          notification.type = type;
+          notification.title = `${type}通知`;
+          notification.content = `这是一条${type}类型的通知消息`;
+          document.body.appendChild(notification);
+        });
+      }
+    });
+    
+    // 位置
+    const positions = [
+      { id: 'top-right', placement: 'top-right' },
+      { id: 'bottom-right', placement: 'bottom-right' },
+      { id: 'top-left', placement: 'top-left' },
+      { id: 'bottom-left', placement: 'bottom-left' }
+    ];
+    
+    positions.forEach(({ id, placement }) => {
+      const btn = document.getElementById(`${id}-btn`);
+      if (btn) {
+        btn.addEventListener('ldesignClick', () => {
+          const notification = document.createElement('ldesign-notification');
+          notification.title = '通知标题';
+          notification.content = `从${placement}弹出`;
+          notification.placement = placement;
+          document.body.appendChild(notification);
+        });
+      }
+    });
+  };
+  
+  // 初次加载
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNotifications);
+  } else {
+    initNotifications();
+  }
+}
+</script>

@@ -1,74 +1,159 @@
-# Empty 空状态
+﻿# Empty 空状态
 
-空状态占位图。
+空状态时的占位提示。
 
 ## 何时使用
 
-- 列表为空时
-- 搜索无结果时
-- 数据加载失败时
+- 当目前没有数据时，用于显式的用户提示。
+- 初始化场景时的引导创建流程。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
+
+简单的空状态展示。
+
+<div class="demo-container">
+  <ldesign-empty></ldesign-empty>
+</div>
+
+```html
+<ldesign-empty></ldesign-empty>
+```
+
+### 自定义描述
+
+自定义描述内容。
+
+<div class="demo-container">
+  <ldesign-empty description="暂无数据"></ldesign-empty>
+</div>
 
 ```html
 <ldesign-empty description="暂无数据"></ldesign-empty>
 ```
 
-:::
+### 自定义图片
 
-## 不同类型
+自定义图片链接。
 
-:::demo
+<div class="demo-container">
+  <ldesign-empty
+    image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+    description="自定义图片">
+  </ldesign-empty>
+</div>
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-  <div>
-    <h4>默认</h4>
-    <ldesign-empty image-type="default" description="暂无数据"></ldesign-empty>
-  </div>
-  
-  <div>
-    <h4>简单</h4>
-    <ldesign-empty image-type="simple" description="空空如也"></ldesign-empty>
-  </div>
-  
-  <div>
-    <h4>搜索</h4>
-    <ldesign-empty image-type="search" description="未找到结果"></ldesign-empty>
-  </div>
-</div>
+<ldesign-empty
+  image="custom-empty.svg"
+  description="自定义图片">
+</ldesign-empty>
 ```
 
-:::
+### 自定义操作
 
-## 自定义操作
+添加自定义操作按钮。
 
-:::demo
+<div class="demo-container">
+  <ldesign-empty description="暂无数据">
+    <ldesign-button type="primary">立即创建</ldesign-button>
+  </ldesign-empty>
+</div>
 
 ```html
-<ldesign-empty description="还没有数据">
+<ldesign-empty description="暂无数据">
   <ldesign-button type="primary">立即创建</ldesign-button>
 </ldesign-empty>
 ```
 
-:::
+### 无描述
+
+无描述展示。
+
+<div class="demo-container">
+  <ldesign-empty description=""></ldesign-empty>
+</div>
+
+```html
+<ldesign-empty description=""></ldesign-empty>
+```
+
+## 框架集成
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const dataList = ref([]);
+
+const createData = () => {
+  dataList.value = [1, 2, 3];
+};
+</script>
+
+<template>
+  <div v-if="dataList.length === 0">
+    <ldesign-empty description="暂无数据">
+      <ldesign-button type="primary" @ldesignClick="createData">
+        立即创建
+      </ldesign-button>
+    </ldesign-empty>
+  </div>
+  
+  <div v-else>
+    <!-- 数据列表 -->
+  </div>
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react';
+
+function App() {
+  const [dataList, setDataList] = useState([]);
+  
+  const createData = () => {
+    setDataList([1, 2, 3]);
+  };
+  
+  if (dataList.length === 0) {
+    return (
+      <ldesign-empty description="暂无数据">
+        <ldesign-button type="primary" onLdesignClick={createData}>
+          立即创建
+        </ldesign-button>
+      </ldesign-empty>
+    );
+  }
+  
+  return <div>{/* 数据列表 */}</div>;
+}
+```
 
 ## API
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| description | `string` | `'暂无数据'` | 描述文字 |
-| image | `string` | - | 自定义图片URL |
-| imageSize | `'small' \| 'medium' \| 'large'` | `'medium'` | 图片大小 |
-| imageType | `'default' \| 'simple' \| 'search'` | `'default'` | 预设图片类型 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `description` | 描述文字 | `string` | `'暂无数据'` |
+| `image` | 图片地址 | `string` | - |
+| `image-style` | 图片样式 | `string` | - |
 
 ### Slots
 
 | 插槽名 | 说明 |
 |--------|------|
-| default | 自定义底部内容（通常放置操作按钮） |
+| `default` | 自定义操作区域 |
+| `description` | 自定义描述内容 |
+| `image` | 自定义图片 |
 
+## 相关组件
+
+- [Result 结果](./result.md)
+- [Skeleton 骨架屏](./skeleton.md)

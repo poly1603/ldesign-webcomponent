@@ -1,4 +1,4 @@
-# 组件概览
+﻿# 组件概览
 
 LDesign WebComponent v2.0 提供 **90 个**生产级 Web Components 组件。
 

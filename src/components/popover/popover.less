@@ -1,0 +1,205 @@
+// Popover 气泡卡片样式
+:host {
+  display: inline-block;
+  position: relative;
+}
+
+.popover {
+  &__trigger {
+    display: inline-block;
+  }
+
+  &__content {
+    position: fixed;
+    z-index: var(--ldesign-z-index-popover, 1060);
+    background-color: var(--ldesign-bg-color, #ffffff);
+    border: 1px solid var(--ldesign-border-color, #d9d9d9);
+    border-radius: var(--ls-border-radius-base, 6px);
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    max-width: 400px;
+    word-wrap: break-word;
+
+    .popover--visible & {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+  }
+
+  &__title {
+    padding: 12px 16px;
+    font-size: var(--ldesign-font-size-base, 14px);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ldesign-text-color, #000000d9);
+    border-bottom: 1px solid var(--ldesign-border-color, #d9d9d9);
+  }
+
+  &__body {
+    padding: 12px 16px;
+    font-size: var(--ldesign-font-size-base, 14px);
+    line-height: 1.5;
+    color: var(--ldesign-text-color, #000000d9);
+  }
+
+  &__text {
+    margin: 0;
+  }
+
+  &__arrow {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    z-index: -1;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: var(--ldesign-bg-color, #ffffff);
+      border: 1px solid var(--ldesign-border-color, #d9d9d9);
+      transform: rotate(45deg);
+    }
+  }
+
+  // 箭头位置
+  &__content--top &__arrow {
+    bottom: -4px;
+
+    &::before {
+      border-top: none;
+      border-left: none;
+    }
+  }
+
+  &__content--top-start &__arrow {
+    bottom: -4px;
+
+    &::before {
+      border-top: none;
+      border-left: none;
+    }
+  }
+
+  &__content--top-end &__arrow {
+    bottom: -4px;
+
+    &::before {
+      border-top: none;
+      border-left: none;
+    }
+  }
+
+  &__content--bottom &__arrow {
+    top: -4px;
+
+    &::before {
+      border-bottom: none;
+      border-right: none;
+    }
+  }
+
+  &__content--bottom-start &__arrow {
+    top: -4px;
+
+    &::before {
+      border-bottom: none;
+      border-right: none;
+    }
+  }
+
+  &__content--bottom-end &__arrow {
+    top: -4px;
+
+    &::before {
+      border-bottom: none;
+      border-right: none;
+    }
+  }
+
+  &__content--left &__arrow {
+    right: -4px;
+
+    &::before {
+      border-left: none;
+      border-bottom: none;
+    }
+  }
+
+  &__content--left-start &__arrow {
+    right: -4px;
+
+    &::before {
+      border-left: none;
+      border-bottom: none;
+    }
+  }
+
+  &__content--left-end &__arrow {
+    right: -4px;
+
+    &::before {
+      border-left: none;
+      border-bottom: none;
+    }
+  }
+
+  &__content--right &__arrow {
+    left: -4px;
+
+    &::before {
+      border-right: none;
+      border-top: none;
+    }
+  }
+
+  &__content--right-start &__arrow {
+    left: -4px;
+
+    &::before {
+      border-right: none;
+      border-top: none;
+    }
+  }
+
+  &__content--right-end &__arrow {
+    left: -4px;
+
+    &::before {
+      border-right: none;
+      border-top: none;
+    }
+  }
+}
+
+// 动画
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes popoverFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}

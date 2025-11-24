@@ -1,0 +1,200 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+
+:host {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+}
+
+.auto-complete {
+  position: relative;
+  width: 100%;
+
+  &__wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__input {
+    width: 100%;
+    height: var(--ldesign-input-height-medium);
+    padding: 0 32px 0 12px;
+    font-size: var(--ldesign-font-size-base);
+    line-height: 1.5;
+    color: var(--ldesign-text-color);
+    background-color: var(--ldesign-bg-color);
+    border: 1px solid var(--ldesign-border-color);
+    border-radius: var(--ldesign-border-radius-base);
+    outline: none;
+    transition: all 0.3s;
+
+    &::placeholder {
+      color: var(--ldesign-text-color-placeholder);
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--ldesign-primary-color-hover);
+    }
+
+    &:focus {
+      border-color: var(--ldesign-primary-color);
+      box-shadow: 0 0 0 2px var(--ldesign-primary-color-alpha-20);
+    }
+
+    &:disabled {
+      color: var(--ldesign-text-color-disabled);
+      background-color: var(--ldesign-bg-color-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--ldesign-text-color-secondary);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s;
+
+    &:hover {
+      color: var(--ldesign-text-color);
+    }
+  }
+
+  &__wrapper:hover &__clear {
+    opacity: 1;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: var(--ldesign-z-index-dropdown);
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--ldesign-bg-color);
+    border: 1px solid var(--ldesign-border-color);
+    border-radius: var(--ldesign-border-radius-base);
+    box-shadow: var(--ldesign-shadow-md);
+    animation: slideDownIn 0.3s ease;
+
+    @include scrollbar();
+  }
+
+  &__options {
+    padding: 4px 0;
+  }
+
+  &__option {
+    padding: 8px 12px;
+    font-size: var(--ldesign-font-size-base);
+    line-height: 1.5;
+    color: var(--ldesign-text-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover:not(&--disabled) {
+      background-color: var(--ldesign-bg-color-hover);
+    }
+
+    &--active {
+      background-color: var(--ldesign-bg-color-active);
+      color: var(--ldesign-primary-color);
+    }
+
+    &--disabled {
+      color: var(--ldesign-text-color-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  &__highlight {
+    background-color: var(--ldesign-warning-color-alpha-20);
+    color: var(--ldesign-warning-color);
+    font-weight: 500;
+  }
+
+  &__loading,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--ldesign-text-color-secondary);
+    font-size: var(--ldesign-font-size-sm);
+
+    span {
+      margin-top: 8px;
+    }
+  }
+
+  // 尺寸变体
+  &--small {
+    .auto-complete__input {
+      height: var(--ldesign-input-height-small);
+      padding: 0 28px 0 8px;
+      font-size: var(--ldesign-font-size-sm);
+    }
+
+    .auto-complete__clear {
+      right: 8px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .auto-complete__option {
+      padding: 6px 8px;
+      font-size: var(--ldesign-font-size-sm);
+    }
+  }
+
+  &--large {
+    .auto-complete__input {
+      height: var(--ldesign-input-height-large);
+      padding: 0 36px 0 16px;
+      font-size: var(--ldesign-font-size-lg);
+    }
+
+    .auto-complete__clear {
+      right: 16px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .auto-complete__option {
+      padding: 10px 16px;
+      font-size: var(--ldesign-font-size-base);
+    }
+  }
+
+  &--disabled {
+    .auto-complete__clear {
+      display: none;
+    }
+  }
+}
+
+// 动画
+@keyframes slideDownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

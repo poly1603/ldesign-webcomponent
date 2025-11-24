@@ -1,111 +1,157 @@
-# Watermark 水印
+﻿# Watermark 水印
 
-为页面添加防删除水印。
+给页面的某个区域加上水印。
 
 ## 何时使用
 
-- 需要保护页面内容
-- 防止截图泄露
-- 版权声明
+- 页面需要添加水印标识版权时使用。
+- 适用于防止信息盗用。
 
-## 基础用法
+## 代码演示
 
-:::demo
+### 基础用法
 
-```html
-<ldesign-watermark content="LDesign" style="height: 300px;">
-  <ldesign-card title="内容区域">
-    <p>这里是需要添加水印的内容。</p>
-    <p>水印会覆盖整个区域。</p>
-  </ldesign-card>
-</ldesign-watermark>
-```
+最简单的用法。
 
-:::
-
-## 多行文字
-
-:::demo
+<div class="demo-container" style="height: 300px; position: relative;">
+  <ldesign-watermark content="Ldesign Watermark">
+    <div style="height: 100%; padding: 20px;">
+      <p>这是一段内容</p>
+      <p>水印在背景层</p>
+    </div>
+  </ldesign-watermark>
+</div>
 
 ```html
-<ldesign-watermark 
-  content='["保密文档", "请勿外传"]'
-  style="height: 300px;"
->
-  <div style="padding: 24px; background: white;">
-    <h3>保密内容</h3>
-    <p>这是一段保密内容...</p>
+<ldesign-watermark content="Ldesign">
+  <div class="content">
+    内容区域
   </div>
 </ldesign-watermark>
 ```
 
-:::
+### 多行水印
 
-## 图片水印
+通过设置 `content` 为数组可以实现多行水印。
 
-:::demo
+<div class="demo-container" style="height: 300px; position: relative;">
+  <ldesign-watermark id="multi-line-watermark">
+    <div style="height: 100%; padding: 20px;">
+      <p>多行水印内容</p>
+    </div>
+  </ldesign-watermark>
+</div>
+
+<script>
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+  const watermark = document.getElementById('multi-line-watermark')
+  if (watermark) {
+    watermark.content = ['第一行', '第二行']
+  }
+  })
+}
+</script>
 
 ```html
-<ldesign-watermark 
-  image="https://via.placeholder.com/120x60/7334cb/ffffff?text=LOGO"
-  style="height: 300px;"
->
-  <div style="padding: 24px; background: white;">
-    <p>使用图片作为水印</p>
-  </div>
+<ldesign-watermark id="watermark">
+  <div>内容</div>
+</ldesign-watermark>
+
+<script>
+  const watermark = document.getElementById('watermark');
+  watermark.content = ['第一行', '第二行'];
+</script>
+```
+
+### 图片水印
+
+通过 `image` 属性设置图片水印。
+
+<div class="demo-container" style="height: 300px; position: relative;">
+  <ldesign-watermark image="https://via.placeholder.com/120x30?text=Logo">
+    <div style="height: 100%; padding: 20px;">
+      <p>图片水印</p>
+    </div>
+  </ldesign-watermark>
+</div>
+
+```html
+<ldesign-watermark image="logo.png">
+  <div>内容</div>
 </ldesign-watermark>
 ```
 
-:::
+## 框架集成
 
-## 自定义配置
+### Vue 3
 
-:::demo
+```vue
+<script setup>
+const watermarkConfig = {
+  content: 'Ldesign',
+  rotate: -22,
+  fontSize: 16,
+  fontColor: 'rgba(0, 0, 0, 0.15)'
+};
+</script>
 
-```html
-<ldesign-watermark 
-  content="Confidential"
-  width="150"
-  height="80"
-  rotate="-30"
-  opacity="0.2"
-  font-size="16"
-  font-color="rgba(255, 0, 0, 0.3)"
-  gap-x="120"
-  gap-y="120"
-  style="height: 300px;"
->
-  <div style="padding: 24px; background: white;">
-    <h3>自定义水印样式</h3>
-    <p>可以自定义大小、旋转角度、透明度、颜色等。</p>
-  </div>
-</ldesign-watermark>
+<template>
+  <ldesign-watermark
+    :content="watermarkConfig.content"
+    :rotate="watermarkConfig.rotate"
+    :font-size="watermarkConfig.fontSize"
+    :font-color="watermarkConfig.fontColor"
+  >
+    <div class="content">
+      内容区域
+    </div>
+  </ldesign-watermark>
+</template>
 ```
 
-:::
+### React
+
+```tsx
+function App() {
+  return (
+    <ldesign-watermark
+      content="Ldesign"
+      rotate={-22}
+      font-size={16}
+      font-color="rgba(0, 0, 0, 0.15)"
+    >
+      <div className="content">
+        内容区域
+      </div>
+    </ldesign-watermark>
+  );
+}
+```
 
 ## API
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| content | `string \| string[]` | - | 水印文字 |
-| image | `string` | - | 水印图片URL |
-| width | `number` | `120` | 水印宽度 |
-| height | `number` | `64` | 水印高度 |
-| rotate | `number` | `-22` | 旋转角度 |
-| opacity | `number` | `0.15` | 透明度（0-1） |
-| fontSize | `number` | `14` | 字体大小 |
-| fontColor | `string` | `'rgba(0,0,0,0.15)'` | 字体颜色 |
-| gapX | `number` | `100` | 水平间距 |
-| gapY | `number` | `100` | 垂直间距 |
-| zIndex | `number` | `9` | z-index层级 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `content` | 水印文字内容 | `string \| string[]` | - |
+| `image` | 图片源，优先级高于文字 | `string` | - |
+| `width` | 水印的宽度 | `number` | `120` |
+| `height` | 水印的高度 | `number` | `64` |
+| `rotate` | 水印绘制时旋转的角度 | `number` | `-22` |
+| `z-index` | 水印的 z-index | `number` | `9` |
+| `font-size` | 字体大小 | `number` | `16` |
+| `font-color` | 字体颜色 | `string` | `'rgba(0,0,0,.15)'` |
+| `gap-x` | 水印之间的水平间距 | `number` | `100` |
+| `gap-y` | 水印之间的垂直间距 | `number` | `100` |
 
-## 特性
+### Slots
 
-- ✅ 防删除机制（使用 MutationObserver）
-- ✅ 支持文字和图片水印
-- ✅ 完全可定制样式
-- ✅ 不影响页面交互
+| 插槽名 | 说明 |
+|--------|------|
+| `default` | 添加水印的内容 |
 
+## 相关组件
+
+- [Image 图片](./image.md)

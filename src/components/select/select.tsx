@@ -9,7 +9,12 @@ export interface SelectOption {
   label: string;
   disabled?: boolean;
   icon?: string;
+  [key: string]: any;  // 支持自定义字段
 }
+
+export type SelectFilterMethod = (input: string, option: SelectOption) => boolean;
+export type SelectRemoteMethod = (query: string) => Promise<SelectOption[]>;
+export type SelectOptionRenderer = (option: SelectOption, selected: boolean) => any;
 
 /**
  * Select 选择器
@@ -62,6 +67,48 @@ export class LdesignSelect {
   /** 主题（浅色/深色），透传给 Popup */
   @Prop() theme: 'light' | 'dark' = 'light';
 
+  /** 是否可搜索/过滤 */
+  @Prop() filterable: boolean = false;
+
+  /** 自定义过滤方法 */
+  @Prop() filterMethod?: SelectFilterMethod;
+
+  /** 是否远程搜索 */
+  @Prop() remote: boolean = false;
+
+  /** 远程搜索方法 */
+  @Prop() remoteMethod?: SelectRemoteMethod;
+
+  /** 远程搜索防抖时间（ms） */
+  @Prop() remoteDebounce: number = 300;
+
+  /** 是否正在加载 */
+  @Prop() loading: boolean = false;
+
+  /** 加载中文案 */
+  @Prop() loadingText: string = '加载中...';
+
+  /** 无数据文案 */
+  @Prop() noDataText: string = '暂无数据';
+
+  /** 无匹配文案 */
+  @Prop() noMatchText: string = '无匹配数据';
+
+  /** 是否启用虚拟滚动（大数据量） */
+  @Prop() virtualScroll: boolean = false;
+
+  /** 虚拟滚动：每项高度（px） */
+  @Prop() virtualItemHeight: number = 32;
+
+  /** 是否允许创建新选项 */
+  @Prop() allowCreate: boolean = false;
+
+  /** 创建选项文案 */
+  @Prop() createText: string = '创建';
+
+  /** 自定义选项渲染函数（通过 JS 赋值） */
+  @Prop() optionRenderer?: SelectOptionRenderer;
+
   /** 是否显示箭头（默认不显示） */
   @Prop() arrow: boolean = false;
 
@@ -72,7 +119,7 @@ export class LdesignSelect {
   @Prop({ mutable: true }) visible: boolean = false;
 
   /** 选中变化事件 */
-  @Event() ldesignChange!: EventEmitter<{ value: string | string[] | undefined; options: SelectOption[] }>; 
+  @Event() ldesignChange!: EventEmitter<{ value: string | string[] | undefined; options: SelectOption[] }>;
 
   /** 对外转发可见性变化 */
   @Event() ldesignVisibleChange!: EventEmitter<boolean>;
@@ -80,8 +127,16 @@ export class LdesignSelect {
   @State() parsedOptions: SelectOption[] = [];
   @State() currentValues: string[] = [];
   @State() highlightIndex: number = -1;
+  @State() searchQuery: string = '';
+  @State() filteredOptions: SelectOption[] = [];
+  @State() internalLoading: boolean = false;
+  @State() virtualStart: number = 0;
+  @State() virtualEnd: number = 20;
 
   private listEl?: HTMLElement;
+  private searchInputEl?: HTMLInputElement;
+  private remoteDebounceTimer?: any;
+  private virtualScrollContainer?: HTMLElement;
 
   @Watch('options')
   watchOptions(val: string | SelectOption[]) {
@@ -331,8 +386,8 @@ export class LdesignSelect {
     const ariaMulti = this.multiple ? { 'aria-multiselectable': 'true' } : {} as any;
 
     return (
-      <ul 
-        class="ldesign-select__list" 
+      <ul
+        class="ldesign-select__list"
         role={role}
         tabindex={0}
         onKeyDown={this.onListKeyDown as any}
@@ -350,7 +405,7 @@ export class LdesignSelect {
             'ldesign-select__item--disabled': !!it.disabled,
           } as any;
           return (
-            <li 
+            <li
               class={classes}
               role="option"
               aria-selected={selected ? 'true' : 'false'}

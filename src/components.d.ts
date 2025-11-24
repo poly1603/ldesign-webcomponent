@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AlertSize, AlertType, AlertVariant } from "./components/alert/alert";
+import { AutoCompleteOption } from "./components/auto-complete/auto-complete";
 import { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size } from "./types";
 import { ButtonColor, ButtonHTMLType, ButtonSize, ButtonVariant } from "./components/button/interface";
 import { CalEvent } from "./components/calendar/calendar";
@@ -13,7 +14,8 @@ import { Breakpoints, CascaderOption, CascaderOverlay, CascaderTrigger } from ".
 import { Placement } from "@floating-ui/dom";
 import { CloseReason, DrawerButton, DrawerLevel, DrawerPlacement, DrawerState, DrawerTheme, SizePreset, SnapPoint } from "./components/drawer/drawer.types";
 import { DropdownItem, DropdownNode, DropdownPlacement, DropdownTrigger, DropdownVariant } from "./components/dropdown/dropdown";
-import { FormRule } from "./components/form/form";
+import { FormRule, FormSnapshot } from "./components/form/form";
+import { FormListField } from "./components/form/form-list";
 import { ImageViewerItem } from "./components/image-viewer/image-viewer";
 import { MenuItem, SubmenuTrigger, VerticalExpand } from "./components/menu/menu";
 import { MessageType } from "./components/message/message";
@@ -21,10 +23,11 @@ import { ModalAnimation, ModalHeaderConfig, ModalSize, ModalTheme, ModalVariant 
 import { NotificationPlacement, NotificationType } from "./components/notification/notification";
 import { PickerOption } from "./components/picker/picker";
 import { PopconfirmIcon, PopconfirmPlacement, PopconfirmTrigger } from "./components/popconfirm/popconfirm";
+import { PopoverPlacement, PopoverTrigger } from "./components/popover/popover";
 import { PopupAnimation, PopupPlacement, PopupSize, PopupTrigger } from "./components/popup/popup";
 import { Element } from "@stencil/core";
-import { SelectOption, SelectPlacement, SelectTrigger } from "./components/select/select";
-import { TableColumn, TableSort } from "./components/table/table";
+import { SelectFilterMethod, SelectOption, SelectOptionRenderer, SelectPlacement, SelectRemoteMethod, SelectTrigger } from "./components/select/select";
+import { TableColumn, TableExpandable, TableRowSelection, TableSort } from "./components/table/table";
 import { TabMeta, TabsPlacement, TabsType } from "./components/tabs/tabs";
 import { TagData } from "./components/tag-group/tag-group";
 import { Breakpoints as Breakpoints1, TimePickerLocale, TimePickerOverlay, TimePickerSize, TimePickerTrigger, TimePreset } from "./components/time-picker/time-picker";
@@ -32,8 +35,10 @@ import { TooltipAnimation, TooltipPlacement, TooltipSize, TooltipTrigger } from 
 import { TourStep } from "./components/tour/tour";
 import { TransferItem } from "./components/transfer/transfer";
 import { TreeNode } from "./components/tree/tree";
+import { TreeSelectNode } from "./components/tree-select/tree-select";
 import { UploadFile } from "./components/upload/upload";
 export { AlertSize, AlertType, AlertVariant } from "./components/alert/alert";
+export { AutoCompleteOption } from "./components/auto-complete/auto-complete";
 export { ButtonIconPosition, ButtonShape, ButtonType, MentionEntity, MentionItem, MentionModel, MentionSegment, MentionTriggerConfig, Size } from "./types";
 export { ButtonColor, ButtonHTMLType, ButtonSize, ButtonVariant } from "./components/button/interface";
 export { CalEvent } from "./components/calendar/calendar";
@@ -41,7 +46,8 @@ export { Breakpoints, CascaderOption, CascaderOverlay, CascaderTrigger } from ".
 export { Placement } from "@floating-ui/dom";
 export { CloseReason, DrawerButton, DrawerLevel, DrawerPlacement, DrawerState, DrawerTheme, SizePreset, SnapPoint } from "./components/drawer/drawer.types";
 export { DropdownItem, DropdownNode, DropdownPlacement, DropdownTrigger, DropdownVariant } from "./components/dropdown/dropdown";
-export { FormRule } from "./components/form/form";
+export { FormRule, FormSnapshot } from "./components/form/form";
+export { FormListField } from "./components/form/form-list";
 export { ImageViewerItem } from "./components/image-viewer/image-viewer";
 export { MenuItem, SubmenuTrigger, VerticalExpand } from "./components/menu/menu";
 export { MessageType } from "./components/message/message";
@@ -49,10 +55,11 @@ export { ModalAnimation, ModalHeaderConfig, ModalSize, ModalTheme, ModalVariant 
 export { NotificationPlacement, NotificationType } from "./components/notification/notification";
 export { PickerOption } from "./components/picker/picker";
 export { PopconfirmIcon, PopconfirmPlacement, PopconfirmTrigger } from "./components/popconfirm/popconfirm";
+export { PopoverPlacement, PopoverTrigger } from "./components/popover/popover";
 export { PopupAnimation, PopupPlacement, PopupSize, PopupTrigger } from "./components/popup/popup";
 export { Element } from "@stencil/core";
-export { SelectOption, SelectPlacement, SelectTrigger } from "./components/select/select";
-export { TableColumn, TableSort } from "./components/table/table";
+export { SelectFilterMethod, SelectOption, SelectOptionRenderer, SelectPlacement, SelectRemoteMethod, SelectTrigger } from "./components/select/select";
+export { TableColumn, TableExpandable, TableRowSelection, TableSort } from "./components/table/table";
 export { TabMeta, TabsPlacement, TabsType } from "./components/tabs/tabs";
 export { TagData } from "./components/tag-group/tag-group";
 export { Breakpoints as Breakpoints1, TimePickerLocale, TimePickerOverlay, TimePickerSize, TimePickerTrigger, TimePreset } from "./components/time-picker/time-picker";
@@ -60,6 +67,7 @@ export { TooltipAnimation, TooltipPlacement, TooltipSize, TooltipTrigger } from 
 export { TourStep } from "./components/tour/tour";
 export { TransferItem } from "./components/transfer/transfer";
 export { TreeNode } from "./components/tree/tree";
+export { TreeSelectNode } from "./components/tree-select/tree-select";
 export { UploadFile } from "./components/upload/upload";
 export namespace Components {
     interface LDropdownPanel {
@@ -255,6 +263,60 @@ export namespace Components {
           * 链接标题
          */
         "title": string;
+    }
+    /**
+     * AutoComplete 自动完成组件
+     * 用于输入建议、搜索框等场景
+     */
+    interface LdesignAutoComplete {
+        /**
+          * 失焦输入框
+         */
+        "blur": () => Promise<void>;
+        /**
+          * 是否允许清空
+         */
+        "clearable": boolean;
+        /**
+          * 防抖延迟（毫秒）
+         */
+        "debounceTime": number;
+        /**
+          * 是否禁用
+         */
+        "disabled": boolean;
+        /**
+          * 是否开启本地过滤
+         */
+        "filterOption": boolean;
+        /**
+          * 聚焦输入框
+         */
+        "focus": () => Promise<void>;
+        /**
+          * 是否高亮匹配文本
+         */
+        "highlightMatch": boolean;
+        /**
+          * 最大显示选项数
+         */
+        "maxOptions": number;
+        /**
+          * 选项数据
+         */
+        "options": AutoCompleteOption[];
+        /**
+          * 占位符
+         */
+        "placeholder": string;
+        /**
+          * 尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+        /**
+          * 输入值
+         */
+        "value": string;
     }
     /**
      * Avatar 头像
@@ -2161,9 +2223,17 @@ export namespace Components {
          */
         "disabled": boolean;
         /**
+          * 获取已变化的字段
+         */
+        "getChangedFields": () => Promise<Record<string, { oldValue: any; newValue: any; }>>;
+        /**
           * 获取表单值
          */
         "getFieldsValue": () => Promise<Record<string, any>>;
+        /**
+          * 检查表单是否已变化
+         */
+        "isChanged": () => Promise<boolean>;
         /**
           * 标签位置
          */
@@ -2185,17 +2255,37 @@ export namespace Components {
          */
         "reset": () => Promise<void>;
         /**
+          * 恢复表单快照
+         */
+        "restore": (snapshot: FormSnapshot) => Promise<void>;
+        /**
           * 更新字段值
          */
         "setFieldValue": (name: string, value: any) => Promise<void>;
+        /**
+          * 设置初始值
+         */
+        "setInitialValues": (values: Record<string, any>) => Promise<void>;
         /**
           * 表单尺寸
          */
         "size": 'small' | 'medium' | 'large';
         /**
+          * 创建表单快照
+         */
+        "snapshot": () => Promise<FormSnapshot>;
+        /**
           * 验证表单
          */
         "validate": () => Promise<{ valid: boolean; errors: Record<string, string>; }>;
+        /**
+          * 验证单个字段
+         */
+        "validateField": (name: string) => Promise<string | null>;
+        /**
+          * 监听字段变化
+         */
+        "watch": (name: string, callback: FieldWatcher) => Promise<() => void>;
     }
     /**
      * FormItem 表单项
@@ -2221,6 +2311,40 @@ export namespace Components {
           * 是否必填
          */
         "required": boolean;
+    }
+    /**
+     * FormList 动态表单列表
+     * 用于动态添加/删除表单项
+     */
+    interface LdesignFormList {
+        /**
+          * 添加字段
+         */
+        "add": (defaultValue?: any) => Promise<void>;
+        /**
+          * 获取所有字段
+         */
+        "getFields": () => Promise<FormListField[]>;
+        /**
+          * 初始数量
+         */
+        "initialCount": number;
+        /**
+          * 最大数量
+         */
+        "maxCount"?: number;
+        /**
+          * 移动字段
+         */
+        "move": (from: number, to: number) => Promise<void>;
+        /**
+          * 字段名
+         */
+        "name": string;
+        /**
+          * 移除字段
+         */
+        "remove": (index: number) => Promise<void>;
     }
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -2833,6 +2957,30 @@ export namespace Components {
           * 输入框的值
          */
         "value": string;
+    }
+    /**
+     * InputGroup 输入框组合
+     * 用于组合多个输入控件
+     */
+    interface LdesignInputGroup {
+        /**
+          * 紧凑模式（无间隙）
+         */
+        "compact": boolean;
+        /**
+          * 自定义类名
+         */
+        "customClass"?: string;
+        /**
+          * 尺寸
+         */
+        "size": 'small' | 'medium' | 'large';
+    }
+    /**
+     * InputGroupAddon 输入框前后缀
+     * 用于显示输入框的前后缀内容
+     */
+    interface LdesignInputGroupAddon {
     }
     /**
      * InputNumber 数字输入框
@@ -3512,7 +3660,7 @@ export namespace Components {
         /**
           * 响应式变体：根据断点自动切换
          */
-        "variantAt"?: Partial<Record<'xs'|'sm'|'md'|'lg', ModalVariant>>;
+        "variantAt"?: Partial<Record<'xs' | 'sm' | 'md' | 'lg', ModalVariant>>;
         /**
           * 新增：支持虚拟化滚动
          */
@@ -3907,6 +4055,76 @@ export namespace Components {
           * 外部受控可见性（仅在 trigger='manual' 时生效）
          */
         "visible": boolean;
+    }
+    /**
+     * Popover 气泡卡片
+     * 比 Tooltip 更强大，支持复杂 HTML 内容和交互
+     */
+    interface LdesignPopover {
+        /**
+          * 是否显示箭头
+         */
+        "arrow": boolean;
+        /**
+          * 点击外部关闭
+         */
+        "closeOnClickOutside": boolean;
+        /**
+          * 内容（简单文本）
+         */
+        "content"?: string;
+        /**
+          * 是否禁用
+         */
+        "disabled": boolean;
+        /**
+          * 隐藏 Popover
+         */
+        "hide": () => Promise<void>;
+        /**
+          * 隐藏延迟（毫秒）
+         */
+        "hideDelay": number;
+        /**
+          * 内容区域可交互（hover 触发时是否保持打开）
+         */
+        "interactive": boolean;
+        /**
+          * 偏移距离
+         */
+        "offset": number;
+        /**
+          * 弹出位置
+         */
+        "placement": PopoverPlacement;
+        /**
+          * 显示 Popover
+         */
+        "show": () => Promise<void>;
+        /**
+          * 显示延迟（毫秒）
+         */
+        "showDelay": number;
+        /**
+          * 标题
+         */
+        "title"?: string;
+        /**
+          * 切换显示/隐藏
+         */
+        "toggle": () => Promise<void>;
+        /**
+          * 触发方式
+         */
+        "trigger": PopoverTrigger;
+        /**
+          * 是否显示
+         */
+        "visible": boolean;
+        /**
+          * 宽度
+         */
+        "width"?: number | string;
     }
     /**
      * ldesign-popup（重写版）
@@ -4599,6 +4817,10 @@ export namespace Components {
      */
     interface LdesignSelect {
         /**
+          * 是否允许创建新选项
+         */
+        "allowCreate": boolean;
+        /**
           * 是否显示箭头（默认不显示）
          */
         "arrow": boolean;
@@ -4611,6 +4833,10 @@ export namespace Components {
          */
         "closeOnSelect"?: boolean;
         /**
+          * 创建选项文案
+         */
+        "createText": string;
+        /**
           * 默认值（非受控）
          */
         "defaultValue"?: string | string[];
@@ -4618,6 +4844,22 @@ export namespace Components {
           * 是否禁用
          */
         "disabled": boolean;
+        /**
+          * 自定义过滤方法
+         */
+        "filterMethod"?: SelectFilterMethod;
+        /**
+          * 是否可搜索/过滤
+         */
+        "filterable": boolean;
+        /**
+          * 是否正在加载
+         */
+        "loading": boolean;
+        /**
+          * 加载中文案
+         */
+        "loadingText": string;
         /**
           * 列表最大高度（px）
          */
@@ -4631,6 +4873,18 @@ export namespace Components {
          */
         "multiple": boolean;
         /**
+          * 无数据文案
+         */
+        "noDataText": string;
+        /**
+          * 无匹配文案
+         */
+        "noMatchText": string;
+        /**
+          * 自定义选项渲染函数（通过 JS 赋值）
+         */
+        "optionRenderer"?: SelectOptionRenderer;
+        /**
           * 选项列表（可传数组或 JSON 字符串）
          */
         "options": string | SelectOption[];
@@ -4643,6 +4897,18 @@ export namespace Components {
          */
         "placement": SelectPlacement;
         /**
+          * 是否远程搜索
+         */
+        "remote": boolean;
+        /**
+          * 远程搜索防抖时间（ms）
+         */
+        "remoteDebounce": number;
+        /**
+          * 远程搜索方法
+         */
+        "remoteMethod"?: SelectRemoteMethod;
+        /**
           * 主题（浅色/深色），透传给 Popup
          */
         "theme": 'light' | 'dark';
@@ -4654,6 +4920,14 @@ export namespace Components {
           * 值（受控）。单选时为 string，多选时为 string[]
          */
         "value"?: string | string[];
+        /**
+          * 虚拟滚动：每项高度（px）
+         */
+        "virtualItemHeight": number;
+        /**
+          * 是否启用虚拟滚动（大数据量）
+         */
+        "virtualScroll": boolean;
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
          */
@@ -5166,6 +5440,10 @@ export namespace Components {
          */
         "bordered": boolean;
         /**
+          * 树形数据子节点字段名
+         */
+        "childrenColumnName": string;
+        /**
           * 表格列配置
          */
         "columns": TableColumn[] | string;
@@ -5174,9 +5452,17 @@ export namespace Components {
          */
         "dataSource": any[] | string;
         /**
+          * 是否可编辑表格
+         */
+        "editable": boolean;
+        /**
           * 空数据提示文字
          */
         "emptyText": string;
+        /**
+          * 展开行配置
+         */
+        "expandable"?: TableExpandable;
         /**
           * 表格高度（启用虚拟滚动时必须指定）
          */
@@ -5185,6 +5471,10 @@ export namespace Components {
           * 是否允许hover高亮
          */
         "hoverable": boolean;
+        /**
+          * 树形数据缩进距离（px）
+         */
+        "indentSize": number;
         /**
           * 是否加载中
          */
@@ -5198,6 +5488,10 @@ export namespace Components {
          */
         "rowKey": string;
         /**
+          * 行选择配置
+         */
+        "rowSelection"?: TableRowSelection;
+        /**
           * 是否显示表头
          */
         "showHeader": boolean;
@@ -5209,6 +5503,10 @@ export namespace Components {
           * 是否显示斑马纹
          */
         "striped": boolean;
+        /**
+          * 是否为树形数据
+         */
+        "treeData": boolean;
         /**
           * 是否启用虚拟滚动
          */
@@ -5752,6 +6050,27 @@ export namespace Components {
         "value"?: string | string[];
     }
     /**
+     * TreeSelect 树选择
+     * 类似 Select，但支持树形结构数据选择
+     */
+    interface LdesignTreeSelect {
+        "checkable": boolean;
+        "clear": () => Promise<void>;
+        "clearable": boolean;
+        "defaultExpandAll": boolean;
+        "disabled": boolean;
+        "expandedKeys": (string | number)[];
+        "hide": () => Promise<void>;
+        "multiple": boolean;
+        "placeholder": string;
+        "searchPlaceholder": string;
+        "searchable": boolean;
+        "show": () => Promise<void>;
+        "size": 'small' | 'medium' | 'large';
+        "treeData": TreeSelectNode[];
+        "value"?: string | number | (string | number)[];
+    }
+    /**
      * Upload 文件上传组件
      */
     interface LdesignUpload {
@@ -5881,6 +6200,10 @@ export interface LdesignAlertCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignAlertElement;
 }
+export interface LdesignAutoCompleteCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignAutoCompleteElement;
+}
 export interface LdesignAvatarCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignAvatarElement;
@@ -6005,6 +6328,10 @@ export interface LdesignPopconfirmCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignPopconfirmElement;
 }
+export interface LdesignPopoverCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignPopoverElement;
+}
 export interface LdesignPopupCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignPopupElement;
@@ -6089,6 +6416,10 @@ export interface LdesignTreeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignTreeElement;
 }
+export interface LdesignTreeSelectCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLdesignTreeSelectElement;
+}
 export interface LdesignUploadCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLdesignUploadElement;
@@ -6172,6 +6503,32 @@ declare global {
     var HTMLLdesignAnchorLinkElement: {
         prototype: HTMLLdesignAnchorLinkElement;
         new (): HTMLLdesignAnchorLinkElement;
+    };
+    interface HTMLLdesignAutoCompleteElementEventMap {
+        "ldesignInput": string;
+        "ldesignSearch": string;
+        "ldesignSelect": AutoCompleteOption;
+        "ldesignClear": void;
+        "ldesignFocus": void;
+        "ldesignBlur": void;
+    }
+    /**
+     * AutoComplete 自动完成组件
+     * 用于输入建议、搜索框等场景
+     */
+    interface HTMLLdesignAutoCompleteElement extends Components.LdesignAutoComplete, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignAutoCompleteElementEventMap>(type: K, listener: (this: HTMLLdesignAutoCompleteElement, ev: LdesignAutoCompleteCustomEvent<HTMLLdesignAutoCompleteElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignAutoCompleteElementEventMap>(type: K, listener: (this: HTMLLdesignAutoCompleteElement, ev: LdesignAutoCompleteCustomEvent<HTMLLdesignAutoCompleteElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignAutoCompleteElement: {
+        prototype: HTMLLdesignAutoCompleteElement;
+        new (): HTMLLdesignAutoCompleteElement;
     };
     interface HTMLLdesignAvatarElementEventMap {
         "ldesignLoad": { width: number; height: number; src: string };
@@ -6690,6 +7047,7 @@ declare global {
         "ldesignSubmit": Record<string, any>;
         "ldesignReset": void;
         "ldesignValidateError": Record<string, string>;
+        "ldesignFieldChange": { name: string; value: any; values: Record<string, any> };
     }
     /**
      * Form 表单组件
@@ -6717,6 +7075,16 @@ declare global {
     var HTMLLdesignFormItemElement: {
         prototype: HTMLLdesignFormItemElement;
         new (): HTMLLdesignFormItemElement;
+    };
+    /**
+     * FormList 动态表单列表
+     * 用于动态添加/删除表单项
+     */
+    interface HTMLLdesignFormListElement extends Components.LdesignFormList, HTMLStencilElement {
+    }
+    var HTMLLdesignFormListElement: {
+        prototype: HTMLLdesignFormListElement;
+        new (): HTMLLdesignFormListElement;
     };
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -6872,6 +7240,26 @@ declare global {
     var HTMLLdesignInputElement: {
         prototype: HTMLLdesignInputElement;
         new (): HTMLLdesignInputElement;
+    };
+    /**
+     * InputGroup 输入框组合
+     * 用于组合多个输入控件
+     */
+    interface HTMLLdesignInputGroupElement extends Components.LdesignInputGroup, HTMLStencilElement {
+    }
+    var HTMLLdesignInputGroupElement: {
+        prototype: HTMLLdesignInputGroupElement;
+        new (): HTMLLdesignInputGroupElement;
+    };
+    /**
+     * InputGroupAddon 输入框前后缀
+     * 用于显示输入框的前后缀内容
+     */
+    interface HTMLLdesignInputGroupAddonElement extends Components.LdesignInputGroupAddon, HTMLStencilElement {
+    }
+    var HTMLLdesignInputGroupAddonElement: {
+        prototype: HTMLLdesignInputGroupAddonElement;
+        new (): HTMLLdesignInputGroupAddonElement;
     };
     interface HTMLLdesignInputNumberElementEventMap {
         "ldesignInput": number | null;
@@ -7144,6 +7532,27 @@ declare global {
     var HTMLLdesignPopconfirmElement: {
         prototype: HTMLLdesignPopconfirmElement;
         new (): HTMLLdesignPopconfirmElement;
+    };
+    interface HTMLLdesignPopoverElementEventMap {
+        "ldesignVisibleChange": boolean;
+    }
+    /**
+     * Popover 气泡卡片
+     * 比 Tooltip 更强大，支持复杂 HTML 内容和交互
+     */
+    interface HTMLLdesignPopoverElement extends Components.LdesignPopover, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignPopoverElementEventMap>(type: K, listener: (this: HTMLLdesignPopoverElement, ev: LdesignPopoverCustomEvent<HTMLLdesignPopoverElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignPopoverElementEventMap>(type: K, listener: (this: HTMLLdesignPopoverElement, ev: LdesignPopoverCustomEvent<HTMLLdesignPopoverElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignPopoverElement: {
+        prototype: HTMLLdesignPopoverElement;
+        new (): HTMLLdesignPopoverElement;
     };
     interface HTMLLdesignPopupElementEventMap {
         "ldesignVisibleChange": boolean;
@@ -7558,6 +7967,9 @@ declare global {
     interface HTMLLdesignTableElementEventMap {
         "ldesignSort": TableSort;
         "ldesignRowClick": { row: any; index: number };
+        "ldesignSelectionChange": { selectedRowKeys: string[]; selectedRows: any[] };
+        "ldesignExpand": { expanded: boolean; row: any; expandedKeys: string[] };
+        "ldesignCellEdit": { row: any; column: TableColumn; value: any };
     }
     /**
      * Table 高性能数据表格组件
@@ -7762,6 +8174,29 @@ declare global {
         prototype: HTMLLdesignTreeElement;
         new (): HTMLLdesignTreeElement;
     };
+    interface HTMLLdesignTreeSelectElementEventMap {
+        "ldesignChange": any;
+        "ldesignClear": void;
+        "ldesignSearch": string;
+    }
+    /**
+     * TreeSelect 树选择
+     * 类似 Select，但支持树形结构数据选择
+     */
+    interface HTMLLdesignTreeSelectElement extends Components.LdesignTreeSelect, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLdesignTreeSelectElementEventMap>(type: K, listener: (this: HTMLLdesignTreeSelectElement, ev: LdesignTreeSelectCustomEvent<HTMLLdesignTreeSelectElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLdesignTreeSelectElementEventMap>(type: K, listener: (this: HTMLLdesignTreeSelectElement, ev: LdesignTreeSelectCustomEvent<HTMLLdesignTreeSelectElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLLdesignTreeSelectElement: {
+        prototype: HTMLLdesignTreeSelectElement;
+        new (): HTMLLdesignTreeSelectElement;
+    };
     interface HTMLLdesignUploadElementEventMap {
         "ldesignChange": UploadFile[];
         "ldesignBeforeUpload": File;
@@ -7812,6 +8247,7 @@ declare global {
         "ldesign-alert": HTMLLdesignAlertElement;
         "ldesign-anchor": HTMLLdesignAnchorElement;
         "ldesign-anchor-link": HTMLLdesignAnchorLinkElement;
+        "ldesign-auto-complete": HTMLLdesignAutoCompleteElement;
         "ldesign-avatar": HTMLLdesignAvatarElement;
         "ldesign-avatar-group": HTMLLdesignAvatarGroupElement;
         "ldesign-backtop": HTMLLdesignBacktopElement;
@@ -7842,6 +8278,7 @@ declare global {
         "ldesign-empty": HTMLLdesignEmptyElement;
         "ldesign-form": HTMLLdesignFormElement;
         "ldesign-form-item": HTMLLdesignFormItemElement;
+        "ldesign-form-list": HTMLLdesignFormListElement;
         "ldesign-grid": HTMLLdesignGridElement;
         "ldesign-grid-item": HTMLLdesignGridItemElement;
         "ldesign-icon": HTMLLdesignIconElement;
@@ -7850,6 +8287,8 @@ declare global {
         "ldesign-image-preview": HTMLLdesignImagePreviewElement;
         "ldesign-image-viewer": HTMLLdesignImageViewerElement;
         "ldesign-input": HTMLLdesignInputElement;
+        "ldesign-input-group": HTMLLdesignInputGroupElement;
+        "ldesign-input-group-addon": HTMLLdesignInputGroupAddonElement;
         "ldesign-input-number": HTMLLdesignInputNumberElement;
         "ldesign-layout": HTMLLdesignLayoutElement;
         "ldesign-layout-content": HTMLLdesignLayoutContentElement;
@@ -7865,6 +8304,7 @@ declare global {
         "ldesign-pagination": HTMLLdesignPaginationElement;
         "ldesign-picker": HTMLLdesignPickerElement;
         "ldesign-popconfirm": HTMLLdesignPopconfirmElement;
+        "ldesign-popover": HTMLLdesignPopoverElement;
         "ldesign-popup": HTMLLdesignPopupElement;
         "ldesign-progress": HTMLLdesignProgressElement;
         "ldesign-radio": HTMLLdesignRadioElement;
@@ -7899,6 +8339,7 @@ declare global {
         "ldesign-tour": HTMLLdesignTourElement;
         "ldesign-transfer": HTMLLdesignTransferElement;
         "ldesign-tree": HTMLLdesignTreeElement;
+        "ldesign-tree-select": HTMLLdesignTreeSelectElement;
         "ldesign-upload": HTMLLdesignUploadElement;
         "ldesign-virtual-list": HTMLLdesignVirtualListElement;
         "ldesign-watermark": HTMLLdesignWatermarkElement;
@@ -8094,6 +8535,76 @@ declare namespace LocalJSX {
           * 链接标题
          */
         "title": string;
+    }
+    /**
+     * AutoComplete 自动完成组件
+     * 用于输入建议、搜索框等场景
+     */
+    interface LdesignAutoComplete {
+        /**
+          * 是否允许清空
+         */
+        "clearable"?: boolean;
+        /**
+          * 防抖延迟（毫秒）
+         */
+        "debounceTime"?: number;
+        /**
+          * 是否禁用
+         */
+        "disabled"?: boolean;
+        /**
+          * 是否开启本地过滤
+         */
+        "filterOption"?: boolean;
+        /**
+          * 是否高亮匹配文本
+         */
+        "highlightMatch"?: boolean;
+        /**
+          * 最大显示选项数
+         */
+        "maxOptions"?: number;
+        /**
+          * 失焦事件
+         */
+        "onLdesignBlur"?: (event: LdesignAutoCompleteCustomEvent<void>) => void;
+        /**
+          * 清空事件
+         */
+        "onLdesignClear"?: (event: LdesignAutoCompleteCustomEvent<void>) => void;
+        /**
+          * 焦点事件
+         */
+        "onLdesignFocus"?: (event: LdesignAutoCompleteCustomEvent<void>) => void;
+        /**
+          * 输入变化事件
+         */
+        "onLdesignInput"?: (event: LdesignAutoCompleteCustomEvent<string>) => void;
+        /**
+          * 搜索事件（用于远程搜索）
+         */
+        "onLdesignSearch"?: (event: LdesignAutoCompleteCustomEvent<string>) => void;
+        /**
+          * 选择事件
+         */
+        "onLdesignSelect"?: (event: LdesignAutoCompleteCustomEvent<AutoCompleteOption>) => void;
+        /**
+          * 选项数据
+         */
+        "options"?: AutoCompleteOption[];
+        /**
+          * 占位符
+         */
+        "placeholder"?: string;
+        /**
+          * 尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        /**
+          * 输入值
+         */
+        "value"?: string;
     }
     /**
      * Avatar 头像
@@ -10055,6 +10566,10 @@ declare namespace LocalJSX {
          */
         "layout"?: 'horizontal' | 'vertical' | 'inline';
         /**
+          * 字段值变化事件
+         */
+        "onLdesignFieldChange"?: (event: LdesignFormCustomEvent<{ name: string; value: any; values: Record<string, any> }>) => void;
+        /**
           * 表单重置事件
          */
         "onLdesignReset"?: (event: LdesignFormCustomEvent<void>) => void;
@@ -10095,6 +10610,24 @@ declare namespace LocalJSX {
           * 是否必填
          */
         "required"?: boolean;
+    }
+    /**
+     * FormList 动态表单列表
+     * 用于动态添加/删除表单项
+     */
+    interface LdesignFormList {
+        /**
+          * 初始数量
+         */
+        "initialCount"?: number;
+        /**
+          * 最大数量
+         */
+        "maxCount"?: number;
+        /**
+          * 字段名
+         */
+        "name": string;
     }
     /**
      * Grid 容器（grid -> grid-item 用法）
@@ -10738,6 +11271,30 @@ declare namespace LocalJSX {
           * 输入框的值
          */
         "value"?: string;
+    }
+    /**
+     * InputGroup 输入框组合
+     * 用于组合多个输入控件
+     */
+    interface LdesignInputGroup {
+        /**
+          * 紧凑模式（无间隙）
+         */
+        "compact"?: boolean;
+        /**
+          * 自定义类名
+         */
+        "customClass"?: string;
+        /**
+          * 尺寸
+         */
+        "size"?: 'small' | 'medium' | 'large';
+    }
+    /**
+     * InputGroupAddon 输入框前后缀
+     * 用于显示输入框的前后缀内容
+     */
+    interface LdesignInputGroupAddon {
     }
     /**
      * InputNumber 数字输入框
@@ -11459,7 +12016,7 @@ declare namespace LocalJSX {
         /**
           * 响应式变体：根据断点自动切换
          */
-        "variantAt"?: Partial<Record<'xs'|'sm'|'md'|'lg', ModalVariant>>;
+        "variantAt"?: Partial<Record<'xs' | 'sm' | 'md' | 'lg', ModalVariant>>;
         /**
           * 新增：支持虚拟化滚动
          */
@@ -11879,6 +12436,68 @@ declare namespace LocalJSX {
           * 外部受控可见性（仅在 trigger='manual' 时生效）
          */
         "visible"?: boolean;
+    }
+    /**
+     * Popover 气泡卡片
+     * 比 Tooltip 更强大，支持复杂 HTML 内容和交互
+     */
+    interface LdesignPopover {
+        /**
+          * 是否显示箭头
+         */
+        "arrow"?: boolean;
+        /**
+          * 点击外部关闭
+         */
+        "closeOnClickOutside"?: boolean;
+        /**
+          * 内容（简单文本）
+         */
+        "content"?: string;
+        /**
+          * 是否禁用
+         */
+        "disabled"?: boolean;
+        /**
+          * 隐藏延迟（毫秒）
+         */
+        "hideDelay"?: number;
+        /**
+          * 内容区域可交互（hover 触发时是否保持打开）
+         */
+        "interactive"?: boolean;
+        /**
+          * 偏移距离
+         */
+        "offset"?: number;
+        /**
+          * 显示/隐藏变化事件
+         */
+        "onLdesignVisibleChange"?: (event: LdesignPopoverCustomEvent<boolean>) => void;
+        /**
+          * 弹出位置
+         */
+        "placement"?: PopoverPlacement;
+        /**
+          * 显示延迟（毫秒）
+         */
+        "showDelay"?: number;
+        /**
+          * 标题
+         */
+        "title"?: string;
+        /**
+          * 触发方式
+         */
+        "trigger"?: PopoverTrigger;
+        /**
+          * 是否显示
+         */
+        "visible"?: boolean;
+        /**
+          * 宽度
+         */
+        "width"?: number | string;
     }
     /**
      * ldesign-popup（重写版）
@@ -12590,6 +13209,10 @@ declare namespace LocalJSX {
      */
     interface LdesignSelect {
         /**
+          * 是否允许创建新选项
+         */
+        "allowCreate"?: boolean;
+        /**
           * 是否显示箭头（默认不显示）
          */
         "arrow"?: boolean;
@@ -12602,6 +13225,10 @@ declare namespace LocalJSX {
          */
         "closeOnSelect"?: boolean;
         /**
+          * 创建选项文案
+         */
+        "createText"?: string;
+        /**
           * 默认值（非受控）
          */
         "defaultValue"?: string | string[];
@@ -12609,6 +13236,22 @@ declare namespace LocalJSX {
           * 是否禁用
          */
         "disabled"?: boolean;
+        /**
+          * 自定义过滤方法
+         */
+        "filterMethod"?: SelectFilterMethod;
+        /**
+          * 是否可搜索/过滤
+         */
+        "filterable"?: boolean;
+        /**
+          * 是否正在加载
+         */
+        "loading"?: boolean;
+        /**
+          * 加载中文案
+         */
+        "loadingText"?: string;
         /**
           * 列表最大高度（px）
          */
@@ -12622,6 +13265,14 @@ declare namespace LocalJSX {
          */
         "multiple"?: boolean;
         /**
+          * 无数据文案
+         */
+        "noDataText"?: string;
+        /**
+          * 无匹配文案
+         */
+        "noMatchText"?: string;
+        /**
           * 选中变化事件
          */
         "onLdesignChange"?: (event: LdesignSelectCustomEvent<{ value: string | string[] | undefined; options: SelectOption[] }>) => void;
@@ -12629,6 +13280,10 @@ declare namespace LocalJSX {
           * 对外转发可见性变化
          */
         "onLdesignVisibleChange"?: (event: LdesignSelectCustomEvent<boolean>) => void;
+        /**
+          * 自定义选项渲染函数（通过 JS 赋值）
+         */
+        "optionRenderer"?: SelectOptionRenderer;
         /**
           * 选项列表（可传数组或 JSON 字符串）
          */
@@ -12642,6 +13297,18 @@ declare namespace LocalJSX {
          */
         "placement"?: SelectPlacement;
         /**
+          * 是否远程搜索
+         */
+        "remote"?: boolean;
+        /**
+          * 远程搜索防抖时间（ms）
+         */
+        "remoteDebounce"?: number;
+        /**
+          * 远程搜索方法
+         */
+        "remoteMethod"?: SelectRemoteMethod;
+        /**
           * 主题（浅色/深色），透传给 Popup
          */
         "theme"?: 'light' | 'dark';
@@ -12653,6 +13320,14 @@ declare namespace LocalJSX {
           * 值（受控）。单选时为 string，多选时为 string[]
          */
         "value"?: string | string[];
+        /**
+          * 虚拟滚动：每项高度（px）
+         */
+        "virtualItemHeight"?: number;
+        /**
+          * 是否启用虚拟滚动（大数据量）
+         */
+        "virtualScroll"?: boolean;
         /**
           * 外部受控可见性（仅 trigger = 'manual' 生效）
          */
@@ -13195,6 +13870,10 @@ declare namespace LocalJSX {
          */
         "bordered"?: boolean;
         /**
+          * 树形数据子节点字段名
+         */
+        "childrenColumnName"?: string;
+        /**
           * 表格列配置
          */
         "columns"?: TableColumn[] | string;
@@ -13203,9 +13882,17 @@ declare namespace LocalJSX {
          */
         "dataSource"?: any[] | string;
         /**
+          * 是否可编辑表格
+         */
+        "editable"?: boolean;
+        /**
           * 空数据提示文字
          */
         "emptyText"?: string;
+        /**
+          * 展开行配置
+         */
+        "expandable"?: TableExpandable;
         /**
           * 表格高度（启用虚拟滚动时必须指定）
          */
@@ -13215,13 +13902,29 @@ declare namespace LocalJSX {
          */
         "hoverable"?: boolean;
         /**
+          * 树形数据缩进距离（px）
+         */
+        "indentSize"?: number;
+        /**
           * 是否加载中
          */
         "loading"?: boolean;
         /**
+          * 单元格编辑事件
+         */
+        "onLdesignCellEdit"?: (event: LdesignTableCustomEvent<{ row: any; column: TableColumn; value: any }>) => void;
+        /**
+          * 展开行变化事件
+         */
+        "onLdesignExpand"?: (event: LdesignTableCustomEvent<{ expanded: boolean; row: any; expandedKeys: string[] }>) => void;
+        /**
           * 行点击事件
          */
         "onLdesignRowClick"?: (event: LdesignTableCustomEvent<{ row: any; index: number }>) => void;
+        /**
+          * 行选择变化事件
+         */
+        "onLdesignSelectionChange"?: (event: LdesignTableCustomEvent<{ selectedRowKeys: string[]; selectedRows: any[] }>) => void;
         /**
           * 排序变化事件
          */
@@ -13235,6 +13938,10 @@ declare namespace LocalJSX {
          */
         "rowKey"?: string;
         /**
+          * 行选择配置
+         */
+        "rowSelection"?: TableRowSelection;
+        /**
           * 是否显示表头
          */
         "showHeader"?: boolean;
@@ -13246,6 +13953,10 @@ declare namespace LocalJSX {
           * 是否显示斑马纹
          */
         "striped"?: boolean;
+        /**
+          * 是否为树形数据
+         */
+        "treeData"?: boolean;
         /**
           * 是否启用虚拟滚动
          */
@@ -13839,6 +14550,27 @@ declare namespace LocalJSX {
         "value"?: string | string[];
     }
     /**
+     * TreeSelect 树选择
+     * 类似 Select，但支持树形结构数据选择
+     */
+    interface LdesignTreeSelect {
+        "checkable"?: boolean;
+        "clearable"?: boolean;
+        "defaultExpandAll"?: boolean;
+        "disabled"?: boolean;
+        "expandedKeys"?: (string | number)[];
+        "multiple"?: boolean;
+        "onLdesignChange"?: (event: LdesignTreeSelectCustomEvent<any>) => void;
+        "onLdesignClear"?: (event: LdesignTreeSelectCustomEvent<void>) => void;
+        "onLdesignSearch"?: (event: LdesignTreeSelectCustomEvent<string>) => void;
+        "placeholder"?: string;
+        "searchPlaceholder"?: string;
+        "searchable"?: boolean;
+        "size"?: 'small' | 'medium' | 'large';
+        "treeData"?: TreeSelectNode[];
+        "value"?: string | number | (string | number)[];
+    }
+    /**
      * Upload 文件上传组件
      */
     interface LdesignUpload {
@@ -13981,6 +14713,7 @@ declare namespace LocalJSX {
         "ldesign-alert": LdesignAlert;
         "ldesign-anchor": LdesignAnchor;
         "ldesign-anchor-link": LdesignAnchorLink;
+        "ldesign-auto-complete": LdesignAutoComplete;
         "ldesign-avatar": LdesignAvatar;
         "ldesign-avatar-group": LdesignAvatarGroup;
         "ldesign-backtop": LdesignBacktop;
@@ -14011,6 +14744,7 @@ declare namespace LocalJSX {
         "ldesign-empty": LdesignEmpty;
         "ldesign-form": LdesignForm;
         "ldesign-form-item": LdesignFormItem;
+        "ldesign-form-list": LdesignFormList;
         "ldesign-grid": LdesignGrid;
         "ldesign-grid-item": LdesignGridItem;
         "ldesign-icon": LdesignIcon;
@@ -14019,6 +14753,8 @@ declare namespace LocalJSX {
         "ldesign-image-preview": LdesignImagePreview;
         "ldesign-image-viewer": LdesignImageViewer;
         "ldesign-input": LdesignInput;
+        "ldesign-input-group": LdesignInputGroup;
+        "ldesign-input-group-addon": LdesignInputGroupAddon;
         "ldesign-input-number": LdesignInputNumber;
         "ldesign-layout": LdesignLayout;
         "ldesign-layout-content": LdesignLayoutContent;
@@ -14034,6 +14770,7 @@ declare namespace LocalJSX {
         "ldesign-pagination": LdesignPagination;
         "ldesign-picker": LdesignPicker;
         "ldesign-popconfirm": LdesignPopconfirm;
+        "ldesign-popover": LdesignPopover;
         "ldesign-popup": LdesignPopup;
         "ldesign-progress": LdesignProgress;
         "ldesign-radio": LdesignRadio;
@@ -14068,6 +14805,7 @@ declare namespace LocalJSX {
         "ldesign-tour": LdesignTour;
         "ldesign-transfer": LdesignTransfer;
         "ldesign-tree": LdesignTree;
+        "ldesign-tree-select": LdesignTreeSelect;
         "ldesign-upload": LdesignUpload;
         "ldesign-virtual-list": LdesignVirtualList;
         "ldesign-watermark": LdesignWatermark;
@@ -14098,6 +14836,11 @@ declare module "@stencil/core" {
              * AnchorLink 锚点链接
              */
             "ldesign-anchor-link": LocalJSX.LdesignAnchorLink & JSXBase.HTMLAttributes<HTMLLdesignAnchorLinkElement>;
+            /**
+             * AutoComplete 自动完成组件
+             * 用于输入建议、搜索框等场景
+             */
+            "ldesign-auto-complete": LocalJSX.LdesignAutoComplete & JSXBase.HTMLAttributes<HTMLLdesignAutoCompleteElement>;
             /**
              * Avatar 头像
              * - 三种展示形态：图片、图标、文字
@@ -14259,6 +15002,11 @@ declare module "@stencil/core" {
              */
             "ldesign-form-item": LocalJSX.LdesignFormItem & JSXBase.HTMLAttributes<HTMLLdesignFormItemElement>;
             /**
+             * FormList 动态表单列表
+             * 用于动态添加/删除表单项
+             */
+            "ldesign-form-list": LocalJSX.LdesignFormList & JSXBase.HTMLAttributes<HTMLLdesignFormListElement>;
+            /**
              * Grid 容器（grid -> grid-item 用法）
              * - 在内部通过计算为每个 grid-item 设置明确的行/列位置与跨度
              * - 支持设置每行列数与横纵间距
@@ -14315,6 +15063,16 @@ declare module "@stencil/core" {
              * 通过鼠标或键盘输入内容，是最基础的表单域的包装
              */
             "ldesign-input": LocalJSX.LdesignInput & JSXBase.HTMLAttributes<HTMLLdesignInputElement>;
+            /**
+             * InputGroup 输入框组合
+             * 用于组合多个输入控件
+             */
+            "ldesign-input-group": LocalJSX.LdesignInputGroup & JSXBase.HTMLAttributes<HTMLLdesignInputGroupElement>;
+            /**
+             * InputGroupAddon 输入框前后缀
+             * 用于显示输入框的前后缀内容
+             */
+            "ldesign-input-group-addon": LocalJSX.LdesignInputGroupAddon & JSXBase.HTMLAttributes<HTMLLdesignInputGroupAddonElement>;
             /**
              * InputNumber 数字输入框
              * - 支持步进按钮、键盘操作（可关闭）、最小/最大值限制、精度控制
@@ -14394,6 +15152,11 @@ declare module "@stencil/core" {
              * 支持动画、主题、尺寸等特性
              */
             "ldesign-popconfirm": LocalJSX.LdesignPopconfirm & JSXBase.HTMLAttributes<HTMLLdesignPopconfirmElement>;
+            /**
+             * Popover 气泡卡片
+             * 比 Tooltip 更强大，支持复杂 HTML 内容和交互
+             */
+            "ldesign-popover": LocalJSX.LdesignPopover & JSXBase.HTMLAttributes<HTMLLdesignPopoverElement>;
             /**
              * ldesign-popup（重写版）
              * 目标：
@@ -14580,6 +15343,11 @@ declare module "@stencil/core" {
              */
             "ldesign-transfer": LocalJSX.LdesignTransfer & JSXBase.HTMLAttributes<HTMLLdesignTransferElement>;
             "ldesign-tree": LocalJSX.LdesignTree & JSXBase.HTMLAttributes<HTMLLdesignTreeElement>;
+            /**
+             * TreeSelect 树选择
+             * 类似 Select，但支持树形结构数据选择
+             */
+            "ldesign-tree-select": LocalJSX.LdesignTreeSelect & JSXBase.HTMLAttributes<HTMLLdesignTreeSelectElement>;
             /**
              * Upload 文件上传组件
              */

@@ -1,209 +1,170 @@
-# Radio 单选框
+﻿# Radio 单选框
 
 在一组备选项中进行单选。
 
-## 基础用法
+## 何时使用
 
-由于选项默认可见，不宜过多，若选项过多，建议使用 Select 选择器。
+- 用于在多个备选项中选中单个状态。
+- 和 Select 的区别是，Radio 所有选项默认可见，方便用户在比较中选择，因此选项不宜过多。
+
+## 代码演示
+
+### 基础用法
+
+最简单的用法。
 
 <div class="demo-container">
-  <ldesign-radio-group>
-    <ldesign-radio value="1">备选项1</ldesign-radio>
-    <ldesign-radio value="2">备选项2</ldesign-radio>
+  <ldesign-radio-group id="basic-radio">
+    <ldesign-radio value="1">选项1</ldesign-radio>
+    <ldesign-radio value="2">选项2</ldesign-radio>
+    <ldesign-radio value="3">选项3</ldesign-radio>
   </ldesign-radio-group>
 </div>
 
 ```html
-<ldesign-radio-group>
-  <ldesign-radio value="1">备选项1</ldesign-radio>
-  <ldesign-radio value="2">备选项2</ldesign-radio>
+<ldesign-radio-group id="radio-group">
+  <ldesign-radio value="1">选项1</ldesign-radio>
+  <ldesign-radio value="2">选项2</ldesign-radio>
 </ldesign-radio-group>
+
+<script>
+  const group = document.getElementById('radio-group');
+  group.addEventListener('ldesignChange', (e) => {
+    console.log('选中:', e.detail);
+  });
+</script>
 ```
 
-## 禁用状态
+### 禁用状态
 
-单选框不可用的状态。
+单选框不可用。
 
 <div class="demo-container">
-  <ldesign-radio-group>
-    <ldesign-radio value="1" disabled>备选项1</ldesign-radio>
-    <ldesign-radio value="2">备选项2</ldesign-radio>
-  </ldesign-radio-group>
+  <ldesign-radio disabled>禁用</ldesign-radio>
+  <ldesign-radio checked disabled>禁用且选中</ldesign-radio>
 </div>
 
 ```html
-<ldesign-radio-group>
-  <ldesign-radio value="1" disabled>备选项1</ldesign-radio>
-  <ldesign-radio value="2">备选项2</ldesign-radio>
-</ldesign-radio-group>
+<ldesign-radio disabled>禁用</ldesign-radio>
+<ldesign-radio checked disabled>禁用且选中</ldesign-radio>
 ```
 
-## 单选框组
-
-适用于在多个互斥的选项中选择的场景。
-
-<div class="demo-container">
-  <ldesign-radio-group value="shanghai">
-    <ldesign-radio value="shanghai">上海</ldesign-radio>
-    <ldesign-radio value="beijing">北京</ldesign-radio>
-    <ldesign-radio value="guangzhou">广州</ldesign-radio>
-    <ldesign-radio value="shenzhen">深圳</ldesign-radio>
-  </ldesign-radio-group>
-</div>
-
-```html
-<ldesign-radio-group value="shanghai">
-  <ldesign-radio value="shanghai">上海</ldesign-radio>
-  <ldesign-radio value="beijing">北京</ldesign-radio>
-  <ldesign-radio value="guangzhou">广州</ldesign-radio>
-  <ldesign-radio value="shenzhen">深圳</ldesign-radio>
-</ldesign-radio-group>
-```
-
-## 按钮样式
+### 按钮样式
 
 按钮样式的单选组合。
 
 <div class="demo-container">
-  <ldesign-radio-group value="shanghai">
-    <ldesign-radio value="shanghai" button>上海</ldesign-radio>
-    <ldesign-radio value="beijing" button>北京</ldesign-radio>
-    <ldesign-radio value="guangzhou" button>广州</ldesign-radio>
-    <ldesign-radio value="shenzhen" button>深圳</ldesign-radio>
-  </ldesign-radio-group>
-</div>
-
-```html
-<ldesign-radio-group value="shanghai">
-  <ldesign-radio value="shanghai" button>上海</ldesign-radio>
-  <ldesign-radio value="beijing" button>北京</ldesign-radio>
-  <ldesign-radio value="guangzhou" button>广州</ldesign-radio>
-  <ldesign-radio value="shenzhen" button>深圳</ldesign-radio>
-</ldesign-radio-group>
-```
-
-## 带有边框
-
-设置 `border` 属性可以渲染为带有边框的单选框。
-
-<div class="demo-container">
-  <ldesign-radio-group>
-    <ldesign-radio value="1" border>选项1</ldesign-radio>
-    <ldesign-radio value="2" border>选项2</ldesign-radio>
+  <ldesign-radio-group id="button-radio">
+    <ldesign-radio value="1" variant="button">Button 1</ldesign-radio>
+    <ldesign-radio value="2" variant="button">Button 2</ldesign-radio>
+    <ldesign-radio value="3" variant="button">Button 3</ldesign-radio>
   </ldesign-radio-group>
 </div>
 
 ```html
 <ldesign-radio-group>
-  <ldesign-radio value="1" border>选项1</ldesign-radio>
-  <ldesign-radio value="2" border>选项2</ldesign-radio>
+  <ldesign-radio variant="button">Button 1</ldesign-radio>
+  <ldesign-radio variant="button">Button 2</ldesign-radio>
 </ldesign-radio-group>
 ```
 
-## 尺寸
+### 不同尺寸
 
-Radio 的尺寸，仅在 border 为真时有效。
+提供三种尺寸。
 
 <div class="demo-container">
-  <ldesign-radio-group>
-    <ldesign-radio value="1" border size="large">大型</ldesign-radio>
-    <ldesign-radio value="2" border size="medium">中等</ldesign-radio>
-    <ldesign-radio value="3" border size="small">小型</ldesign-radio>
-  </ldesign-radio-group>
+  <ldesign-radio size="small">Small</ldesign-radio>
+  <ldesign-radio size="medium">Medium</ldesign-radio>
+  <ldesign-radio size="large">Large</ldesign-radio>
 </div>
 
 ```html
-<ldesign-radio-group>
-  <ldesign-radio value="1" border size="large">大型</ldesign-radio>
-  <ldesign-radio value="2" border size="medium">中等</ldesign-radio>
-  <ldesign-radio value="3" border size="small">小型</ldesign-radio>
-</ldesign-radio-group>
+<ldesign-radio size="small">Small</ldesign-radio>
+<ldesign-radio size="medium">Medium</ldesign-radio>
+<ldesign-radio size="large">Large</ldesign-radio>
 ```
 
-## 垂直排列
+## 框架集成
 
-设置 `direction="vertical"` 可以让单选框垂直排列。
+### Vue 3
 
-<div class="demo-container">
-  <ldesign-radio-group direction="vertical">
-    <ldesign-radio value="1">备选项1</ldesign-radio>
-    <ldesign-radio value="2">备选项2</ldesign-radio>
-    <ldesign-radio value="3">备选项3</ldesign-radio>
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const value = ref('1');
+
+const handleChange = (e) => {
+  console.log('选中:', e.detail);
+};
+</script>
+
+<template>
+  <ldesign-radio-group 
+    :value="value"
+    @ldesignChange="handleChange"
+  >
+    <ldesign-radio value="1">选项1</ldesign-radio>
+    <ldesign-radio value="2">选项2</ldesign-radio>
+    <ldesign-radio value="3">选项3</ldesign-radio>
   </ldesign-radio-group>
-</div>
+</template>
+```
 
+### React
 
+```tsx
+import { useState } from 'react';
 
-```html
-<ldesign-radio-group direction="vertical">
-  <ldesign-radio value="1">备选项1</ldesign-radio>
-  <ldesign-radio value="2">备选项2</ldesign-radio>
-  <ldesign-radio value="3">备选项3</ldesign-radio>
-</ldesign-radio-group>
+function App() {
+  const [value, setValue] = useState('1');
+  
+  return (
+    <ldesign-radio-group
+      value={value}
+      onLdesignChange={(e) => setValue(e.detail)}
+    >
+      <ldesign-radio value="1">选项1</ldesign-radio>
+      <ldesign-radio value="2">选项2</ldesign-radio>
+      <ldesign-radio value="3">选项3</ldesign-radio>
+    </ldesign-radio-group>
+  );
+}
 ```
 
 ## API
 
-### Radio 属性
+### Radio Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| `value` | `string \| number` | `-` | 单选框的值 |
-| `checked` | `boolean` | `false` | 是否选中 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `border` | `boolean` | `false` | 是否显示边框 |
-| `button` | `boolean` | `false` | 是否为按钮样式 |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | 单选框的尺寸 |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `checked` | 是否选中 | `boolean` | `false` |
+| `value` | 选中状态的值 | `string \| number` | - |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+| `size` | 尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `variant` | 外观变体 | `'default' \| 'button'` | `'default'` |
 
-### RadioGroup 属性
-
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| `value` | `string \| number` | `-` | 绑定值 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | 排列方向 |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | 单选框组尺寸 |
-
-### Radio 事件
+### Radio Events
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|----------|
-| `ldesignChange` | 绑定值变化时触发 | `(event: CustomEvent<string \| number>) => void` |
+| `ldesignChange` | 状态改变时触发 | `(event: CustomEvent<boolean>) => void` |
 
-### RadioGroup 事件
+### RadioGroup Props
+
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `value` | 选中项的值 | `string \| number` | - |
+| `disabled` | 是否禁用 | `boolean` | `false` |
+
+### RadioGroup Events
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|----------|
-| `ldesignChange` | 绑定值变化时触发 | `(event: CustomEvent<string \| number>) => void` |
+| `ldesignChange` | 选中值改变时触发 | `(event: CustomEvent<string \| number>) => void` |
 
-## 无障碍
+## 相关组件
 
-Radio 组件遵循 WAI-ARIA 规范：
-
-- 支持键盘导航（方向键切换选项，Space 键选中）
-- 提供 `aria-checked` 属性表示选中状态
-- 提供 `aria-disabled` 属性表示禁用状态
-- 支持屏幕阅读器
-- 提供适当的焦点管理
-- 单选框组具有 `role="radiogroup"` 属性
-
-## 设计指南
-
-### 何时使用
-
-- 用于在多个互斥的选项中选择一个
-- 当选项少于 7 个时推荐使用
-- 当用户需要看到所有可选项时
-
-### 何时不使用
-
-- 当选项过多时，建议使用 Select 选择器
-- 当需要多选时，使用 Checkbox 复选框
-
-### 最佳实践
-
-- 单选框的标签应该清晰地描述选项
-- 使用单选框组时，应该提供清晰的组标题
-- 默认应该有一个选项被选中
-- 选项的排列应该有逻辑顺序（如按重要性、字母顺序等）
-- 避免使用过多的单选框选项
+- [Checkbox 多选框](./checkbox.md)
+- [Select 选择器](./select.md)
+- [Form 表单](./form.md)

@@ -1,0 +1,218 @@
+// AutoComplete 自动完成组件样式
+:host {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+}
+
+.auto-complete {
+  position: relative;
+  width: 100%;
+
+  &__wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__input {
+    width: 100%;
+    height: var(--ls-input-height-medium, 40px);
+    padding: 0 32px 0 12px;
+    font-size: var(--ldesign-font-size-base, 14px);
+    line-height: 1.5;
+    color: var(--ldesign-text-color, #000000d9);
+    background-color: var(--ldesign-bg-color, #ffffff);
+    border: 1px solid var(--ldesign-border-color, #d9d9d9);
+    border-radius: var(--ls-border-radius-base, 6px);
+    outline: none;
+    transition: all 0.3s;
+
+    &::placeholder {
+      color: var(--ldesign-text-color-placeholder, #00000040);
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--ldesign-brand-color-hover, #7334cb);
+    }
+
+    &:focus {
+      border-color: var(--ldesign-brand-color, #722ED1);
+      box-shadow: 0 0 0 2px rgba(114, 46, 209, 0.1);
+    }
+
+    &:disabled {
+      color: var(--ldesign-text-color-disabled, #00000040);
+      background-color: var(--ldesign-disabled-bg, #f5f5f5);
+      cursor: not-allowed;
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--ldesign-text-color-secondary, #00000073);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s;
+
+    &:hover {
+      color: var(--ldesign-text-color, #000000d9);
+    }
+  }
+
+  &__wrapper:hover &__clear {
+    opacity: 1;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: var(--ldesign-z-index-dropdown, 1050);
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--ldesign-bg-color, #ffffff);
+    border: 1px solid var(--ldesign-border-color, #d9d9d9);
+    border-radius: var(--ls-border-radius-base, 6px);
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    animation: slideDownIn 0.3s ease;
+
+    // 滚动条样式
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  }
+
+  &__options {
+    padding: 4px 0;
+  }
+
+  &__option {
+    padding: 8px 12px;
+    font-size: var(--ldesign-font-size-base, 14px);
+    line-height: 1.5;
+    color: var(--ldesign-text-color, #000000d9);
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover:not(&--disabled) {
+      background-color: var(--ldesign-bg-color-hover, #f5f5f5);
+    }
+
+    &--active {
+      background-color: var(--ldesign-bg-color-active, #e6e6fa);
+      color: var(--ldesign-brand-color, #722ED1);
+    }
+
+    &--disabled {
+      color: var(--ldesign-text-color-disabled, #00000040);
+      cursor: not-allowed;
+    }
+  }
+
+  &__highlight {
+    background-color: rgba(255, 215, 0, 0.3);
+    color: var(--ldesign-warning-color, #faad14);
+    font-weight: 500;
+  }
+
+  &__loading,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--ldesign-text-color-secondary, #00000073);
+    font-size: var(--ldesign-font-size-sm, 12px);
+
+    span {
+      margin-top: 8px;
+    }
+  }
+
+  // 尺寸变体
+  &--small {
+    .auto-complete__input {
+      height: var(--ls-input-height-small, 32px);
+      padding: 0 28px 0 8px;
+      font-size: var(--ldesign-font-size-sm, 12px);
+    }
+
+    .auto-complete__clear {
+      right: 8px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .auto-complete__option {
+      padding: 6px 8px;
+      font-size: var(--ldesign-font-size-sm, 12px);
+    }
+  }
+
+  &--large {
+    .auto-complete__input {
+      height: var(--ls-input-height-large, 48px);
+      padding: 0 36px 0 16px;
+      font-size: var(--ldesign-font-size-lg, 16px);
+    }
+
+    .auto-complete__clear {
+      right: 16px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .auto-complete__option {
+      padding: 10px 16px;
+      font-size: var(--ldesign-font-size-base, 14px);
+    }
+  }
+
+  &--disabled {
+    .auto-complete__clear {
+      display: none;
+    }
+  }
+}
+
+// 下拉动画
+@keyframes slideDownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

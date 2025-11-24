@@ -1,397 +1,354 @@
-# Alert 警告信息
+﻿# Alert 警告提示
 
-用于在页面中展示重要的操作提示或状态说明。支持多种类型、丰富的样式变体、尺寸、动画效果、标题/描述、可关闭与操作区等能力。
+警告提示，展现需要关注的信息。
 
-## 基础用法
+## 何时使用
 
-通过 `type` 指定不同语义：`info`、`success`、`warning`、`error`、`custom`。
+- 当某个页面需要向用户显示警告的信息时。
+- 非浮层的静态展现形式，始终展现，不会自动消失，用户可以点击关闭。
+
+## 代码演示
+
+### 基础用法
+
+最简单的用法，适用于简短的警告提示。
 
 <div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success">Success Text</ldesign-alert>
-    <ldesign-alert type="info">Informational Notes</ldesign-alert>
-    <ldesign-alert type="warning">Warning Text</ldesign-alert>
-    <ldesign-alert type="error">Error Text</ldesign-alert>
-    <ldesign-alert type="custom" color="#7334cb">Custom Color Alert</ldesign-alert>
-  </div>
+  <ldesign-alert type="info" description="这是一条提示信息"></ldesign-alert>
+  <ldesign-alert type="success" description="这是一条成功信息"></ldesign-alert>
+  <ldesign-alert type="warning" description="这是一条警告信息"></ldesign-alert>
+  <ldesign-alert type="error" description="这是一条错误信息"></ldesign-alert>
 </div>
 
 ```html
-<ldesign-alert type="success">Success Text</ldesign-alert>
-<ldesign-alert type="info">Informational Notes</ldesign-alert>
-<ldesign-alert type="warning">Warning Text</ldesign-alert>
-<ldesign-alert type="error">Error Text</ldesign-alert>
-<ldesign-alert type="custom" color="#7334cb">Custom Color Alert</ldesign-alert>
+<ldesign-alert type="info" description="提示信息"></ldesign-alert>
+<ldesign-alert type="success" description="成功信息"></ldesign-alert>
+<ldesign-alert type="warning" description="警告信息"></ldesign-alert>
+<ldesign-alert type="error" description="错误信息"></ldesign-alert>
 ```
 
-## 样式变体
+### 可关闭的警告提示
 
-支持四种样式变体：`light`（默认）、`filled`、`outlined`、`gradient`。
-
-### Light 变体（默认）
+显示关闭按钮，点击可关闭警告提示。
 
 <div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success" variant="light">Light Success Alert</ldesign-alert>
-    <ldesign-alert type="info" variant="light">Light Info Alert</ldesign-alert>
-    <ldesign-alert type="warning" variant="light">Light Warning Alert</ldesign-alert>
-    <ldesign-alert type="error" variant="light">Light Error Alert</ldesign-alert>
-  </div>
-</div>
-
-### Filled 变体
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success" variant="filled">Filled Success Alert</ldesign-alert>
-    <ldesign-alert type="info" variant="filled">Filled Info Alert</ldesign-alert>
-    <ldesign-alert type="warning" variant="filled">Filled Warning Alert</ldesign-alert>
-    <ldesign-alert type="error" variant="filled">Filled Error Alert</ldesign-alert>
-  </div>
+  <ldesign-alert type="info" description="可关闭的提示信息" closable></ldesign-alert>
+  <ldesign-alert type="success" description="可关闭的成功信息" closable></ldesign-alert>
 </div>
 
 ```html
-<ldesign-alert type="success" variant="filled">Filled Success Alert</ldesign-alert>
-```
-
-### Outlined 变体
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success" variant="outlined">Outlined Success Alert</ldesign-alert>
-    <ldesign-alert type="info" variant="outlined">Outlined Info Alert</ldesign-alert>
-    <ldesign-alert type="warning" variant="outlined">Outlined Warning Alert</ldesign-alert>
-    <ldesign-alert type="error" variant="outlined">Outlined Error Alert</ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="warning" variant="outlined">Outlined Warning Alert</ldesign-alert>
-```
-
-### Gradient 变体
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success" variant="gradient">Gradient Success Alert</ldesign-alert>
-    <ldesign-alert type="info" variant="gradient">Gradient Info Alert</ldesign-alert>
-    <ldesign-alert type="warning" variant="gradient">Gradient Warning Alert</ldesign-alert>
-    <ldesign-alert type="error" variant="gradient">Gradient Error Alert</ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" variant="gradient">Gradient Info Alert</ldesign-alert>
-```
-
-## 尺寸
-
-提供三种尺寸：`small`、`medium`（默认）、`large`。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" size="small" alert-title="Small Alert">
-      This is a small size alert with less padding and smaller font.
-    </ldesign-alert>
-    <ldesign-alert type="info" size="medium" alert-title="Medium Alert">
-      This is the default medium size alert.
-    </ldesign-alert>
-    <ldesign-alert type="info" size="large" alert-title="Large Alert">
-      This is a large size alert with more padding and larger font.
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" size="small">Small Size</ldesign-alert>
-<ldesign-alert type="info" size="medium">Medium Size</ldesign-alert>
-<ldesign-alert type="info" size="large">Large Size</ldesign-alert>
-```
-
-## 标题与描述
-
-使用 `alertTitle` 指定标题；描述内容可直接放在默认插槽（或使用 `description` 属性）。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="success" alert-title="Success Tips">Detailed description and advice about successful copywriting.</ldesign-alert>
-    <ldesign-alert type="info" alert-title="Informational Notes">Additional description and information about copywriting.</ldesign-alert>
-    <ldesign-alert type="warning" alert-title="Warning">This is a warning notice about copywriting.</ldesign-alert>
-    <ldesign-alert type="error" alert-title="Error">This is an error message about copywriting.</ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="success" alert-title="Success Tips">Detailed description...</ldesign-alert>
-<ldesign-alert type="info" alert-title="Informational Notes">Additional description...</ldesign-alert>
-<ldesign-alert type="warning" alert-title="Warning">This is a warning notice...</ldesign-alert>
-<ldesign-alert type="error" alert-title="Error">This is an error message...</ldesign-alert>
-```
-
-## 可关闭
-
-设置 `closable` 显示关闭按钮，调用内置过渡将平滑收起。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="error" alert-title="Error Text" closable>
-      Error Description Error Description Error Description Error Description Error Description
-    </ldesign-alert>
-    <ldesign-alert type="error" alert-title="Error Text" closable>
-      Error Description Error Description Error Description Error Description Error Description
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="error" alert-title="Error Text" closable>
-  Error Description Error Description Error Description
+<ldesign-alert 
+  type="info" 
+  description="可关闭的提示" 
+  closable>
 </ldesign-alert>
 ```
 
-## 隐藏图标
+### 含有标题
 
-通过 `showIcon=false` 关闭左侧图标。
+含有标题和辅助性文字介绍的警告提示。
 
 <div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="warning" show-icon="false" alert-title="Warning Text">Warning Text Warning Text Warning Text</ldesign-alert>
-  </div>
+  <ldesign-alert 
+    type="success" 
+    alert-title="成功提示" 
+    description="这是一条带有标题的成功提示信息，包含详细的描述内容。">
+  </ldesign-alert>
+  
+  <ldesign-alert 
+    type="error" 
+    alert-title="错误提示" 
+    description="这是一条带有标题的错误提示信息，请及时处理。"
+    closable>
+  </ldesign-alert>
 </div>
 
 ```html
-<ldesign-alert type="warning" show-icon="false" alert-title="Warning Text">Warning Text...</ldesign-alert>
+<ldesign-alert 
+  type="success" 
+  alert-title="成功提示" 
+  description="详细描述内容">
+</ldesign-alert>
 ```
 
-## 带操作区
+### 不同样式变体
 
-通过 `actions` 插槽放置操作按钮。
+提供 filled、outlined、light、gradient 四种样式变体。
 
 <div class="demo-container">
-  <ldesign-alert type="info" alert-title="Info Text">
-    Info Description Info Description Info Description
+  <ldesign-alert type="info" variant="filled" description="填充样式"></ldesign-alert>
+  <ldesign-alert type="info" variant="outlined" description="描边样式"></ldesign-alert>
+  <ldesign-alert type="info" variant="light" description="浅色样式"></ldesign-alert>
+  <ldesign-alert type="info" variant="gradient" description="渐变样式"></ldesign-alert>
+</div>
+
+```html
+<ldesign-alert variant="filled">填充样式</ldesign-alert>
+<ldesign-alert variant="outlined">描边样式</ldesign-alert>
+<ldesign-alert variant="light">浅色样式</ldesign-alert>
+<ldesign-alert variant="gradient">渐变样式</ldesign-alert>
+```
+
+### 不同尺寸
+
+提供 small、medium、large 三种尺寸。
+
+<div class="demo-container">
+  <ldesign-alert size="small" type="info" description="小尺寸提示"></ldesign-alert>
+  <ldesign-alert size="medium" type="info" description="中尺寸提示"></ldesign-alert>
+  <ldesign-alert size="large" type="info" description="大尺寸提示"></ldesign-alert>
+</div>
+
+```html
+<ldesign-alert size="small">小尺寸</ldesign-alert>
+<ldesign-alert size="medium">中尺寸</ldesign-alert>
+<ldesign-alert size="large">大尺寸</ldesign-alert>
+```
+
+### 带图标
+
+显示图标可以更清晰地表达提示类型。
+
+<div class="demo-container">
+  <ldesign-alert type="info" description="带图标的提示信息" show-icon></ldesign-alert>
+  <ldesign-alert type="success" description="带图标的成功信息" show-icon></ldesign-alert>
+  <ldesign-alert type="warning" description="带图标的警告信息" show-icon></ldesign-alert>
+  <ldesign-alert type="error" description="带图标的错误信息" show-icon></ldesign-alert>
+</div>
+
+```html
+<ldesign-alert type="info" show-icon>
+  带图标的提示
+</ldesign-alert>
+```
+
+### 自定义图标
+
+可以自定义图标。
+
+<div class="demo-container">
+  <ldesign-alert 
+    type="info" 
+    icon-name="heart" 
+    description="自定义图标"
+    show-icon>
+  </ldesign-alert>
+  
+  <ldesign-alert 
+    type="success" 
+    icon-name="star" 
+    description="自定义星星图标"
+    show-icon>
+  </ldesign-alert>
+</div>
+
+```html
+<ldesign-alert 
+  type="info" 
+  icon-name="heart"
+  show-icon>
+  自定义图标
+</ldesign-alert>
+```
+
+### 横幅样式
+
+页面顶部通告形式，带有背景色。
+
+<div class="demo-container">
+  <ldesign-alert 
+    type="warning" 
+    description="系统将在今晚 22:00 进行维护，请提前保存数据。"
+    banner
+    closable>
+  </ldesign-alert>
+</div>
+
+```html
+<ldesign-alert 
+  type="warning" 
+  description="系统维护通知"
+  banner
+  closable>
+</ldesign-alert>
+```
+
+### 带阴影
+
+为警告提示添加阴影效果。
+
+<div class="demo-container">
+  <ldesign-alert 
+    type="info" 
+    description="带阴影的提示信息"
+    shadow>
+  </ldesign-alert>
+</div>
+
+```html
+<ldesign-alert shadow>
+  带阴影效果
+</ldesign-alert>
+```
+
+### 跑马灯效果
+
+当内容过长时，可以使用跑马灯效果。
+
+<div class="demo-container">
+  <ldesign-alert 
+    type="info" 
+    description="这是一条很长很长很长很长很长很长很长很长很长很长的滚动通知信息。"
+    marquee
+    banner>
+  </ldesign-alert>
+</div>
+
+```html
+<ldesign-alert 
+  description="很长的通知内容..."
+  marquee
+  banner>
+</ldesign-alert>
+```
+
+### 自定义操作
+
+通过 slot 可以添加自定义操作按钮。
+
+<div class="demo-container">
+  <ldesign-alert 
+    type="info" 
+    alert-title="提示"
+    description="这是一条带有操作按钮的提示信息">
     <div slot="actions">
-      <ldesign-button type="primary" size="small">Accept</ldesign-button>
-      <ldesign-button size="small">Decline</ldesign-button>
+      <ldesign-button size="small" type="text">查看详情</ldesign-button>
     </div>
   </ldesign-alert>
 </div>
 
 ```html
-<ldesign-alert type="info" alert-title="Info Text">
-  Info Description...
+<ldesign-alert type="info" alert-title="提示">
+  提示内容
+  
   <div slot="actions">
-    <ldesign-button type="primary" size="small">Accept</ldesign-button>
-    <ldesign-button size="small">Decline</ldesign-button>
+    <ldesign-button size="small">操作</ldesign-button>
   </div>
 </ldesign-alert>
 ```
 
-## 轮播公告（Marquee）
+### 自定义内容
 
-用于页面顶部的滚动公告。开启 `marquee` 后会自动无缝滚动，默认向左移动，支持悬停暂停。
-
-### 普通轮播（保留边框）
+使用默认插槽可以自定义内容。
 
 <div class="demo-container">
-  <ldesign-alert type="warning" marquee alert-title="轮播的公告">
-    React components, or just some text. I can be a React component, multiple components, or just some text.
+  <ldesign-alert type="success" show-icon>
+    <strong>成功提示：</strong>
+    <p style="margin: 8px 0 0;">您的操作已成功完成，系统已自动保存。</p>
+    <ul style="margin: 8px 0; padding-left: 20px;">
+      <li>数据已备份</li>
+      <li>相关用户已通知</li>
+      <li>日志已记录</li>
+    </ul>
   </ldesign-alert>
 </div>
 
 ```html
-<ldesign-alert type="warning" marquee alert-title="轮播的公告">
-  这是一条可以循环滚动的公告文本，保留完整边框……
+<ldesign-alert type="success" show-icon>
+  <strong>成功提示：</strong>
+  <p>详细内容...</p>
+  <ul>
+    <li>项目1</li>
+    <li>项目2</li>
+  </ul>
 </ldesign-alert>
 ```
 
-### Banner 轮播（保留边框）
+## 框架集成
 
-<div class="demo-container">
-  <ldesign-alert type="info" banner marquee>
-    📢 这是一条 Banner 模式的轮播公告，现在保留了左右边框。Banner 模式没有圆角，适合全宽展示。
-  </ldesign-alert>
-</div>
+### Vue 3
 
-```html
-<!-- Banner 模式依然保留边框 -->
-<ldesign-alert type="info" banner marquee>
-  Banner 轮播公告内容...
-</ldesign-alert>
+```vue
+<script setup>
+import { ref } from 'vue';
+
+const visible = ref(true);
+
+const handleClose = () => {
+  visible.value = false;
+};
+</script>
+
+<template>
+  <ldesign-alert
+    v-if="visible"
+    type="success"
+    description="可关闭的提示"
+    closable
+    @ldesignClose="handleClose"
+  />
+</template>
 ```
 
-### 可配置项
-- `marqueeSpeed`：滚动速度（px/s），默认 60
-- `marqueePauseOnHover`：悬停是否暂停，默认 true
-- `marqueeDirection`：`left | right`，默认 left
-- `marqueeGap`：两段文本间距（px），默认 24
+### React
 
-## 特殊效果
+```tsx
+import { useState } from 'react';
 
-### 阴影效果
-
-使用 `shadow` 属性添加阴影效果，鼠标悬停时会有浮起效果。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" shadow alert-title="Shadow Alert">
-      This alert has a shadow effect and will elevate on hover.
-    </ldesign-alert>
-    <ldesign-alert type="success" variant="gradient" shadow alert-title="Gradient with Shadow">
-      Combining gradient variant with shadow effect.
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" shadow>Shadow Alert</ldesign-alert>
+function App() {
+  const [visible, setVisible] = useState(true);
+  
+  if (!visible) return null;
+  
+  return (
+    <ldesign-alert
+      type="success"
+      description="可关闭的提示"
+      closable
+      onLdesignClose={() => setVisible(false)}
+    />
+  );
+}
 ```
-
-### 动画效果
-
-默认启用 `animated` 属性，警告会以滑入动画显示。
-
-<div class="demo-container">
-  <ldesign-alert type="success" animated alert-title="Animated Alert">
-    This alert slides in with animation when it appears.
-  </ldesign-alert>
-</div>
-
-```html
-<ldesign-alert type="success" animated>Animated Alert</ldesign-alert>
-```
-
-### 紧凑模式
-
-使用 `compact` 属性减少内边距和间距。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" compact>Compact mode with less padding</ldesign-alert>
-    <ldesign-alert type="warning" compact alert-title="Compact Title">
-      Compact mode is useful when space is limited.
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" compact>Compact Alert</ldesign-alert>
-```
-
-### 自定义图标
-
-使用 `iconName` 属性自定义图标。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" icon-name="star" alert-title="Featured">
-      Alert with custom star icon.
-    </ldesign-alert>
-    <ldesign-alert type="success" icon-name="heart" alert-title="Favorite">
-      Alert with custom heart icon.
-    </ldesign-alert>
-    <ldesign-alert type="custom" color="#ff1493" icon-name="zap" alert-title="Power Alert">
-      Custom colored alert with lightning icon.
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" icon-name="star">Custom Icon Alert</ldesign-alert>
-```
-
-### 自定义边框宽度
-
-使用 `borderWidth` 属性设置边框宽度。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" variant="outlined" border-width="3">
-      Alert with 3px border width
-    </ldesign-alert>
-    <ldesign-alert type="warning" variant="outlined" border-width="4">
-      Alert with 4px border width
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" variant="outlined" border-width="3">Thick Border</ldesign-alert>
-```
-
-### 无圆角
-
-使用 `rounded="false"` 移除圆角。
-
-<div class="demo-container">
-  <div class="demo-row" style="flex-direction:column;align-items:stretch">
-    <ldesign-alert type="info" rounded="false">
-      Alert without rounded corners
-    </ldesign-alert>
-    <ldesign-alert type="error" variant="filled" rounded="false">
-      Filled alert without rounded corners
-    </ldesign-alert>
-  </div>
-</div>
-
-```html
-<ldesign-alert type="info" rounded="false">No Rounded Corners</ldesign-alert>
-```
-
-## 横幅 Banner
-
-在页面顶部显示一条横幅提示，使用 `banner` 属性即可。
-
-<div class="demo-container">
-  <ldesign-alert type="success" banner>Success Tips</ldesign-alert>
-  <ldesign-alert type="info" variant="filled" banner>Important announcement for all users</ldesign-alert>
-</div>
-
-```html
-<ldesign-alert type="success" banner>Success Tips</ldesign-alert>
-<ldesign-alert type="info" variant="filled" banner>Important announcement</ldesign-alert>
-```
-
-## 无障碍
-
-- 组件默认包含 `role="alert"` 与 `aria-live="polite"`，读屏器可以及时播报。
-- 关闭按钮可聚焦，键盘回车可关闭。
 
 ## API
 
-### 属性
+### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|---|---|---|---|
-| `type` | `'info' \| 'success' \| 'warning' \| 'error' \| 'custom'` | `'info'` | 警告类型 |
-| `variant` | `'light' \| 'filled' \| 'outlined' \| 'gradient'` | `'light'` | 样式变体 |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | 尺寸大小 |
-| `alertTitle` | `string` | - | 标题文本 |
-| `description` | `string` | - | 描述文本（也可使用默认 slot） |
-| `closable` | `boolean` | `false` | 是否显示关闭按钮 |
-| `showIcon` | `boolean` | `true` | 是否显示左侧图标 |
-| `iconName` | `string` | - | 自定义图标名称 |
-| `color` | `string` | - | 自定义颜色（仅在 type 为 custom 时生效） |
-| `banner` | `boolean` | `false` | 横幅样式（占据整行、无圆角） |
-| `shadow` | `boolean` | `false` | 是否带有阴影效果 |
-| `animated` | `boolean` | `true` | 是否启用动画效果 |
-| `compact` | `boolean` | `false` | 是否为紧凑模式 |
-| `rounded` | `boolean` | `true` | 是否显示圆角 |
-| `borderWidth` | `number` | `1` | 边框宽度（px） |
-| `marquee` | `boolean` | `false` | 是否启用滚动公告 |
-| `marqueeSpeed` | `number` | `60` | 滚动速度（px/s） |
-| `marqueePauseOnHover` | `boolean` | `true` | 悬停时是否暂停滚动 |
-| `marqueeDirection` | `'left' \| 'right'` | `'left'` | 滚动方向 |
-| `marqueeGap` | `number` | `24` | 两段文本间距（px） |
+| 属性 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| `type` | 警告类型 | `'info' \| 'success' \| 'warning' \| 'error' \| 'custom'` | `'info'` |
+| `variant` | 样式变体 | `'filled' \| 'outlined' \| 'light' \| 'gradient'` | `'light'` |
+| `size` | 尺寸 | `'small' \| 'medium' \| 'large'` | `'medium'` |
+| `alert-title` | 标题 | `string` | - |
+| `description` | 描述内容 | `string` | - |
+| `closable` | 是否可关闭 | `boolean` | `false` |
+| `show-icon` | 是否显示图标 | `boolean` | `true` |
+| `icon-name` | 自定义图标 | `string` | - |
+| `color` | 自定义颜色（type为custom时） | `string` | - |
+| `banner` | 横幅样式 | `boolean` | `false` |
+| `shadow` | 阴影效果 | `boolean` | `false` |
+| `animated` | 动画效果 | `boolean` | `true` |
+| `compact` | 紧凑模式 | `boolean` | `false` |
+| `rounded` | 圆角 | `boolean` | `true` |
+| `marquee` | 跑马灯效果 | `boolean` | `false` |
+| `marquee-speed` | 跑马灯速度(px/s) | `number` | `60` |
+| `marquee-pause-on-hover` | 悬停时暂停 | `boolean` | `true` |
 
-### 方法
-
-| 方法名 | 说明 | 签名 |
-|---|---|---|
-| `close()` | 手动关闭并触发收起动画 | `() => Promise<void>` |
-
-### 事件
+### Events
 
 | 事件名 | 说明 | 回调参数 |
-|---|---|---|
-| `ldesignClose` | 关闭后触发 | `() => void` |
+|--------|------|----------|
+| `ldesignClose` | 关闭时触发 | `() => void` |
+
+### Slots
+
+| 插槽名 | 说明 |
+|--------|------|
+| `default` | 自定义内容 |
+| `actions` | 自定义操作按钮 |
+
+## 相关组件
+
+- [Message 消息提示](./message.md)
+- [Notification 通知](./notification.md)
