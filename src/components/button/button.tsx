@@ -165,6 +165,8 @@ export class LdesignButton {
   private loadingDelayTimer?: ReturnType<typeof setTimeout>;
   private buttonRef?: HTMLButtonElement | HTMLAnchorElement;
   private resources = new ResourceManager();
+  /** 性能优化：缓存上次文本内容，避免重复检查 */
+  private lastTextContent: string = '';
 
   // ==================== Lifecycle ====================
   componentWillLoad() {
@@ -176,11 +178,27 @@ export class LdesignButton {
   componentDidLoad() {
     // 检查是否包含两个中文字符
     this.checkTwoCNChar();
+
+    // 性能优化：使用 MutationObserver 监听内容变化
+    // 只在文本实际变化时重新检查，避免 componentDidUpdate 中的重复计算
+    if (this.el) {
+      this.resources.observeMutation(() => {
+        const currentText = this.el?.textContent?.trim() || '';
+        if (currentText !== this.lastTextContent) {
+          this.lastTextContent = currentText;
+          this.checkTwoCNChar();
+        }
+      }, this.el, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+    }
   }
 
   componentDidUpdate() {
-    // 更新时重新检查
-    this.checkTwoCNChar();
+    // 性能优化：移除此处的检查，由 MutationObserver 负责监听
+    // 避免每次组件更新都执行不必要的检查
   }
 
   disconnectedCallback() {

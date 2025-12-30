@@ -1,5 +1,6 @@
 import { Component, Prop, State, Element, Event, EventEmitter, h, Host, Watch } from '@stencil/core';
 import { createVirtualScroll, VirtualScrollRange } from '../../utils/virtual-scroll';
+import { throttle } from '../../utils';
 
 export interface TableColumn {
   /** 列键值 */
@@ -253,6 +254,7 @@ export class LdesignTable {
 
   /**
    * 初始化虚拟滚动
+   * 性能优化：动态计算缓冲区大小
    */
   private initVirtualScroll(): void {
     if (!this.height) return;
@@ -261,11 +263,15 @@ export class LdesignTable {
       ? this.height
       : parseInt(this.height as string, 10);
 
+    // 性能优化：动态计算最佳缓冲区
+    const visibleRows = Math.ceil(containerHeight / this.rowHeight);
+    const optimalBuffer = Math.max(3, Math.floor(visibleRows * 0.5));
+
     this.virtualScroll = createVirtualScroll({
       total: this.parsedData.length,
       itemHeight: this.rowHeight,
       containerHeight,
-      buffer: 3,
+      buffer: optimalBuffer, // 使用动态缓冲区
       onScroll: (range) => {
         this.visibleRange = range;
       },
@@ -286,14 +292,15 @@ export class LdesignTable {
 
   /**
    * 处理滚动
+   * 性能优化：使用节流减少RAF调用频率，确保60fps
    */
-  private handleScroll = (): void => {
+  private handleScroll = throttle(() => {
     if (this.virtual) {
       requestAnimationFrame(() => {
         this.updateVisibleRange();
       });
     }
-  };
+  }, 16); // 16ms = 60fps 限流
 
   /**
    * 处理排序

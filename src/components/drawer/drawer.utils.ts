@@ -175,53 +175,53 @@ export function unlockContainerScroll(container: HTMLElement): void {
 export function lockPageScroll(): void {
   // 检查是否已经锁定
   const lockCount = parseInt(document.body.getAttribute('data-scroll-lock-count') || '0');
-  
+
   // 增加锁定计数（支持多个 drawer 同时打开）
   document.body.setAttribute('data-scroll-lock-count', (lockCount + 1).toString());
-  
+
   // 如果已经锁定过，不重复处理
   if (lockCount > 0) {
     return;
   }
-  
+
   // 保存当前滚动位置
   const scrollY = window.scrollY || window.pageYOffset;
   const scrollX = window.scrollX || window.pageXOffset;
   document.body.setAttribute('data-scroll-y', scrollY.toString());
   document.body.setAttribute('data-scroll-x', scrollX.toString());
-  
+
   // 计算滚动条宽度（在设置 overflow: hidden 之前）
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-  
+
   // 保存原始样式
   const originalOverflow = window.getComputedStyle(document.body).overflow;
   const originalOverflowX = window.getComputedStyle(document.body).overflowX;
   const originalOverflowY = window.getComputedStyle(document.body).overflowY;
   const originalPaddingRight = window.getComputedStyle(document.body).paddingRight;
   const originalPosition = window.getComputedStyle(document.body).position;
-  
+
   document.body.setAttribute('data-original-overflow', originalOverflow);
   document.body.setAttribute('data-original-overflow-x', originalOverflowX);
   document.body.setAttribute('data-original-overflow-y', originalOverflowY);
   document.body.setAttribute('data-original-padding-right', originalPaddingRight);
   document.body.setAttribute('data-original-position', originalPosition);
   document.body.setAttribute('data-scrollbar-width', scrollbarWidth.toString());
-  
+
   // 锁定滚动 - 先设置 padding，再设置 overflow
   // 这样可以避免瞬间的抖动
   if (scrollbarWidth > 0) {
     const currentPadding = parseInt(originalPaddingRight) || 0;
     document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
-    
+
     // 同时补偿所有 fixed 和 sticky 定位的元素
     compensateFixedElements(scrollbarWidth);
   }
-  
+
   // 然后再设置 overflow
   requestAnimationFrame(() => {
     document.body.style.overflow = 'hidden';
   });
-  
+
   // 移动设备的额外处理：使用 position: fixed 防止滚动突破
   // 仅在 iOS 上使用，因为 overflow:hidden 在 iOS 上不可靠
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -239,40 +239,40 @@ function compensateFixedElements(scrollbarWidth: number): void {
   // 查找所有 fixed 和 sticky 定位的元素
   const allElements = document.querySelectorAll('*');
   const elementsToCompensate: HTMLElement[] = [];
-  
+
   allElements.forEach((el: Element) => {
     const htmlEl = el as HTMLElement;
     const computedStyle = window.getComputedStyle(htmlEl);
     const position = computedStyle.position;
-    
+
     // 补偿 fixed 或 sticky 元素，或者带有 data-fixed-compensate 属性的元素
     if (
-      position === 'fixed' || 
-      position === 'sticky' || 
+      position === 'fixed' ||
+      position === 'sticky' ||
       htmlEl.hasAttribute('data-fixed-compensate')
     ) {
       // 检查元素是否在视口右侧或全宽
       const rect = htmlEl.getBoundingClientRect();
       const isFullWidth = rect.width >= window.innerWidth - 20; // 允许一些容差
       const isRightAligned = rect.right >= window.innerWidth - 20;
-      
+
       if (isFullWidth || isRightAligned) {
         elementsToCompensate.push(htmlEl);
       }
     }
   });
-  
+
   // 应用补偿
   elementsToCompensate.forEach((htmlEl) => {
     const originalPaddingRight = window.getComputedStyle(htmlEl).paddingRight;
     const originalRight = window.getComputedStyle(htmlEl).right;
-    
+
     htmlEl.setAttribute('data-original-padding-right', originalPaddingRight);
     htmlEl.setAttribute('data-original-right', originalRight);
     htmlEl.setAttribute('data-scroll-compensated', 'true');
-    
+
     const currentPadding = parseInt(originalPaddingRight) || 0;
-    
+
     // 如果元素使用了 right 定位，调整 right 值
     if (originalRight !== 'auto' && originalRight !== '0px') {
       const currentRight = parseInt(originalRight) || 0;
@@ -288,20 +288,20 @@ function compensateFixedElements(scrollbarWidth: number): void {
 export function unlockPageScroll(): void {
   // 获取锁定计数
   const lockCount = parseInt(document.body.getAttribute('data-scroll-lock-count') || '0');
-  
+
   if (lockCount <= 0) {
     return;
   }
-  
+
   // 减少锁定计数
   const newLockCount = lockCount - 1;
   document.body.setAttribute('data-scroll-lock-count', newLockCount.toString());
-  
+
   // 如果还有其他 drawer 在显示，不解锁
   if (newLockCount > 0) {
     return;
   }
-  
+
   // 恢复原始样式
   const originalOverflow = document.body.getAttribute('data-original-overflow') || '';
   const originalOverflowX = document.body.getAttribute('data-original-overflow-x') || '';
@@ -310,21 +310,21 @@ export function unlockPageScroll(): void {
   const originalPosition = document.body.getAttribute('data-original-position') || '';
   const scrollY = parseInt(document.body.getAttribute('data-scroll-y') || '0');
   const scrollX = parseInt(document.body.getAttribute('data-scroll-x') || '0');
-  
+
   // 先恢复 overflow，再恢复 padding
   // 这样可以避免瞬间的抖动
   document.body.style.overflow = originalOverflow;
   if (originalOverflowX) document.body.style.overflowX = originalOverflowX;
   if (originalOverflowY) document.body.style.overflowY = originalOverflowY;
-  
+
   // 延迟恢复 padding，让浏览器先渲染出滚动条
   requestAnimationFrame(() => {
     document.body.style.paddingRight = originalPaddingRight;
-    
+
     // 恢复所有被补偿的元素
     restoreFixedElements();
   });
-  
+
   // 移除标记
   document.body.removeAttribute('data-scroll-lock-count');
   document.body.removeAttribute('data-original-overflow');
@@ -335,7 +335,7 @@ export function unlockPageScroll(): void {
   document.body.removeAttribute('data-scroll-y');
   document.body.removeAttribute('data-scroll-x');
   document.body.removeAttribute('data-scrollbar-width');
-  
+
   // iOS 的特殊处理：恢复位置和滚动
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   if (isIOS) {
@@ -351,22 +351,22 @@ export function unlockPageScroll(): void {
 /** 恢复 fixed 和 sticky 元素的原始状态 */
 function restoreFixedElements(): void {
   const compensatedElements = document.querySelectorAll('[data-scroll-compensated="true"]');
-  
+
   compensatedElements.forEach((el: Element) => {
     const htmlEl = el as HTMLElement;
     const originalPaddingRight = htmlEl.getAttribute('data-original-padding-right');
     const originalRight = htmlEl.getAttribute('data-original-right');
-    
+
     if (originalPaddingRight !== null) {
       htmlEl.style.paddingRight = originalPaddingRight;
       htmlEl.removeAttribute('data-original-padding-right');
     }
-    
+
     if (originalRight !== null) {
       htmlEl.style.right = originalRight;
       htmlEl.removeAttribute('data-original-right');
     }
-    
+
     htmlEl.removeAttribute('data-scroll-compensated');
   });
 }
@@ -451,38 +451,13 @@ export function shouldTriggerSwipeClose(
   return progress >= threshold || velocity >= velocityThreshold;
 }
 
-/** 创建防抖函数 */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
+// ============================================================
+// 性能优化：从统一工具库导入，避免重复定义
+// ============================================================
+import { debounce, throttle, generateId } from '../../utils';
 
-  return function (this: any, ...args: Parameters<T>) {
-    if (timeout) clearTimeout(timeout);
-
-    timeout = setTimeout(() => {
-      func.apply(this, args);
-    }, wait);
-  };
-}
-
-/** 创建节流函数 */
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let lastCall = 0;
-
-  return function (this: any, ...args: Parameters<T>) {
-    const now = Date.now();
-
-    if (now - lastCall >= limit) {
-      lastCall = now;
-      func.apply(this, args);
-    }
-  };
-}
+// 删除了 debounce、throttle、generateId 的重复定义
+// 原代码位于 454-468行（debounce）、470-485行（throttle）、635-637行（generateId）
 
 /** 获取焦点捕获元素 */
 export function getFocusableElements(container: HTMLElement): HTMLElement[] {
@@ -631,10 +606,7 @@ function mergeA11yConfig(a: any, b: any): any {
   return { ...a, ...b };
 }
 
-/** 生成唯一ID */
-export function generateId(prefix: string = 'drawer'): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
+
 
 /** 判断是否为移动设备 */
 export function isMobile(): boolean {

@@ -1,4 +1,4 @@
-// ../../node_modules/.pnpm/@vue+shared@3.5.24/node_modules/@vue/shared/dist/shared.esm-bundler.js
+// node_modules/@vue/shared/dist/shared.esm-bundler.js
 function makeMap(str) {
   const map2 = /* @__PURE__ */ Object.create(null);
   for (const key of str.split(",")) map2[key] = 1;
@@ -319,7 +319,7 @@ function normalizeCssVarValue(value) {
   return String(value);
 }
 
-// ../../node_modules/.pnpm/@vue+reactivity@3.5.24/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js
+// node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js
 function warn(msg, ...args) {
   console.warn(`[Vue warn] ${msg}`, ...args);
 }
@@ -2105,7 +2105,7 @@ function traverse(value, depth = Infinity, seen) {
   return value;
 }
 
-// ../../node_modules/.pnpm/@vue+runtime-core@3.5.24/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js
+// node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js
 var stack = [];
 function pushWarningContext(vnode) {
   stack.push(vnode);
@@ -4052,9 +4052,7 @@ Server rendered element contains more child nodes than client vdom.`
         if (clientText[0] === "\n" && (el.tagName === "PRE" || el.tagName === "TEXTAREA")) {
           clientText = clientText.slice(1);
         }
-        const { textContent } = el;
-        if (textContent !== clientText && // innerHTML normalize \r\n or \r into a single \n in the DOM
-        textContent !== clientText.replace(/\r\n|\r/g, "\n")) {
+        if (el.textContent !== clientText) {
           if (!isMismatchAllowed(
             el,
             0
@@ -4064,8 +4062,8 @@ Server rendered element contains more child nodes than client vdom.`
               `Hydration text content mismatch on`,
               el,
               `
-  - rendered on server: ${textContent}
-  - expected on client: ${clientText}`
+  - rendered on server: ${el.textContent}
+  - expected on client: ${vnode.children}`
             );
             logMismatchError();
           }
@@ -4691,10 +4689,7 @@ function defineAsyncComponent(source) {
             error: error.value
           });
         } else if (loadingComponent && !delayed.value) {
-          return createInnerComp(
-            loadingComponent,
-            instance
-          );
+          return createVNode(loadingComponent);
         }
       };
     }
@@ -5262,7 +5257,7 @@ var PublicInstanceProxyHandlers = {
       } else if (hasSetupBinding(setupState, key)) {
         accessCache[key] = 1;
         return setupState[key];
-      } else if (__VUE_OPTIONS_API__ && data !== EMPTY_OBJ && hasOwn(data, key)) {
+      } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
         accessCache[key] = 2;
         return data[key];
       } else if (
@@ -5328,7 +5323,7 @@ var PublicInstanceProxyHandlers = {
     } else if (setupState.__isScriptSetup && hasOwn(setupState, key)) {
       warn$1(`Cannot mutate <script setup> binding "${key}" from Options API.`);
       return false;
-    } else if (__VUE_OPTIONS_API__ && data !== EMPTY_OBJ && hasOwn(data, key)) {
+    } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
       data[key] = value;
       return true;
     } else if (hasOwn(instance.props, key)) {
@@ -5357,7 +5352,7 @@ var PublicInstanceProxyHandlers = {
     _: { data, setupState, accessCache, ctx, appContext, propsOptions, type }
   }, key) {
     let normalizedProps, cssModules;
-    return !!(accessCache[key] || __VUE_OPTIONS_API__ && data !== EMPTY_OBJ && key[0] !== "$" && hasOwn(data, key) || hasSetupBinding(setupState, key) || (normalizedProps = propsOptions[0]) && hasOwn(normalizedProps, key) || hasOwn(ctx, key) || hasOwn(publicPropertiesMap, key) || hasOwn(appContext.config.globalProperties, key) || (cssModules = type.__cssModules) && cssModules[key]);
+    return !!(accessCache[key] || data !== EMPTY_OBJ && key[0] !== "$" && hasOwn(data, key) || hasSetupBinding(setupState, key) || (normalizedProps = propsOptions[0]) && hasOwn(normalizedProps, key) || hasOwn(ctx, key) || hasOwn(publicPropertiesMap, key) || hasOwn(appContext.config.globalProperties, key) || (cssModules = type.__cssModules) && cssModules[key]);
   },
   defineProperty(target, key, descriptor) {
     if (descriptor.get != null) {
@@ -7020,25 +7015,15 @@ function baseCreateRenderer(options, createHydrationFns) {
         optimized
       );
     } else {
-      const customElement = !!(n1.el && n1.el._isVueCE) ? n1.el : null;
-      try {
-        if (customElement) {
-          customElement._beginPatch();
-        }
-        patchElement(
-          n1,
-          n2,
-          parentComponent,
-          parentSuspense,
-          namespace,
-          slotScopeIds,
-          optimized
-        );
-      } finally {
-        if (customElement) {
-          customElement._endPatch();
-        }
-      }
+      patchElement(
+        n1,
+        n2,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
     }
   };
   const mountElement = (vnode, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
@@ -9287,8 +9272,7 @@ function createSuspenseBoundary(vnode, parentSuspense, parentComponent, containe
         pendingId,
         effects,
         parentComponent: parentComponent2,
-        container: container2,
-        isInFallback
+        container: container2
       } = suspense;
       let delayEnter = false;
       if (suspense.isHydrating) {
@@ -9305,9 +9289,6 @@ function createSuspenseBoundary(vnode, parentSuspense, parentComponent, containe
                 0
               );
               queuePostFlushCb(effects);
-              if (isInFallback && vnode2.ssFallback) {
-                vnode2.ssFallback.el = null;
-              }
             }
           };
         }
@@ -9316,9 +9297,6 @@ function createSuspenseBoundary(vnode, parentSuspense, parentComponent, containe
             anchor = next(activeBranch);
           }
           unmount(activeBranch, parentComponent2, suspense, true);
-          if (!delayEnter && isInFallback && vnode2.ssFallback) {
-            vnode2.ssFallback.el = null;
-          }
         }
         if (!delayEnter) {
           move(pendingBranch, container2, anchor, 0);
@@ -9437,7 +9415,6 @@ function createSuspenseBoundary(vnode, parentSuspense, parentComponent, containe
           optimized2
         );
         if (placeholder) {
-          vnode2.placeholder = null;
           remove2(placeholder);
         }
         updateHOCHostEl(instance, vnode2.el);
@@ -10620,7 +10597,7 @@ function isMemoSame(cached, memo) {
   }
   return true;
 }
-var version = "3.5.24";
+var version = "3.5.22";
 var warn2 = true ? warn$1 : NOOP;
 var ErrorTypeStrings = ErrorTypeStrings$1;
 var devtools = true ? devtools$1 : void 0;
@@ -10642,7 +10619,7 @@ var resolveFilter = null;
 var compatUtils = null;
 var DeprecationTypes = null;
 
-// ../../node_modules/.pnpm/@vue+runtime-dom@3.5.24/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js
+// node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js
 var policy = void 0;
 var tt = typeof window !== "undefined" && window.trustedTypes;
 if (tt) {
@@ -11434,9 +11411,6 @@ function shouldSetAsProp(el, key, value, isSVG) {
   if (key === "spellcheck" || key === "draggable" || key === "translate" || key === "autocorrect") {
     return false;
   }
-  if (key === "sandbox" && el.tagName === "IFRAME") {
-    return false;
-  }
   if (key === "form") {
     return false;
   }
@@ -11486,8 +11460,6 @@ var VueElement = class _VueElement extends BaseClass {
     this._nonce = this._def.nonce;
     this._connected = false;
     this._resolved = false;
-    this._patching = false;
-    this._dirty = false;
     this._numberProps = null;
     this._styleChildren = /* @__PURE__ */ new WeakSet();
     this._ob = null;
@@ -11663,7 +11635,7 @@ var VueElement = class _VueElement extends BaseClass {
           return this._getProp(key);
         },
         set(val) {
-          this._setProp(key, val, true, !this._patching);
+          this._setProp(key, val, true, true);
         }
       });
     }
@@ -11689,7 +11661,6 @@ var VueElement = class _VueElement extends BaseClass {
    */
   _setProp(key, val, shouldReflect = true, shouldUpdate = false) {
     if (val !== this._props[key]) {
-      this._dirty = true;
       if (val === REMOVAL) {
         delete this._props[key];
       } else {
@@ -11844,36 +11815,16 @@ var VueElement = class _VueElement extends BaseClass {
     if (this._teleportTargets) {
       roots.push(...this._teleportTargets);
     }
-    const slots = /* @__PURE__ */ new Set();
-    for (const root of roots) {
-      const found = root.querySelectorAll("slot");
-      for (let i = 0; i < found.length; i++) {
-        slots.add(found[i]);
-      }
-    }
-    return Array.from(slots);
+    return roots.reduce((res, i) => {
+      res.push(...Array.from(i.querySelectorAll("slot")));
+      return res;
+    }, []);
   }
   /**
    * @internal
    */
   _injectChildStyle(comp) {
     this._applyStyles(comp.styles, comp);
-  }
-  /**
-   * @internal
-   */
-  _beginPatch() {
-    this._patching = true;
-    this._dirty = false;
-  }
-  /**
-   * @internal
-   */
-  _endPatch() {
-    this._patching = false;
-    if (this._dirty && this._instance) {
-      this._update();
-    }
   }
   /**
    * @internal
@@ -12007,10 +11958,10 @@ var TransitionGroupImpl = decorate({
                 instance
               )
             );
-            positionMap.set(child, {
-              left: child.el.offsetLeft,
-              top: child.el.offsetTop
-            });
+            positionMap.set(
+              child,
+              child.el.getBoundingClientRect()
+            );
           }
         }
       }
@@ -12041,10 +11992,7 @@ function callPendingCbs(c) {
   }
 }
 function recordPosition(c) {
-  newPositionMap.set(c, {
-    left: c.el.offsetLeft,
-    top: c.el.offsetTop
-  });
+  newPositionMap.set(c, c.el.getBoundingClientRect());
 }
 function applyTranslation(c) {
   const oldPos = positionMap.get(c);
@@ -12089,22 +12037,24 @@ function onCompositionEnd(e) {
   }
 }
 var assignKey = Symbol("_assign");
-function castValue(value, trim, number) {
-  if (trim) value = value.trim();
-  if (number) value = looseToNumber(value);
-  return value;
-}
 var vModelText = {
   created(el, { modifiers: { lazy, trim, number } }, vnode) {
     el[assignKey] = getModelAssigner(vnode);
     const castToNumber = number || vnode.props && vnode.props.type === "number";
     addEventListener(el, lazy ? "change" : "input", (e) => {
       if (e.target.composing) return;
-      el[assignKey](castValue(el.value, trim, castToNumber));
+      let domValue = el.value;
+      if (trim) {
+        domValue = domValue.trim();
+      }
+      if (castToNumber) {
+        domValue = looseToNumber(domValue);
+      }
+      el[assignKey](domValue);
     });
-    if (trim || castToNumber) {
+    if (trim) {
       addEventListener(el, "change", () => {
-        el.value = castValue(el.value, trim, castToNumber);
+        el.value = el.value.trim();
       });
     }
     if (!lazy) {
@@ -12527,7 +12477,7 @@ var initDirectivesForSSR = () => {
   }
 };
 
-// ../../node_modules/.pnpm/vue@3.5.24_typescript@5.9.3/node_modules/vue/dist/vue.runtime.esm-bundler.js
+// node_modules/vue/dist/vue.runtime.esm-bundler.js
 function initDev() {
   {
     initCustomFormatter();
@@ -12719,37 +12669,37 @@ export {
 
 @vue/shared/dist/shared.esm-bundler.js:
   (**
-  * @vue/shared v3.5.24
+  * @vue/shared v3.5.22
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
   **)
 
 @vue/reactivity/dist/reactivity.esm-bundler.js:
   (**
-  * @vue/reactivity v3.5.24
+  * @vue/reactivity v3.5.22
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
   **)
 
 @vue/runtime-core/dist/runtime-core.esm-bundler.js:
   (**
-  * @vue/runtime-core v3.5.24
+  * @vue/runtime-core v3.5.22
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
   **)
 
 @vue/runtime-dom/dist/runtime-dom.esm-bundler.js:
   (**
-  * @vue/runtime-dom v3.5.24
+  * @vue/runtime-dom v3.5.22
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
   **)
 
 vue/dist/vue.runtime.esm-bundler.js:
   (**
-  * vue v3.5.24
+  * vue v3.5.22
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
   **)
 */
-//# sourceMappingURL=chunk-LI6JXYPQ.js.map
+//# sourceMappingURL=chunk-QAXAIFA7.js.map

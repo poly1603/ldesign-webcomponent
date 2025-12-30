@@ -86,6 +86,7 @@ export { LdesignResult } from './result/result';
 // New Feedback Components
 export { LdesignSkeleton } from './skeleton/skeleton';
 export { LdesignSpin } from './spin/spin';
+export { LdesignErrorBoundary } from './error-boundary/error-boundary';
 
 // New Layout Components
 export { LdesignCard } from './card/card';
